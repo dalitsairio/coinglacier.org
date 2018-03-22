@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<!--
+This is a skeleton html file that you can use to get you started on each new
+HTML project
+
+Name: Your Name Here
+Class: CIS 3303
+Section: x
+-->
+<html>
+
+<head>
+    <meta charset="UTF-8">
+
+    <link rel="stylesheet" href="../node_modules/mocha/mocha.css" inline>
+    <script src="../node_modules/mocha/mocha.js" inline></script>
+
+    <script src="http://code.jquery.com/jquery-latest.min.js"></script>
+
+
+
+<title>My Title</title>
+</head>
+
+<body>
+
+<div id="temporary"></div>
+
+
+
+<div id="mocha"></div>
+
+
+<script src="js/bundle.js" inline></script>
+<script>
+        var mnemonic = bundle.initiateHDWallet();
+
+        html_output = "<h1>" + mnemonic + "</h1>";
+
+        var div_tag = document.getElementById('temporary');
+
+        var x = {
+            non_segwit_mainnet: bundle.createP2PKHaddresses(0, bundle.p2pkhAddressTypes.p2pkh, bundle.networks.bitcoin),
+            non_segwit_testnet: bundle.createP2PKHaddresses(3, bundle.p2pkhAddressTypes.p2pkh, bundle.networks.testnet),
+            p2sh_p2wpkh_mainnet: bundle.createP2PKHaddresses(1, bundle.p2pkhAddressTypes.p2sh_p2wpkh, bundle.networks.bitcoin),
+            p2sh_p2wpkh_testnet: bundle.createP2PKHaddresses(2, bundle.p2pkhAddressTypes.p2sh_p2wpkh, bundle.networks.testnet),
+            bech32_mainnet: bundle.createP2PKHaddresses(-1, bundle.p2pkhAddressTypes.bech32, bundle.networks.bitcoin),
+            bech32_testnet: bundle.createP2PKHaddresses(0, bundle.p2pkhAddressTypes.bech32, bundle.networks.testnet)
+        }
+
+
+        jQuery.each(x, function(i, dataset){
+            jQuery.each(dataset, function(index, data){
+                html_output += "<h2>" + i + "</h2><table>";
+
+                jQuery.each(data, function(inner_index, inner_data){
+                    html_output += "<tr><td><b>" + inner_index + "</b></td><td>" + inner_data + "</td></tr>";
+                });
+
+                html_output += "</table>";
+            });
+        });
+
+        div_tag.innerHTML = html_output;
+</script>
+
+
+
+
+</body>
+</html>
