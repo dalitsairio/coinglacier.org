@@ -1,7 +1,9 @@
 # coinglacier.org
 JavaScript Client-Side Bitcoin HD-Wallet Generator
 
-Coinglacier.org enables the creation of Bitcoin addresses and their corresponding private keys conveniently generated in a web browser. Further convenience is brought by hierarchic deterministic key derivation from 12 words (called "mnemonic") following BIPXXXXXX.
+> Coinglacier.org enables the creation of Bitcoin addresses and their corresponding
+> private keys conveniently generated in a web browser. Further convenience is brought
+> by the use of hierarchic deterministic key derivation from 12 words following BIP39.
 
 The coinglacier.org project provides an all-in-one HTML document with embedded
 JavaScript/Css/Images. The JavaScript is readable not minified and contains no
@@ -9,64 +11,100 @@ XMLHttpRequest's (no AJAX). The benefit of this technique is you can load the
 JavaScript locally and trust that the JavaScript did not change after being 
 loaded. 
 
-Here is a link to the BitcoinTalk.org forum topic discussing this project:
-XXXXXX https://bitcointalk.org/index.php?topic=43496.0
+Here is a link to the BitcoinTalk.org forum topic discussing this project:<br />
+**XXXXXX https://bitcointalk.org/index.php?topic=43496.0**
 
+Please send DONATIONS for this project to Bitcoin Address:<br />
+**XXXXXX (Bitcoin Address here)**
 
-Please send DONATIONS for this project to Bitcoin Address: 
-XXXXXX (Bitcoin Address here)
+# Installation
+## End Users
 
-The project supports the following Bitcoin standards:
- - BIPXX - HD Wallets
- - BIPXX - SegWit
+*Only use this application on a secure computer that has not been compromised.*
 
-## Installation
-### End Users
-
-Only use this application on a secure computer that has not been compromised.
-
+Download the git repository
+```sh
 git clone https://github.com/dalitsairio/coinglacier.org.git
 cd coinglacier.org
-
-Verify Source Code Authenticity
+```
+### Verify authenticity of the source code
 If you do this procedure for the first time on this machine, add our GPG key to your Public Key ring
+```sh
 wget XXXXXXhttp://www.bitaddress.org/ninja_bitaddress.org.txt
 gpg --import XXXXXXninja_bitaddress.org.txt
+```
 
-Verify that the file was actually produced by us and has not been tampered with:
+Verify that the file was actually produced by us and has not been tampered with
+```sh
 gpg --verify coinglacier.org*.html.asc
+```
+### Use the coinglacier app
+Open the HTML file in a trustworthy browser on a trustworthy machine.<br />
+*If you want to print out the keys, make sure the printer does not store or transmit any data you send to it.*
 
-
-Open the HTML file in your trustworthy browser.
-
-If you want to print out the keys, make sure the printer does not store the data in any way.
-
-
-
-### Developers
+## Developers
 
 Install git, NodeJS and NPM
+```sh
 apt install git nodejs-legacy npm
+```
 
-Install gulp 4 globally
+Install Gulp 4 globally
+```sh
 npm install -g gulpjs/gulp.git#4.0
+```
 
 Download coinglacier.org
+```sh
 git clone https://github.com/dalitsairio/coinglacier.org.git
 cd coinglacier.org
+```
 
 Install dependencies
+```sh
 npm install --only=dev
-
-For developing run gulp watchers.
-Bugfixes:
+```
+### Development
+During development, run gulp watchers.
+```sh
+gulp
+```
+### Build finished releases
+Bugfix releases
+```sh
 gulp build
-backwards compatible releases:
+```
+Backwards compatible releases
+```sh
 gulp build-minor
-backwards incompatible releases:
+```
+Backwards incompatible releases:
+```sh
 gulp build-major
+```
+# Supported Bitcoin Standards
+| BIP | Description |
+| ------ | ------ |
+| BIP38 | [Wallet Encryption][BIP38] |
+| BIP32 | [Hierarchical Deterministic Wallets][BIP32] |
+| BIP39 | [Mnemonic Phrase][BIP39] |
+| BIP44 | [Derivation Paths][BIP44] |
+| BIP49 | [P2SH SegWit Paths][BIP49] |
+| BIP84 | [Native SegWit Paths][BIP84] |
+| BIP141 | [Segregated Witness][BIP141] |
+| BIP173 | [Bech32 Addresses][BIP173] |
+
+   [BIP38]: <https://github.com/bitcoin/bips/blob/master/bip-0038.mediawiki>
+   [BIP32]: <https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki>
+   [BIP39]: <https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki>
+   [BIP44]: <https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki>
+   [BIP49]: <https://github.com/bitcoin/bips/blob/master/bip-0049.mediawiki>
+   [BIP84]: <https://github.com/bitcoin/bips/blob/master/bip-0084.mediawiki>
+   [BIP141]: <https://github.com/bitcoin/bips/blob/master/bip-0141.mediawiki>
+   [BIP173]: <https://github.com/bitcoin/bips/blob/master/bip-0173.mediawiki>
 
 
+# To be done ....
 --------------- onwards is just a copy from bitaddress.org -------------------------- 
 
 END USER NOTES:
