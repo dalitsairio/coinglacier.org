@@ -103,9 +103,6 @@ function createP2PKHaddresses (amount, addressType, targetNetwork) {
     }
 
     return addresses;
-
-    //todo testen ob richtige addressen erstellt werden (passender PrivKey?).
-    //todo testen mnemonic rauskopieren und schauen ob gleiches Resultat.
 }
 
 module.exports = {
