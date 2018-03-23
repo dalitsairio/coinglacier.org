@@ -66,7 +66,7 @@ gulp.task('browser-sync', function () {
 // //////////////////////////////////////////////////
 
 gulp.task('html', function () {
-    gulp.src('src/**/*.html')
+    return gulp.src('src/**/*.html')
         .pipe(reload({stream:true}));
 });
 
@@ -77,9 +77,11 @@ gulp.task('html', function () {
 
 gulp.task('watch', function () {
     gulp.watch(['src/js/**/*.js', '!src/js/**/bundle.js', 'test/**/*.js'], gulp.parallel('javascript', 'tests'));
-    gulp.watch('src/**/*.html', gulp.parallel('html'));
 });
 
+gulp.task('watch-html', function () {
+    gulp.watch('src/**/*.html', gulp.parallel('html'));
+});
 
 // //////////////////////////////////////////////////
 // Unit Tests Task
@@ -95,7 +97,7 @@ gulp.task('tests', function () {
 // Default Task
 // //////////////////////////////////////////////////
 
-gulp.task('default', gulp.parallel('tests', 'javascript', 'browser-sync', 'watch'));
+gulp.task('default', gulp.parallel('tests', 'javascript', 'browser-sync', 'watch', 'watch-html'));
 
 
 // //////////////////////////////////////////////////
