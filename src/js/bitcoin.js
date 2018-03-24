@@ -36,11 +36,13 @@ function initiateHDWallet (loadMnemonic) {
     return mnemonic;
 }
 
-function createP2PKHaddresses (amount, addressType, targetNetwork) {
+// if you want 2 accounts with 3 addresses each:
+// accounts = [3, 3];
+function createP2PKHaddresses (accounts, addressType, targetNetwork) {
 
     // by default return one address
-    if(amount === undefined || amount < 1) {
-        amount = 1;
+    if(accounts === undefined || accounts.constructor !== Array) {
+        accounts = [1];
     }
 
     // set P2SH-P2WPKH as standard address type
@@ -59,50 +61,64 @@ function createP2PKHaddresses (amount, addressType, targetNetwork) {
         mainnetORtestnet = 1;
     }
 
-    var addresses = [];
-    var privKey;
+    var result = [];
 
-    // calculate address
-    for(var index = 0; index < amount; index++) {
-        switch (addressType) {
-            case p2pkhAddressTypes.p2pkh:
-                // PrivKey / BIP44 / Bitcoin | Testnet / Account / External / First Address
-                var derivationPath = "m/44'/" + mainnetORtestnet + "'/0'/0/" + index;
-                privKey = root.derivePath(derivationPath);
-                privKey.keyPair.network = targetNetwork;
-                addresses.push({privateKey: privKey.keyPair.toWIF(), address: privKey.getAddress()});
-                break;
-            case p2pkhAddressTypes.p2sh_p2wpkh:
-                // PrivKey / BIP49 / Bitcoin | Testnet / Account / External / First Address
-                var derivationPath = "m/49'/" + mainnetORtestnet + "'/0'/0/" + index;
-                privKey = root.derivePath(derivationPath);
-                privKey.keyPair.network = targetNetwork;
-                var pubKey = privKey.getPublicKeyBuffer();
-                var redeemScript = bitcoin.script.witnessPubKeyHash.output.encode(bitcoin.crypto.hash160(pubKey));
-                var scriptPubKey = bitcoin.script.scriptHash.output.encode(bitcoin.crypto.hash160(redeemScript));
-                addresses.push({
-                    privateKey: privKey.keyPair.toWIF(),
-                    address: bitcoin.address.fromOutputScript(scriptPubKey, targetNetwork)
-                });
-                break;
-            case p2pkhAddressTypes.bech32:
-                // PrivKey / BIP84 / Bitcoin | Testnet / Account / External / First Address
-                var derivationPath = "m/84'/" + mainnetORtestnet + "'/0'/0/" + index;
-                privKey = root.derivePath(derivationPath);
-                privKey.keyPair.network = targetNetwork;
-                var pubKey = privKey.getPublicKeyBuffer();
-                var scriptPubKey = bitcoin.script.witnessPubKeyHash.output.encode(bitcoin.crypto.hash160(pubKey));
-                addresses.push({
-                    privateKey: privKey.keyPair.toWIF(),
-                    address: bitcoin.address.fromOutputScript(scriptPubKey, targetNetwork)
-                });
-                break;
-            default:
-                throw ("\"" + addressType + "\" is not a valid address type");
+    // calculate addresses
+    for(var accIndex = 0; accIndex < accounts.length; accIndex++) {
+        var amount = accounts[accIndex];
+        for (var index = 0; index < amount; index++) {
+            switch (addressType) {
+                case p2pkhAddressTypes.p2pkh:
+                    if(result[accIndex] === undefined || result[accIndex].constructor !== Array){
+                        result[accIndex] = [];
+                    }
+
+                    // PrivKey / BIP44 / Bitcoin | Testnet / Account / External / First Address
+                    var derivationPath = "m/44'/" + mainnetORtestnet + "'/" + accIndex + "'/0/" + index;
+                    var bip32 = root.derivePath(derivationPath);
+                    bip32.keyPair.network = targetNetwork;
+                    result[accIndex].push({privateKey: bip32.keyPair.toWIF(), address: bip32.getAddress()});
+                    break;
+                case p2pkhAddressTypes.p2sh_p2wpkh:
+                    if(result[accIndex] === undefined || result[accIndex].constructor !== Array){
+                        result[accIndex] = [];
+                    }
+
+                    // PrivKey / BIP49 / Bitcoin | Testnet / Account / External / First Address
+                    var derivationPath = "m/49'/" + mainnetORtestnet + "'/" + accIndex + "'/0/" + index;
+                    var bip32 = root.derivePath(derivationPath);
+                    bip32.keyPair.network = targetNetwork;
+                    var pubKey = bip32.getPublicKeyBuffer();
+                    var redeemScript = bitcoin.script.witnessPubKeyHash.output.encode(bitcoin.crypto.hash160(pubKey));
+                    var scriptPubKey = bitcoin.script.scriptHash.output.encode(bitcoin.crypto.hash160(redeemScript));
+                    result[accIndex].push({
+                        privateKey: bip32.keyPair.toWIF(),
+                        address: bitcoin.address.fromOutputScript(scriptPubKey, targetNetwork)
+                    });
+                    break;
+                case p2pkhAddressTypes.bech32:
+                    if(result[accIndex] === undefined || result[accIndex].constructor !== Array){
+                        result[accIndex] = [];
+                    }
+
+                    // PrivKey / BIP84 / Bitcoin | Testnet / Account / External / First Address
+                    var derivationPath = "m/84'/" + mainnetORtestnet + "'/" + accIndex + "'/0/" + index;
+                    var bip32 = root.derivePath(derivationPath);
+                    bip32.keyPair.network = targetNetwork;
+                    var pubKey = bip32.getPublicKeyBuffer();
+                    var scriptPubKey = bitcoin.script.witnessPubKeyHash.output.encode(bitcoin.crypto.hash160(pubKey));
+                    result[accIndex].push({
+                        privateKey: bip32.keyPair.toWIF(),
+                        address: bitcoin.address.fromOutputScript(scriptPubKey, targetNetwork)
+                    });
+                    break;
+                default:
+                    throw ("\"" + addressType + "\" is not a valid address type");
+            }
         }
     }
 
-    return addresses;
+    return result;
 }
 
 module.exports = {

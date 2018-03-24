@@ -36,8 +36,8 @@ function bitcoinJStests() {
                 // load testing mnemonic
                 bitcoin.initiateHDWallet(testing_mnemonic);
 
-                var credentials = bitcoin.createP2PKHaddresses(1, p2pkhAddressTypes.p2pkh, bitcoinjs.networks.bitcoin)
-                var address = credentials[0]['address'];
+                var credentials = bitcoin.createP2PKHaddresses([1], p2pkhAddressTypes.p2pkh, bitcoinjs.networks.bitcoin);
+                var address = credentials[0][0]['address'];
                 assert.equal(address, '16C6UYcvPuiY4nHMbdSFAXgB2QEyxjr8Jx');
             });
 
@@ -45,8 +45,8 @@ function bitcoinJStests() {
                 // load testing mnemonic
                 bitcoin.initiateHDWallet(testing_mnemonic);
 
-                var credentials = bitcoin.createP2PKHaddresses(1, p2pkhAddressTypes.p2pkh, bitcoinjs.networks.bitcoin)
-                var privateKey = credentials[0]['privateKey'];
+                var credentials = bitcoin.createP2PKHaddresses([1], p2pkhAddressTypes.p2pkh, bitcoinjs.networks.bitcoin);
+                var privateKey = credentials[0][0]['privateKey'];
                 assert.equal(privateKey, 'L2THPE6rBFZBqe1qsXAZvjHwNe1UP3PCePPLsdCv9WxpoeQuXsAd');
             });
 
@@ -56,11 +56,16 @@ function bitcoinJStests() {
                 bitcoin.initiateHDWallet(testing_mnemonic);
                 var amount = 3;
                 var addresses = [];
-                var credentials = bitcoin.createP2PKHaddresses(amount, p2pkhAddressTypes.p2pkh, bitcoinjs.networks.testnet)
+                var credentials = bitcoin.createP2PKHaddresses([amount], p2pkhAddressTypes.p2pkh, bitcoinjs.networks.testnet)
                 for (var x = 0; x < amount; x++) {
-                    addresses[x] = credentials[x]['address'];
+                    addresses[x] = credentials[0][x]['address'];
                 }
-                assert.deepEqual(addresses, ['mopKVYnyG1MXViEtsWSrmCRvfdBh87JEDC', 'n3Efkt9APhTRZS37oP7BQvj4ngjZTmZvEh', 'n4MbxG5MjgJ7KhFgb5639vWA2AbvRBbGmw']);
+                assert.deepEqual(addresses,
+                    [
+                        'mopKVYnyG1MXViEtsWSrmCRvfdBh87JEDC',
+                        'n3Efkt9APhTRZS37oP7BQvj4ngjZTmZvEh',
+                        'n4MbxG5MjgJ7KhFgb5639vWA2AbvRBbGmw'
+                    ]);
             });
 
             it('2 non-Segwit privKeys [testnet]', function () {
@@ -68,19 +73,23 @@ function bitcoinJStests() {
                 bitcoin.initiateHDWallet(testing_mnemonic);
                 var amount = 2;
                 var privKeys = [];
-                var credentials = bitcoin.createP2PKHaddresses(amount, p2pkhAddressTypes.p2pkh, bitcoinjs.networks.testnet)
+                var credentials = bitcoin.createP2PKHaddresses([amount], p2pkhAddressTypes.p2pkh, bitcoinjs.networks.testnet)
                 for (var x = 0; x < amount; x++) {
-                    privKeys[x] = credentials[x]['privateKey'];
+                    privKeys[x] = credentials[0][x]['privateKey'];
                 }
-                assert.deepEqual(privKeys, ['cPbsmCBdoz9FkvoYQxcM7neaZXKhXDQpWcZRUJZPtjTttWRKFvTQ', 'cT9PJkpvFxZZe4CUf8kxZKHuwD6KDwue9qZtyvhPAJuYwLR8oyA6']);
+                assert.deepEqual(privKeys,
+                    [
+                        'cPbsmCBdoz9FkvoYQxcM7neaZXKhXDQpWcZRUJZPtjTttWRKFvTQ',
+                        'cT9PJkpvFxZZe4CUf8kxZKHuwD6KDwue9qZtyvhPAJuYwLR8oyA6'
+                    ]);
             });
 
             it('P2SH-P2WPKH address [mainnet]', function () {
                 // load testing mnemonic
                 bitcoin.initiateHDWallet(testing_mnemonic);
 
-                var credentials = bitcoin.createP2PKHaddresses(1, p2pkhAddressTypes.p2sh_p2wpkh, bitcoinjs.networks.bitcoin)
-                var address = credentials[0]['address'];
+                var credentials = bitcoin.createP2PKHaddresses([1], p2pkhAddressTypes.p2sh_p2wpkh, bitcoinjs.networks.bitcoin)
+                var address = credentials[0][0]['address'];
                 assert.equal(address, '31uAoP3hMQ2rehKnfEFTMJC4tADveRzx6K');
             });
 
@@ -88,8 +97,8 @@ function bitcoinJStests() {
                 // load testing mnemonic
                 bitcoin.initiateHDWallet(testing_mnemonic);
 
-                var credentials = bitcoin.createP2PKHaddresses(1, p2pkhAddressTypes.p2sh_p2wpkh, bitcoinjs.networks.bitcoin)
-                var privateKey = credentials[0]['privateKey'];
+                var credentials = bitcoin.createP2PKHaddresses([1], p2pkhAddressTypes.p2sh_p2wpkh, bitcoinjs.networks.bitcoin)
+                var privateKey = credentials[0][0]['privateKey'];
                 assert.equal(privateKey, 'KxxQTCfkZgBBQYRBJTJr41avZJdQ1fHb7gc1Q1poGvSBdJtUeaR7');
             });
 
@@ -97,8 +106,8 @@ function bitcoinJStests() {
                 // load testing mnemonic
                 bitcoin.initiateHDWallet(testing_mnemonic);
 
-                var credentials = bitcoin.createP2PKHaddresses(1, p2pkhAddressTypes.p2sh_p2wpkh, bitcoinjs.networks.testnet)
-                var address = credentials[0]['address'];
+                var credentials = bitcoin.createP2PKHaddresses([1], p2pkhAddressTypes.p2sh_p2wpkh, bitcoinjs.networks.testnet)
+                var address = credentials[0][0]['address'];
                 assert.equal(address, '2N7oVd4Xq9TfpCWaVHhFNCPQbi4buiLdpyi');
             });
 
@@ -106,8 +115,8 @@ function bitcoinJStests() {
                 // load testing mnemonic
                 bitcoin.initiateHDWallet(testing_mnemonic);
 
-                var credentials = bitcoin.createP2PKHaddresses(1, p2pkhAddressTypes.p2sh_p2wpkh, bitcoinjs.networks.testnet)
-                var privateKey = credentials[0]['privateKey'];
+                var credentials = bitcoin.createP2PKHaddresses([1], p2pkhAddressTypes.p2sh_p2wpkh, bitcoinjs.networks.testnet)
+                var privateKey = credentials[0][0]['privateKey'];
                 assert.equal(privateKey, 'cRsGmgKfnAueMA2DJzT29dvMx4cLJ4gMbTK8CRahP4orPeD15caX');
             });
 
@@ -115,8 +124,8 @@ function bitcoinJStests() {
                 // load testing mnemonic
                 bitcoin.initiateHDWallet(testing_mnemonic);
 
-                var credentials = bitcoin.createP2PKHaddresses(1, p2pkhAddressTypes.bech32, bitcoinjs.networks.bitcoin)
-                var address = credentials[0]['address'];
+                var credentials = bitcoin.createP2PKHaddresses([1], p2pkhAddressTypes.bech32, bitcoinjs.networks.bitcoin)
+                var address = credentials[0][0]['address'];
                 assert.equal(address, 'bc1qk6rjegtxrvp7ty2tzd4uj88n33vnc3vqn90ps9');
             });
 
@@ -124,8 +133,8 @@ function bitcoinJStests() {
                 // load testing mnemonic
                 bitcoin.initiateHDWallet(testing_mnemonic);
 
-                var credentials = bitcoin.createP2PKHaddresses(1, p2pkhAddressTypes.bech32, bitcoinjs.networks.bitcoin)
-                var privateKey = credentials[0]['privateKey'];
+                var credentials = bitcoin.createP2PKHaddresses([1], p2pkhAddressTypes.bech32, bitcoinjs.networks.bitcoin)
+                var privateKey = credentials[0][0]['privateKey'];
                 assert.equal(privateKey, 'Kzkuno5MDgVcs841HW5HWnSFmZ4xBEjzxNN2FnTv6k7cWMkzkvrc');
             });
 
@@ -133,8 +142,8 @@ function bitcoinJStests() {
                 // load testing mnemonic
                 bitcoin.initiateHDWallet(testing_mnemonic);
 
-                var credentials = bitcoin.createP2PKHaddresses(1, p2pkhAddressTypes.bech32, bitcoinjs.networks.testnet)
-                var address = credentials[0]['address'];
+                var credentials = bitcoin.createP2PKHaddresses([1], p2pkhAddressTypes.bech32, bitcoinjs.networks.testnet)
+                var address = credentials[0][0]['address'];
                 assert.equal(address, 'tb1qc45lcycj4upms5v0hzdnhnyq4s09xe7jnsdhtz');
             });
 
@@ -142,9 +151,36 @@ function bitcoinJStests() {
                 // load testing mnemonic
                 bitcoin.initiateHDWallet(testing_mnemonic);
 
-                var credentials = bitcoin.createP2PKHaddresses(1, p2pkhAddressTypes.bech32, bitcoinjs.networks.testnet)
-                var privateKey = credentials[0]['privateKey'];
+                var credentials = bitcoin.createP2PKHaddresses([1], p2pkhAddressTypes.bech32, bitcoinjs.networks.testnet)
+                var privateKey = credentials[0][0]['privateKey'];
                 assert.equal(privateKey, 'cSoNGp1yv5yJFsUNKJck5TRufjVZ6aCRUu8tQB6X9o8eNa4ZVP1R');
+            });
+
+            it('2 accounts with 3 addresses each', function () {
+                var amountAccounts = 2;
+                var amountAddresses = 3;
+
+                // load testing mnemonic
+                bitcoin.initiateHDWallet(testing_mnemonic);
+
+                var credentials = bitcoin.createP2PKHaddresses([3, 3], p2pkhAddressTypes.bech32, bitcoinjs.networks.testnet)
+                var addresses = [];
+
+                for(var accounts = 0; accounts < amountAccounts; accounts++) {
+                    for (var x = 0; x < amountAddresses; x++) {
+                        addresses.push(credentials[accounts][x]['address']);
+                    }
+                }
+
+                assert.deepEqual(addresses,
+                    [
+                        'tb1qc45lcycj4upms5v0hzdnhnyq4s09xe7jnsdhtz',
+                        'tb1q2cn8tv0uf3gcl7y3jj4eflddeyk3l3sqm29h2s',
+                        'tb1q47ef5s9eyfcyrn5hnsm0p6cdnrld7mvsfjrccm',
+                        'tb1qhgaflwwuxauaz7d8lp937nh9kkegatc4pjuq2a',
+                        'tb1qgds0hznpnfg33nytttaaea6x54yjk6jg60530q',
+                        'tb1qxkhq30zjdfx6xvw55d2pql638pzx4lm044npug'
+                    ]);
             });
         });
     });
