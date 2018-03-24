@@ -11,10 +11,23 @@ function bitcoinJStests() {
         this.timeout(10000); // all tests may take up to 10 seconds
         this.slow(3000); // a test is considered slow if it takes more than 3 seconds to completes
 
-        it('Initiating HD Wallet returns 12 words', function () {
-            var mnemonic = bitcoin.initiateHDWallet();
-            var mnemonic_array = mnemonic.split(' ');
-            assert.equal(mnemonic_array.length, 12);
+        describe('Initiating HD wallet', function () {
+            it('Return new 12 word mnemonic', function () {
+                var mnemonic = bitcoin.initiateHDWallet();
+                var mnemonic_array = mnemonic.split(' ');
+                assert.equal(mnemonic_array.length, 12);
+            });
+
+            it('Return given 12 word mnemonic', function () {
+                var mnemonic = bitcoin.initiateHDWallet(testing_mnemonic);
+                assert.equal(mnemonic, testing_mnemonic);
+            });
+
+            // it('Returns extended public key', function () {
+            //     var xpub = bitcoin.initiateHDWallet().xpub;
+            //     assert.equal(xpub.substring(0, 4), 'xpub');
+            // });
+
         });
 
         describe('Retrieve from mnemonic', function () {
