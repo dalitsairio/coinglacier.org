@@ -15,23 +15,25 @@ function initiateHDWallet (loadMnemonic) {
     // create a new mnemonic and return it
     if(loadMnemonic === undefined) {
         mnemonic = bip39.generateMnemonic();
-        //var mnemonic = 'praise you muffin lion enable neck grocery crumble super myself license ghost'
 
-        var seed = bip39.mnemonicToSeed(mnemonic);
-        root = bitcoin.HDNode.fromSeedBuffer(seed);
-
-        return mnemonic;
-
-    // import a given mnemonic
+        // import a given mnemonic
     }else{
         if(bip39.validateMnemonic(loadMnemonic)) {
             mnemonic = loadMnemonic;
-            var seed = bip39.mnemonicToSeed(mnemonic);
-            root = bitcoin.HDNode.fromSeedBuffer(seed);
         }else{
             throw ('given mnemonic [' + loadMnemonic + '] is not a valid 12 word mnemonic');
         }
     }
+
+    var seed = bip39.mnemonicToSeed(mnemonic);
+    root = bitcoin.HDNode.fromSeedBuffer(seed);
+
+    // todo this must be put into the function createP2PKHaddresses
+    // var derivationPath = "m/44'/0'/0'";
+    // var account0 = root.derivePath(derivationPath);
+    // xpub = account0.neutered().toBase58();
+
+    return mnemonic;
 }
 
 function createP2PKHaddresses (amount, addressType, targetNetwork) {
@@ -56,8 +58,6 @@ function createP2PKHaddresses (amount, addressType, targetNetwork) {
     if(targetNetwork === bitcoin.networks.testnet){
         mainnetORtestnet = 1;
     }
-
-    // var keyPair = bitcoin.ECPair.fromWIF('cSNUsrVpzTCYNRV6FBncTveoSxYeCLSPsZNicyCu3zmiWqg1vWoV', bitcoin.networks.testnet)
 
     var addresses = [];
     var privKey;
