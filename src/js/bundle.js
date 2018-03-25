@@ -43474,15 +43474,9 @@ const tests = require('../../test/bitcoinTest');
 mocha.setup('bdd');
 tests.bitcoinJStests();
 mocha.run();
-},{"../../test/bitcoinTest":167,"./bitcoin":166}],166:[function(require,module,exports){
-var bip39 = require('bip39');
-var bitcoin = require('bitcoinjs-lib');
-
-var p2pkhAddressTypes = {
-    p2pkh: 0,       // non-segwit                                      // address begins with 1
-    p2sh_p2wpkh: 1, // backwards compatible segwit (wrapped in a P2SH) // address begins with 3
-    bech32: 2,      // native segwit                                   // address begins with bc1
-}
+},{"../../test/bitcoinTest":168,"./bitcoin":166}],166:[function(require,module,exports){
+const bip39 = require('bip39');
+const bitcoinjs = require('./bitcoinjs-lib_patched').bitcoinjs;
 
 var mnemonic;
 var root;
@@ -43503,38 +43497,30 @@ function initiateHDWallet (loadMnemonic) {
     }
 
     var seed = bip39.mnemonicToSeed(mnemonic);
-    root = bitcoin.HDNode.fromSeedBuffer(seed);
-
-    // todo this must be put into the function createP2PKHaddresses
-    // var derivationPath = "m/44'/0'/0'";
-    // var account0 = root.derivePath(derivationPath);
-    // xpub = account0.neutered().toBase58();
+    root = bitcoinjs.HDNode.fromSeedBuffer(seed);
 
     return mnemonic;
 }
 
 // if you want 2 accounts with 3 addresses each:
 // accounts = [3, 3];
-function createP2PKHaddresses (accounts, addressType, targetNetwork) {
+function createP2PKHaddresses (accounts, targetNetwork) {
 
     // by default return one address
     if(accounts === undefined || accounts.constructor !== Array) {
         accounts = [1];
     }
 
-    // set P2SH-P2WPKH as standard address type
-    if(addressType === undefined) {
-        addressType = p2pkhAddressTypes.p2sh_p2wpkh;
-    }
-
-    // set MAINNET as standard network
+    // set MAINNET P2SH-P2WPKH as standard network
     if(targetNetwork === undefined) {
-        targetNetwork = bitcoin.networks.bitcoin;
+        targetNetwork = bitcoinjs.networks.bitcoin.p2wpkhInP2sh;
     }
 
     // https://github.com/satoshilabs/slips/blob/master/slip-0044.md
     var mainnetORtestnet = 0;
-    if(targetNetwork === bitcoin.networks.testnet){
+    if(targetNetwork === bitcoinjs.networks.testnet ||
+        targetNetwork === bitcoinjs.networks.testnet.p2wpkhInP2sh ||
+        targetNetwork === bitcoinjs.networks.testnet.p2wpkh){
         mainnetORtestnet = 1;
     }
 
@@ -43543,54 +43529,81 @@ function createP2PKHaddresses (accounts, addressType, targetNetwork) {
     // calculate addresses
     for(var accIndex = 0; accIndex < accounts.length; accIndex++) {
         var amount = accounts[accIndex];
+
+        result[accIndex] = [];
+        result[accIndex]['credentials'] = [];
+        var accountPath;
+
+        // get extended public key of each account
+        switch (targetNetwork) {
+            case bitcoinjs.networks.bitcoin:
+            case bitcoinjs.networks.testnet:
+
+                // PrivKey / BIP44 / Bitcoin | Testnet / Account
+                accountPath = "m/44'/" + mainnetORtestnet + "'/" + accIndex + "'";
+
+                break;
+            case bitcoinjs.networks.bitcoin.p2wpkhInP2sh:
+            case bitcoinjs.networks.testnet.p2wpkhInP2sh:
+
+                // PrivKey / BIP49 / Bitcoin | Testnet / Account
+                accountPath = "m/49'/" + mainnetORtestnet + "'/" + accIndex + "'";
+
+                break;
+            case bitcoinjs.networks.bitcoin.p2wpkh:
+            case bitcoinjs.networks.testnet.p2wpkh:
+
+                // PrivKey / BIP84 / Bitcoin | Testnet / Account
+                accountPath = "m/84'/" + mainnetORtestnet + "'/" + accIndex + "'";
+
+                break;
+            default:
+                throw ("given network is not a valid network");
+        }
+
+        var account =  root.derivePath(accountPath);
+        account.keyPair.network = targetNetwork;
+        result[accIndex]['xpub'] = account.neutered().toBase58();
+
         for (var index = 0; index < amount; index++) {
-            switch (addressType) {
-                case p2pkhAddressTypes.p2pkh:
-                    if(result[accIndex] === undefined || result[accIndex].constructor !== Array){
-                        result[accIndex] = [];
-                    }
 
-                    // PrivKey / BIP44 / Bitcoin | Testnet / Account / External / First Address
-                    var derivationPath = "m/44'/" + mainnetORtestnet + "'/" + accIndex + "'/0/" + index;
-                    var bip32 = root.derivePath(derivationPath);
-                    bip32.keyPair.network = targetNetwork;
-                    result[accIndex].push({privateKey: bip32.keyPair.toWIF(), address: bip32.getAddress()});
+            // PrivKey / BIP44 | BIP49 | BIP84 / Bitcoin | Testnet / Account / External / First Address
+            var addressPath = "0/" + index;
+            var bip32 = account.derivePath(addressPath);
+
+            bip32.keyPair.network = targetNetwork;
+
+            switch (targetNetwork) {
+                case bitcoinjs.networks.bitcoin:
+                case bitcoinjs.networks.testnet:
+
+                    result[accIndex]['credentials'].push({privateKey: bip32.keyPair.toWIF(), address: bip32.getAddress()});
                     break;
-                case p2pkhAddressTypes.p2sh_p2wpkh:
-                    if(result[accIndex] === undefined || result[accIndex].constructor !== Array){
-                        result[accIndex] = [];
-                    }
+                case bitcoinjs.networks.bitcoin.p2wpkhInP2sh:
+                case bitcoinjs.networks.testnet.p2wpkhInP2sh:
 
-                    // PrivKey / BIP49 / Bitcoin | Testnet / Account / External / First Address
-                    var derivationPath = "m/49'/" + mainnetORtestnet + "'/" + accIndex + "'/0/" + index;
-                    var bip32 = root.derivePath(derivationPath);
-                    bip32.keyPair.network = targetNetwork;
                     var pubKey = bip32.getPublicKeyBuffer();
-                    var redeemScript = bitcoin.script.witnessPubKeyHash.output.encode(bitcoin.crypto.hash160(pubKey));
-                    var scriptPubKey = bitcoin.script.scriptHash.output.encode(bitcoin.crypto.hash160(redeemScript));
-                    result[accIndex].push({
+                    var redeemScript = bitcoinjs.script.witnessPubKeyHash.output.encode(bitcoinjs.crypto.hash160(pubKey));
+                    var scriptPubKey = bitcoinjs.script.scriptHash.output.encode(bitcoinjs.crypto.hash160(redeemScript));
+
+                    result[accIndex]['credentials'].push({
                         privateKey: bip32.keyPair.toWIF(),
-                        address: bitcoin.address.fromOutputScript(scriptPubKey, targetNetwork)
+                        address: bitcoinjs.address.fromOutputScript(scriptPubKey, targetNetwork)
                     });
                     break;
-                case p2pkhAddressTypes.bech32:
-                    if(result[accIndex] === undefined || result[accIndex].constructor !== Array){
-                        result[accIndex] = [];
-                    }
+                case bitcoinjs.networks.bitcoin.p2wpkh:
+                case bitcoinjs.networks.testnet.p2wpkh:
 
-                    // PrivKey / BIP84 / Bitcoin | Testnet / Account / External / First Address
-                    var derivationPath = "m/84'/" + mainnetORtestnet + "'/" + accIndex + "'/0/" + index;
-                    var bip32 = root.derivePath(derivationPath);
-                    bip32.keyPair.network = targetNetwork;
                     var pubKey = bip32.getPublicKeyBuffer();
-                    var scriptPubKey = bitcoin.script.witnessPubKeyHash.output.encode(bitcoin.crypto.hash160(pubKey));
-                    result[accIndex].push({
+                    var scriptPubKey = bitcoinjs.script.witnessPubKeyHash.output.encode(bitcoinjs.crypto.hash160(pubKey));
+
+                    result[accIndex]['credentials'].push({
                         privateKey: bip32.keyPair.toWIF(),
-                        address: bitcoin.address.fromOutputScript(scriptPubKey, targetNetwork)
+                        address: bitcoinjs.address.fromOutputScript(scriptPubKey, targetNetwork)
                     });
                     break;
                 default:
-                    throw ("\"" + addressType + "\" is not a valid address type");
+                    throw ("given network is not a valid network");
             }
         }
     }
@@ -43601,20 +43614,97 @@ function createP2PKHaddresses (accounts, addressType, targetNetwork) {
 module.exports = {
     initiateHDWallet,
     createP2PKHaddresses,
-    p2pkhAddressTypes,
-    networks: bitcoin.networks
+    networks: bitcoinjs.networks
 }
 
-},{"bip39":10,"bitcoinjs-lib":30}],167:[function(require,module,exports){
-const bitcoinjs = require('bitcoinjs-lib');
+},{"./bitcoinjs-lib_patched":167,"bip39":10}],167:[function(require,module,exports){
+var bitcoinjs = require('bitcoinjs-lib');
+
+// extensions copied from https://github.com/iancoleman/bip39/blob/master/src/js/segwit-parameters.js
+(function() {
+
+// p2wpkh
+
+bitcoinjs.networks.bitcoin.p2wpkh = {
+    baseNetwork: "bitcoin",
+    messagePrefix: '\x18Bitcoin Signed Message:\n',
+    bech32: 'bc',
+    bip32: {
+        public: 0x04b24746,
+        private: 0x04b2430c
+    },
+    pubKeyHash: 0x00,
+    scriptHash: 0x05,
+    wif: 0x80
+};
+
+bitcoinjs.networks.testnet.p2wpkh = {
+    baseNetwork: "testnet",
+    messagePrefix: '\x18Bitcoin Signed Message:\n',
+    bech32: 'tb',
+    bip32: {
+        public: 0x045f1cf6,
+        private: 0x045f18bc
+    },
+    pubKeyHash: 0x6f,
+    scriptHash: 0xc4,
+    wif: 0xef
+};
+
+// p2wpkh in p2sh
+
+bitcoinjs.networks.bitcoin.p2wpkhInP2sh = {
+    baseNetwork: "bitcoin",
+    messagePrefix: '\x18Bitcoin Signed Message:\n',
+    bech32: 'bc',
+    bip32: {
+        public: 0x049d7cb2,
+        private: 0x049d7878
+    },
+    pubKeyHash: 0x00,
+    scriptHash: 0x05,
+    wif: 0x80
+};
+
+bitcoinjs.networks.testnet.p2wpkhInP2sh = {
+    baseNetwork: "testnet",
+    messagePrefix: '\x18Bitcoin Signed Message:\n',
+    bech32: 'tb',
+    bip32: {
+        public: 0x044a5262,
+        private: 0x044a4e28
+    },
+    pubKeyHash: 0x6f,
+    scriptHash: 0xc4,
+    wif: 0xef
+};
+
+bitcoinjs.networks.litecoin.p2wpkhInP2sh = {
+    baseNetwork: "litecoin",
+    messagePrefix: '\x19Litecoin Signed Message:\n',
+    bip32: {
+        public: 0x01b26ef6,
+        private: 0x01b26792
+    },
+    pubKeyHash: 0x30,
+    scriptHash: 0x32,
+    wif: 0xb0
+};
+
+})();
+
+module.exports = {
+    bitcoinjs
+}
+
+},{"bitcoinjs-lib":30}],168:[function(require,module,exports){
 const assert = require('chai').assert;
 const bitcoin = require('../src/js/bitcoin');
-const p2pkhAddressTypes = bitcoin.p2pkhAddressTypes;
 
 const testing_mnemonic = 'curve swear maze domain knock frozen ordinary climb love possible brave market';
 
 function bitcoinJStests() {
-    describe('BitcoinJS', function () {
+    describe('bitcoin', function () {
 
         this.timeout(10000); // all tests may take up to 10 seconds
         this.slow(3000); // a test is considered slow if it takes more than 3 seconds to completes
@@ -43631,10 +43721,83 @@ function bitcoinJStests() {
                 assert.equal(mnemonic, testing_mnemonic);
             });
 
-            // it('Returns extended public key', function () {
-            //     var xpub = bitcoin.initiateHDWallet().xpub;
-            //     assert.equal(xpub.substring(0, 4), 'xpub');
-            // });
+        });
+
+        // see https://github.com/spesmilo/electrum-docs/blob/0821640adeda072fec1ee4ccfe74a0e47803f4cb/xpub_version_bytes.rst
+        describe('Extended public key', function () {
+            describe('New mnemonic', function () {
+                it('Returns xpub', function () {
+                    bitcoin.initiateHDWallet();
+                    var credentials = bitcoin.createP2PKHaddresses([1], bitcoin.networks.bitcoin);
+                    var xpub = credentials[0]['xpub'];
+
+                    assert.equal(xpub.substring(0, 4), 'xpub');
+                });
+                it('Returns ypub', function () {
+                    bitcoin.initiateHDWallet();
+                    var credentials = bitcoin.createP2PKHaddresses([1], bitcoin.networks.bitcoin.p2wpkhInP2sh);
+                    var ypub = credentials[0]['xpub'];
+
+                    assert.equal(ypub.substring(0, 4), 'ypub');
+                });
+                it('Returns zpub', function () {
+                    bitcoin.initiateHDWallet();
+                    var credentials = bitcoin.createP2PKHaddresses([1], bitcoin.networks.bitcoin.p2wpkh);
+                    var zpub = credentials[0]['xpub'];
+
+                    assert.equal(zpub.substring(0, 4), 'zpub');
+                });
+                it('Returns tpub', function () {
+                    bitcoin.initiateHDWallet();
+                    var credentials = bitcoin.createP2PKHaddresses([1], bitcoin.networks.testnet);
+                    var tpub = credentials[0]['xpub'];
+
+                    assert.equal(tpub.substring(0, 4), 'tpub');
+                });
+                it('Returns upub', function () {
+                    bitcoin.initiateHDWallet();
+                    var credentials = bitcoin.createP2PKHaddresses([1], bitcoin.networks.testnet.p2wpkhInP2sh);
+                    var upub = credentials[0]['xpub'];
+
+                    assert.equal(upub.substring(0, 4), 'upub');
+                });
+                it('Returns vpub', function () {
+                    bitcoin.initiateHDWallet();
+                    var credentials = bitcoin.createP2PKHaddresses([1], bitcoin.networks.testnet.p2wpkh);
+                    var vpub = credentials[0]['xpub'];
+
+                    assert.equal(vpub.substring(0, 4), 'vpub');
+                });
+            });
+            describe('Given mnemonic', function () {
+                it('Returns XPUB [Non-Segwit]', function () {
+                    bitcoin.initiateHDWallet(testing_mnemonic);
+                    var credentials = bitcoin.createP2PKHaddresses([1], bitcoin.networks.bitcoin);
+                    var xpub = credentials[0]['xpub'];
+
+                    var expected = 'xpub6BgB4HXnJs3gV9t9r4LB6ZXmwbawUEZSwFcCHZC3K3yEN4Lmtzg8bBSpriKgHJLS9Jufgym9osUAVHvyMYdQ82zMzp3voYFbgfUYvq9XhCD';
+
+                    assert.equal(xpub, expected);
+                });
+                it('Returns YPUB [P2SH-P2WPKH]', function () {
+                    bitcoin.initiateHDWallet(testing_mnemonic);
+                    var credentials = bitcoin.createP2PKHaddresses([1, 1], bitcoin.networks.bitcoin.p2wpkhInP2sh);
+                    var xpub = credentials[0]['xpub'];
+
+                    var expected = 'ypub6Xvc2hTW5ziP5tApCAFBM9JeyuriZ8SQ3GZfpdneEueDmmhUYgbqtzDub34jqwKAEe9YNwgKD7mBpBfbh1g6Mt5b3xtcczuZXNeu5Q5yJp8';
+
+                    assert.equal(xpub, expected);
+                });
+                it('Returns ZPUB [Bech32, 2nd account]', function () {
+                    bitcoin.initiateHDWallet(testing_mnemonic);
+                    var credentials = bitcoin.createP2PKHaddresses([1, 1], bitcoin.networks.bitcoin.p2wpkh);
+                    var xpub = credentials[1]['xpub'];
+
+                    var expected = 'zpub6s7a2Y5RyxmLZLRMD79crfAeXuwXvChc5MRU5WvipdJHZG84Z1en4LGJCmMVLzYYRprAWShdKgcqPjr3kBuDLPj57j2XA44HaREZ4HMfFHw';
+
+                    assert.equal(xpub, expected);
+                });
+            });
 
         });
 
@@ -43644,8 +43807,8 @@ function bitcoinJStests() {
                 // load testing mnemonic
                 bitcoin.initiateHDWallet(testing_mnemonic);
 
-                var credentials = bitcoin.createP2PKHaddresses([1], p2pkhAddressTypes.p2pkh, bitcoinjs.networks.bitcoin);
-                var address = credentials[0][0]['address'];
+                var credentials = bitcoin.createP2PKHaddresses([1], bitcoin.networks.bitcoin);
+                var address = credentials[0]['credentials'][0]['address'];
                 assert.equal(address, '16C6UYcvPuiY4nHMbdSFAXgB2QEyxjr8Jx');
             });
 
@@ -43653,8 +43816,8 @@ function bitcoinJStests() {
                 // load testing mnemonic
                 bitcoin.initiateHDWallet(testing_mnemonic);
 
-                var credentials = bitcoin.createP2PKHaddresses([1], p2pkhAddressTypes.p2pkh, bitcoinjs.networks.bitcoin);
-                var privateKey = credentials[0][0]['privateKey'];
+                var credentials = bitcoin.createP2PKHaddresses([1], bitcoin.networks.bitcoin);
+                var privateKey = credentials[0]['credentials'][0]['privateKey'];
                 assert.equal(privateKey, 'L2THPE6rBFZBqe1qsXAZvjHwNe1UP3PCePPLsdCv9WxpoeQuXsAd');
             });
 
@@ -43664,9 +43827,9 @@ function bitcoinJStests() {
                 bitcoin.initiateHDWallet(testing_mnemonic);
                 var amount = 3;
                 var addresses = [];
-                var credentials = bitcoin.createP2PKHaddresses([amount], p2pkhAddressTypes.p2pkh, bitcoinjs.networks.testnet)
+                var credentials = bitcoin.createP2PKHaddresses([amount], bitcoin.networks.testnet)
                 for (var x = 0; x < amount; x++) {
-                    addresses[x] = credentials[0][x]['address'];
+                    addresses[x] = credentials[0]['credentials'][x]['address'];
                 }
                 assert.deepEqual(addresses,
                     [
@@ -43681,9 +43844,9 @@ function bitcoinJStests() {
                 bitcoin.initiateHDWallet(testing_mnemonic);
                 var amount = 2;
                 var privKeys = [];
-                var credentials = bitcoin.createP2PKHaddresses([amount], p2pkhAddressTypes.p2pkh, bitcoinjs.networks.testnet)
+                var credentials = bitcoin.createP2PKHaddresses([amount], bitcoin.networks.testnet)
                 for (var x = 0; x < amount; x++) {
-                    privKeys[x] = credentials[0][x]['privateKey'];
+                    privKeys[x] = credentials[0]['credentials'][x]['privateKey'];
                 }
                 assert.deepEqual(privKeys,
                     [
@@ -43696,8 +43859,8 @@ function bitcoinJStests() {
                 // load testing mnemonic
                 bitcoin.initiateHDWallet(testing_mnemonic);
 
-                var credentials = bitcoin.createP2PKHaddresses([1], p2pkhAddressTypes.p2sh_p2wpkh, bitcoinjs.networks.bitcoin)
-                var address = credentials[0][0]['address'];
+                var credentials = bitcoin.createP2PKHaddresses([1], bitcoin.networks.bitcoin.p2wpkhInP2sh)
+                var address = credentials[0]['credentials'][0]['address'];
                 assert.equal(address, '31uAoP3hMQ2rehKnfEFTMJC4tADveRzx6K');
             });
 
@@ -43705,8 +43868,8 @@ function bitcoinJStests() {
                 // load testing mnemonic
                 bitcoin.initiateHDWallet(testing_mnemonic);
 
-                var credentials = bitcoin.createP2PKHaddresses([1], p2pkhAddressTypes.p2sh_p2wpkh, bitcoinjs.networks.bitcoin)
-                var privateKey = credentials[0][0]['privateKey'];
+                var credentials = bitcoin.createP2PKHaddresses([1], bitcoin.networks.bitcoin.p2wpkhInP2sh)
+                var privateKey = credentials[0]['credentials'][0]['privateKey'];
                 assert.equal(privateKey, 'KxxQTCfkZgBBQYRBJTJr41avZJdQ1fHb7gc1Q1poGvSBdJtUeaR7');
             });
 
@@ -43714,8 +43877,8 @@ function bitcoinJStests() {
                 // load testing mnemonic
                 bitcoin.initiateHDWallet(testing_mnemonic);
 
-                var credentials = bitcoin.createP2PKHaddresses([1], p2pkhAddressTypes.p2sh_p2wpkh, bitcoinjs.networks.testnet)
-                var address = credentials[0][0]['address'];
+                var credentials = bitcoin.createP2PKHaddresses([1], bitcoin.networks.testnet.p2wpkhInP2sh)
+                var address = credentials[0]['credentials'][0]['address'];
                 assert.equal(address, '2N7oVd4Xq9TfpCWaVHhFNCPQbi4buiLdpyi');
             });
 
@@ -43723,8 +43886,8 @@ function bitcoinJStests() {
                 // load testing mnemonic
                 bitcoin.initiateHDWallet(testing_mnemonic);
 
-                var credentials = bitcoin.createP2PKHaddresses([1], p2pkhAddressTypes.p2sh_p2wpkh, bitcoinjs.networks.testnet)
-                var privateKey = credentials[0][0]['privateKey'];
+                var credentials = bitcoin.createP2PKHaddresses([1], bitcoin.networks.testnet.p2wpkhInP2sh)
+                var privateKey = credentials[0]['credentials'][0]['privateKey'];
                 assert.equal(privateKey, 'cRsGmgKfnAueMA2DJzT29dvMx4cLJ4gMbTK8CRahP4orPeD15caX');
             });
 
@@ -43732,8 +43895,8 @@ function bitcoinJStests() {
                 // load testing mnemonic
                 bitcoin.initiateHDWallet(testing_mnemonic);
 
-                var credentials = bitcoin.createP2PKHaddresses([1], p2pkhAddressTypes.bech32, bitcoinjs.networks.bitcoin)
-                var address = credentials[0][0]['address'];
+                var credentials = bitcoin.createP2PKHaddresses([1], bitcoin.networks.bitcoin.p2wpkh)
+                var address = credentials[0]['credentials'][0]['address'];
                 assert.equal(address, 'bc1qk6rjegtxrvp7ty2tzd4uj88n33vnc3vqn90ps9');
             });
 
@@ -43741,8 +43904,8 @@ function bitcoinJStests() {
                 // load testing mnemonic
                 bitcoin.initiateHDWallet(testing_mnemonic);
 
-                var credentials = bitcoin.createP2PKHaddresses([1], p2pkhAddressTypes.bech32, bitcoinjs.networks.bitcoin)
-                var privateKey = credentials[0][0]['privateKey'];
+                var credentials = bitcoin.createP2PKHaddresses([1], bitcoin.networks.bitcoin.p2wpkh)
+                var privateKey = credentials[0]['credentials'][0]['privateKey'];
                 assert.equal(privateKey, 'Kzkuno5MDgVcs841HW5HWnSFmZ4xBEjzxNN2FnTv6k7cWMkzkvrc');
             });
 
@@ -43750,8 +43913,8 @@ function bitcoinJStests() {
                 // load testing mnemonic
                 bitcoin.initiateHDWallet(testing_mnemonic);
 
-                var credentials = bitcoin.createP2PKHaddresses([1], p2pkhAddressTypes.bech32, bitcoinjs.networks.testnet)
-                var address = credentials[0][0]['address'];
+                var credentials = bitcoin.createP2PKHaddresses([1], bitcoin.networks.testnet.p2wpkh)
+                var address = credentials[0]['credentials'][0]['address'];
                 assert.equal(address, 'tb1qc45lcycj4upms5v0hzdnhnyq4s09xe7jnsdhtz');
             });
 
@@ -43759,8 +43922,8 @@ function bitcoinJStests() {
                 // load testing mnemonic
                 bitcoin.initiateHDWallet(testing_mnemonic);
 
-                var credentials = bitcoin.createP2PKHaddresses([1], p2pkhAddressTypes.bech32, bitcoinjs.networks.testnet)
-                var privateKey = credentials[0][0]['privateKey'];
+                var credentials = bitcoin.createP2PKHaddresses([1], bitcoin.networks.testnet.p2wpkh)
+                var privateKey = credentials[0]['credentials'][0]['privateKey'];
                 assert.equal(privateKey, 'cSoNGp1yv5yJFsUNKJck5TRufjVZ6aCRUu8tQB6X9o8eNa4ZVP1R');
             });
 
@@ -43771,12 +43934,12 @@ function bitcoinJStests() {
                 // load testing mnemonic
                 bitcoin.initiateHDWallet(testing_mnemonic);
 
-                var credentials = bitcoin.createP2PKHaddresses([3, 3], p2pkhAddressTypes.bech32, bitcoinjs.networks.testnet)
+                var credentials = bitcoin.createP2PKHaddresses([3, 3], bitcoin.networks.testnet.p2wpkh)
                 var addresses = [];
 
-                for(var accounts = 0; accounts < amountAccounts; accounts++) {
+                for (var accounts = 0; accounts < amountAccounts; accounts++) {
                     for (var x = 0; x < amountAddresses; x++) {
-                        addresses.push(credentials[accounts][x]['address']);
+                        addresses.push(credentials[accounts]['credentials'][x]['address']);
                     }
                 }
 
@@ -43797,7 +43960,7 @@ function bitcoinJStests() {
 module.exports = {
     bitcoinJStests
 }
-},{"../src/js/bitcoin":166,"bitcoinjs-lib":30,"chai":64}]},{},[165,166])(166)
+},{"../src/js/bitcoin":166,"chai":64}]},{},[165,166])(166)
 });
 
 //# sourceMappingURL=../maps/bundle.js.map
