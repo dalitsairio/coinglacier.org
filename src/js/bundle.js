@@ -43512,9 +43512,7 @@ function createP2PKHaddresses (accounts, targetNetwork) {
     }
 
     // set MAINNET P2SH-P2WPKH as standard network
-    if(targetNetwork === undefined) {
-        targetNetwork = bitcoinjs.networks.bitcoin.p2wpkhInP2sh;
-    }
+    targetNetwork = targetNetwork || bitcoinjs.networks.bitcoin.p2wpkhInP2sh;
 
     var result = [];
 
