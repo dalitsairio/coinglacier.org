@@ -1,5 +1,7 @@
 const bitcoinjs = require('./bitcoinjs-lib_patched').bitcoinjs;
 const bip39 = require('bip39');
+const bip38 = require('bip38');
+const wif = require('wif');
 
 var mnemonic;
 var root;
@@ -27,7 +29,7 @@ function initiateHDWallet (loadMnemonic, password) {
 
 // if you want 2 accounts with 3 addresses each:
 // accounts = [3, 3];
-function createP2PKHaddresses (accounts, targetNetwork) {
+function createP2PKHaddresses (accounts, targetNetwork, password) {
 
     // by default return one address
     if(accounts === undefined || accounts.constructor !== Array) {
@@ -47,7 +49,7 @@ function createP2PKHaddresses (accounts, targetNetwork) {
         account.keyPair.network = targetNetwork;
 
         result[accIndex] = [];
-        result[accIndex]['credentials'] = createAccountCredentials(account, targetNetwork, amount);
+        result[accIndex]['credentials'] = createAccountCredentials(account, targetNetwork, amount, password);
         result[accIndex]['xpub'] = account.neutered().toBase58();
 
     }
@@ -56,7 +58,7 @@ function createP2PKHaddresses (accounts, targetNetwork) {
 }
 
 // creates addresses and privKeys on the level of a BIP32 account
-function createAccountCredentials(account, network, amount){
+function createAccountCredentials(account, network, amount, password){
 
     var credentials = [];
 
@@ -67,11 +69,18 @@ function createAccountCredentials(account, network, amount){
         var bip32 = account.derivePath(addressPath);
         bip32.keyPair.network = network;
 
+        var privateKey = bip32.keyPair.toWIF();
+        if(password){
+            // encrypt the privateKey
+            var decoded = wif.decode(privateKey);
+            privateKey = bip38.encrypt(decoded.privateKey, decoded.compressed, password);
+        }
+
         switch (network) {
             case bitcoinjs.networks.bitcoin:
             case bitcoinjs.networks.testnet:
 
-                credentials.push({privateKey: bip32.keyPair.toWIF(), address: bip32.getAddress()});
+                credentials.push({privateKey: privateKey, address: bip32.getAddress()});
                 break;
             case bitcoinjs.networks.bitcoin.p2wpkhInP2sh:
             case bitcoinjs.networks.testnet.p2wpkhInP2sh:
@@ -81,7 +90,7 @@ function createAccountCredentials(account, network, amount){
                 var scriptPubKey = bitcoinjs.script.scriptHash.output.encode(bitcoinjs.crypto.hash160(redeemScript));
 
                 credentials.push({
-                    privateKey: bip32.keyPair.toWIF(),
+                    privateKey: privateKey,
                     address: bitcoinjs.address.fromOutputScript(scriptPubKey, network)
                 });
                 break;
@@ -92,7 +101,7 @@ function createAccountCredentials(account, network, amount){
                 var scriptPubKey = bitcoinjs.script.witnessPubKeyHash.output.encode(bitcoinjs.crypto.hash160(pubKey));
 
                 credentials.push({
-                    privateKey: bip32.keyPair.toWIF(),
+                    privateKey: privateKey,
                     address: bitcoinjs.address.fromOutputScript(scriptPubKey, network)
                 });
                 break;

@@ -271,6 +271,15 @@ function bitcoinJStests() {
                         'tb1qxkhq30zjdfx6xvw55d2pql638pzx4lm044npug'
                     ]);
             });
+
+            it('BIP32 Encrypted PrivKey', function () {
+                // load testing mnemonic
+                bitcoin.initiateHDWallet(testing_mnemonic);
+
+                var credentials = bitcoin.createP2PKHaddresses([1], bitcoin.networks.bitcoin.p2wpkh, testing_password);
+                var privateKey = credentials[0]['credentials'][0]['privateKey'];
+                assert.equal(privateKey, '6PYUjuUte84KiL2kFzuCNTven4WkdRFXmeMGGCVzDkpR1AcTBhLn2jMdoo');
+            });
         });
 
         describe('Retrieve from encrypted mnemonic', function () {
@@ -310,6 +319,7 @@ function bitcoinJStests() {
                 var privateKey = credentials[0]['credentials'][0]['privateKey'];
                 assert.equal(privateKey, 'L38Umd9kZNjeo98PFbpzaSfpuyREBc1rzBiyHBqQUXkjrysVyDi5');
             });
+
         });
     });
 }
