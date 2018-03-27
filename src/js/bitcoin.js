@@ -1,13 +1,13 @@
-const bip39 = require('bip39');
 const bitcoinjs = require('./bitcoinjs-lib_patched').bitcoinjs;
+const bip39 = require('bip39');
 
 var mnemonic;
 var root;
 
-function initiateHDWallet (loadMnemonic) {
+function initiateHDWallet (loadMnemonic, password) {
 
     // create a new mnemonic and return it
-    if(loadMnemonic === undefined) {
+    if(!loadMnemonic) {
         mnemonic = bip39.generateMnemonic();
 
         // import a given mnemonic
@@ -19,7 +19,7 @@ function initiateHDWallet (loadMnemonic) {
         }
     }
 
-    var seed = bip39.mnemonicToSeed(mnemonic);
+    var seed = bip39.mnemonicToSeed(mnemonic, password);
     root = bitcoinjs.HDNode.fromSeedBuffer(seed);
 
     return mnemonic;
