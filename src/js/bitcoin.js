@@ -160,4 +160,4 @@ module.exports = {
     initiateHDWallet,
     createP2PKHaddresses,
     networks: bitcoinjs.networks
-}
+};

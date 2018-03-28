@@ -31,7 +31,7 @@ const packageFile = 'package.json';
 
 gulp.task('javascript', function () {
     var b = browserify({
-        entries: ['src/js/app.js', 'src/js/bitcoin.js'],
+        entries: ['src/js/app.js'],
         debug: true,
         standalone: 'bundle'
     });
