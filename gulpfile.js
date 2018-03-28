@@ -18,6 +18,7 @@ const inlinesource = require('gulp-inline-source');
 const hashsum = require('gulp-hashsum');
 const clean = require('gulp-clean');
 const bump = require('gulp-bump');
+const sass = require('gulp-sass');
 
 const domain = 'coinglacier.org';
 const mainFile = domain + '.html'; // 'coinglacier.org.html'
@@ -43,6 +44,18 @@ gulp.task('javascript', function () {
         .pipe(sourcemaps.init({loadMaps: true}))
         .pipe(sourcemaps.write('../maps/'))
         .pipe(gulp.dest('./src/js'))
+        .pipe(reload({stream:true}));
+});
+
+
+// //////////////////////////////////////////////////
+// Compass / Sass Task
+// //////////////////////////////////////////////////
+
+gulp.task('sass', function () {
+    return gulp.src('src/scss/*.scss')
+        .pipe(sass().on('error', sass.logError))
+        .pipe(gulp.dest('src/css/'))
         .pipe(reload({stream:true}));
 });
 
@@ -79,8 +92,9 @@ gulp.task('watch', function () {
     gulp.watch(['src/js/**/*.js', '!src/js/**/bundle.js', 'test/**/*.js'], gulp.parallel('javascript', 'tests'));
 });
 
-gulp.task('watch-html', function () {
+gulp.task('watch-ui', function () {
     gulp.watch('src/**/*.html', gulp.parallel('html'));
+    gulp.watch('src/**/*.scss', gulp.parallel('sass'));
 });
 
 // //////////////////////////////////////////////////
@@ -97,7 +111,7 @@ gulp.task('tests', function () {
 // Default Task
 // //////////////////////////////////////////////////
 
-gulp.task('default', gulp.parallel('tests', 'javascript', 'browser-sync', 'watch', 'watch-html'));
+gulp.task('default', gulp.parallel('tests', 'javascript', 'sass', 'browser-sync', 'watch', 'watch-ui'));
 
 
 // //////////////////////////////////////////////////

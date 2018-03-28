@@ -12,12 +12,10 @@ Section: x
 <head>
     <meta charset="UTF-8">
 
+    <link rel="stylesheet" href="css/coinglacier.org.css" inline>
+
     <link rel="stylesheet" href="../node_modules/mocha/mocha.css" inline>
     <script src="../node_modules/mocha/mocha.js" inline></script>
-
-    <script src="http://code.jquery.com/jquery-latest.min.js"></script>
-
-
 
 <title>My Title</title>
 </head>
@@ -33,31 +31,38 @@ Section: x
 
 <script src="js/bundle.js" inline></script>
 <script>
-        var mnemonic = bundle.initiateHDWallet();
+
+        var bitcoin = bundle.bitcoin;
+        var $ = bundle.jQuery;
+
+        var mnemonic = bitcoin.initiateHDWallet('curve swear maze domain knock frozen ordinary climb love possible brave market');
 
         html_output = "<h1>" + mnemonic + "</h1>";
 
         var div_tag = document.getElementById('temporary');
 
         var x = {
-            non_segwit_mainnet: bundle.createP2PKHaddresses([1], bundle.p2pkhAddressTypes.p2pkh, bundle.networks.bitcoin),
-            non_segwit_testnet: bundle.createP2PKHaddresses(3, bundle.p2pkhAddressTypes.p2pkh, bundle.networks.testnet),
-            p2sh_p2wpkh_mainnet: bundle.createP2PKHaddresses(1, bundle.p2pkhAddressTypes.p2sh_p2wpkh, bundle.networks.bitcoin),
-            p2sh_p2wpkh_testnet: bundle.createP2PKHaddresses(2, bundle.p2pkhAddressTypes.p2sh_p2wpkh, bundle.networks.testnet),
-            bech32_mainnet: bundle.createP2PKHaddresses(-1, bundle.p2pkhAddressTypes.bech32, bundle.networks.bitcoin),
-            bech32_testnet: bundle.createP2PKHaddresses([2], bundle.p2pkhAddressTypes.bech32, bundle.networks.testnet),
-            bech32_mainnet_multi: bundle.createP2PKHaddresses([3, 3], bundle.p2pkhAddressTypes.bech32, bundle.networks.testnet)
+            non_segwit_mainnet: bitcoin.createP2PKHaddresses([1], bitcoin.networks.bitcoin),
+            // non_segwit_mainnet_encrypted: bitcoin.createP2PKHaddresses([1], bitcoin.networks.bitcoin.p2wpkh, 'MoonLambo'),
+            // non_segwit_testnet: bitcoin.createP2PKHaddresses([2, 3], bitcoin.networks.testnet),
+            // p2sh_p2wpkh_mainnet: bitcoin.createP2PKHaddresses(1, bitcoin.networks.bitcoin.p2wpkhInP2sh),
+            // p2sh_p2wpkh_testnet: bitcoin.createP2PKHaddresses(2, bitcoin.networks.testnet.p2wpkhInP2sh),
+            // bech32_mainnet: bitcoin.createP2PKHaddresses([1], bitcoin.networks.bitcoin.p2wpkh),
+            // bech32_testnet: bitcoin.createP2PKHaddresses([2], bitcoin.networks.testnet.p2wpkh),
+            // bech32_mainnet_multi: bitcoin.createP2PKHaddresses([3, 3], bitcoin.networks.testnet.p2wpkh)
         }
 
 
-        jQuery.each(x, function(i, dataset){
-            jQuery.each(dataset, function(accountIndex, addresses){
-                jQuery.each(addresses, function(index, data){
+        $.each(x, function(i, dataset){
+            $.each(dataset, function(accountIndex, addresses){
+                $.each(addresses['credentials'], function(index, data){
                     html_output += "<h2>" + i + "</h2><table>";
 
-                    jQuery.each(data, function(inner_index, inner_data){
+                    $.each(data, function(inner_index, inner_data){
                         html_output += "<tr><td><b>" + inner_index + "</b></td><td>" + inner_data + "</td></tr>";
                     });
+
+                    html_output += "<tr><td><b>XPUB</b></td><td>" + addresses['xpub'] + "</td></tr>"
 
                     html_output += "</table>";
                 });
