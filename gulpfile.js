@@ -55,8 +55,32 @@ gulp.task('javascript', function () {
 gulp.task('sass', function () {
     return gulp.src('src/scss/*.scss')
         .pipe(sass().on('error', sass.logError))
-        .pipe(gulp.dest('src/css/'))
+        .pipe(gulp.dest('src/css'))
         .pipe(reload({stream:true}));
+});
+
+
+// //////////////////////////////////////////////////
+// Copy JavaScript and CSS dependencies to src folder
+// //////////////////////////////////////////////////
+
+gulp.task('move-dependencies', function () {
+    gulp.src(
+        [
+            'node_modules/bootstrap/dist/js/bootstrap.js',
+            'node_modules/jquery/dist/jquery.js',
+            'node_modules/popper.js/dist/popper.js',
+            'node_modules/mocha/mocha.js'
+        ])
+        .pipe(gulp.dest('src/js/libs'));
+
+    gulp.src(['node_modules/mocha/mocha.css'])
+        .pipe(gulp.dest('src/css/libs'));
+
+    return gulp.src(['node_modules/bootstrap/scss/bootstrap.scss'])
+        .pipe(sass())
+        .pipe(gulp.dest('src/css/libs'));
+
 });
 
 
@@ -66,10 +90,9 @@ gulp.task('sass', function () {
 gulp.task('browser-sync', function () {
     browserSync({
         server:{
-            baseDir: './',
+            baseDir: 'src',
             index: 'index.html'
-        },
-        startPath: './src'
+        }
     });
 });
 
@@ -111,7 +134,7 @@ gulp.task('tests', function () {
 // Default Task
 // //////////////////////////////////////////////////
 
-gulp.task('default', gulp.parallel('tests', 'javascript', 'sass', 'browser-sync', 'watch', 'watch-ui'));
+gulp.task('default', gulp.parallel('tests', 'javascript', 'sass', 'browser-sync', 'watch', 'watch-ui', 'move-dependencies'));
 
 
 // //////////////////////////////////////////////////

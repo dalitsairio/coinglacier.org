@@ -5,6 +5,5 @@ tests.bitcoinJStests();
 mocha.run();
 
 module.exports = {
-    bitcoin: require('./bitcoin'),
-    jQuery: require('jquery')
+    bitcoin: require('./bitcoin')
 };

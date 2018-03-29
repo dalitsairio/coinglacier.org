@@ -14,15 +14,23 @@ Section: x
 
     <link rel="stylesheet" href="css/coinglacier.org.css" inline>
 
-    <link rel="stylesheet" href="../node_modules/mocha/mocha.css" inline>
-    <script src="../node_modules/mocha/mocha.js" inline></script>
+    <!-- mocha -->
+    <link rel="stylesheet" href="css/libs/mocha.css" inline>
+    <script src="js/libs/mocha.js" inline></script>
+
+    <!-- jQuery -->
+    <script src="js/libs/jquery.js" inline></script>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="css/libs/bootstrap.css" inline>
+    <script src="js/libs/bootstrap.js" inline></script>
 
 <title>My Title</title>
 </head>
 
 <body>
 
-<div id="temporary"></div>
+<div id="temporary" class="container"></div>
 
 
 
@@ -33,7 +41,6 @@ Section: x
 <script>
 
         var bitcoin = bundle.bitcoin;
-        var $ = bundle.jQuery;
 
         var mnemonic = bitcoin.initiateHDWallet('curve swear maze domain knock frozen ordinary climb love possible brave market');
 
