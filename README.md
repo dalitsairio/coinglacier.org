@@ -1,4 +1,4 @@
-# coinglacier.org
+# coinglacier.org cold storage
 JavaScript Client-Side Bitcoin HD-Wallet Generator
 
 > Coinglacier.org enables the creation of Bitcoin addresses and their corresponding
