@@ -12,8 +12,6 @@ Section: x
 <head>
     <meta charset="UTF-8">
 
-    <link rel="stylesheet" href="css/coinglacier.org.css" inline>
-
     <!-- mocha -->
     <link rel="stylesheet" href="css/libs/mocha.css" inline>
     <script src="js/libs/mocha.js" inline></script>
@@ -25,17 +23,28 @@ Section: x
     <link rel="stylesheet" href="css/libs/bootstrap.css" inline>
     <script src="js/libs/bootstrap.js" inline></script>
 
+
+    <link rel="stylesheet" href="css/coinglacier.org.css" inline>
+
 <title>My Title</title>
 </head>
 
 <body>
 
-<div id="temporary" class="container"></div>
+
+<div id="root-container" class="container">
+
+    <div>
+        <a id="mainnet-link" href="javascript:void(0);">Mainnet</a>
+        <a id="testnet-link" href="javascript:void(0);">Testnet</a>
+    </div>
+
+    <div id="temporary"></div>
 
 
 
-<div id="mocha"></div>
-
+    <div id="mocha"></div>
+</div>
 
 <script src="js/bundle.js" inline></script>
 <script>

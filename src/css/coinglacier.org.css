@@ -1,2 +1,5 @@
-body {
-  background: lightyellow; }
+.mainnet {
+  background: yellow; }
+
+.testnet {
+  background: lightblue; }
