@@ -77,9 +77,14 @@ gulp.task('move-dependencies', function () {
     gulp.src(['node_modules/mocha/mocha.css'])
         .pipe(gulp.dest('src/css/libs'));
 
-    return gulp.src(['node_modules/bootstrap/scss/bootstrap.scss'])
-        .pipe(sass())
-        .pipe(gulp.dest('src/css/libs'));
+    gulp.src(['node_modules/bootstrap/scss/*.scss'])
+        .pipe(gulp.dest('src/scss/libs/bootstrap'));
+
+    gulp.src(['node_modules/bootstrap/scss/mixins/*.scss'])
+        .pipe(gulp.dest('src/scss/libs/bootstrap/mixins'));
+
+    return gulp.src(['node_modules/bootstrap/scss/utilities/*.scss'])
+        .pipe(gulp.dest('src/scss/libs/bootstrap/utilities'));
 
 });
 
@@ -112,7 +117,8 @@ gulp.task('html', function () {
 // //////////////////////////////////////////////////
 
 gulp.task('watch', function () {
-    gulp.watch(['src/js/**/*.js', '!src/js/**/bundle.js', 'test/**/*.js'], gulp.parallel('javascript', 'tests'));
+    gulp.watch(['src/js/**/*.js', '!src/js/**/bundle.js', 'test/**/*.js'], gulp.parallel('javascript'));
+    // gulp.watch(['src/js/**/*.js', '!src/js/**/bundle.js', 'test/**/*.js'], gulp.parallel('javascript', 'tests'));
 });
 
 gulp.task('watch-ui', function () {
