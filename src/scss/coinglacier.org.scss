@@ -1,10 +1,25 @@
+
 .mainnet{
-    background: yellow;
+
+    $theme-colors: (
+            "primary": #F7931A
+    );
+
+    @import "libs/bootstrap/bootstrap.scss";
 }
 
 .testnet{
-    background: lightblue;
+
+    $theme-colors: (
+            "primary": #A0E04C
+    );
+
+    @import "libs/bootstrap/bootstrap.scss";
 }
+//
+//.testnet{
+//    background: lightblue;
+//}
 
 // Bootstrap
 @import "libs/bootstrap/bootstrap.scss";
