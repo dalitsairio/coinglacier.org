@@ -1,0 +1,1 @@
+The logo is directly included into the index.html file (as base64 data). The svg file stored in this folder is never referenced in the source code and is only stored here for completeness.

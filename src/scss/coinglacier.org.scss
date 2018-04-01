@@ -1,25 +1,105 @@
+// //////////////////////////////////////////////////
+// Variables
+// //////////////////////////////////////////////////
 
-.mainnet{
+$mainnet-primary: #53aff6;
+$testnet-primary: #A0E04C;
 
-    $theme-colors: (
-            "primary": #F7931A
-    );
+$bootstrap-md: 992px;
+$bootstrap-sm: 768px;
 
-    @import "libs/bootstrap/bootstrap.scss";
-}
 
+// //////////////////////////////////////////////////
+// Themes
+// //////////////////////////////////////////////////
+
+// generate testnet theme
 .testnet{
-
     $theme-colors: (
-            "primary": #A0E04C
+            "primary": $testnet-primary
     );
-
     @import "libs/bootstrap/bootstrap.scss";
 }
-//
-//.testnet{
-//    background: lightblue;
-//}
 
-// Bootstrap
+// mainnet theme
+$theme-colors: (
+        "primary": $mainnet-primary
+);
+
 @import "libs/bootstrap/bootstrap.scss";
+
+
+// //////////////////////////////////////////////////
+// Main Menu
+// //////////////////////////////////////////////////
+
+// the link for switching between mainnet and testnet
+#switch-network{
+    button, button:visited{
+        color: $gray-700 !important;
+    }
+    button:hover, button:active{
+        color: $gray-900 !important;
+    }
+}
+
+#mainmenu {
+    position: relative;
+    padding-left: 285px;
+    font-weight: bold;
+
+    span#service-name{
+        margin-right: 10px;
+        font-style: italic;
+        color: #c1dfff;
+        font-size: 15px;
+    }
+
+    a.navbar-brand{
+        left: 26px;
+        top: -14px;
+        position: absolute;
+
+        img {
+            width: 75px;
+        }
+    }
+}
+
+@media screen and (min-width: $bootstrap-sm) and (max-width: $bootstrap-md){
+    #mainmenu {
+        padding-left: 95px;
+
+        a.navbar-brand {
+            left: 10px;
+        }
+    }
+}
+
+@media screen and (max-width: $bootstrap-sm){
+    #mainmenu {
+
+        padding: 0px;
+
+        .navbar-toggler{
+            position: absolute;
+            top: 8px;
+            right: 12px;
+        }
+
+        #navbarNav {
+            margin: 0 18px;
+        }
+
+        a.navbar-brand{
+            position: relative;
+            margin-top: 12px;
+            margin-bottom: -15px;
+
+            img {
+                width: 50px;
+            }
+        }
+    }
+}
+
