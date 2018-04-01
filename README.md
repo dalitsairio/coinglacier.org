@@ -1,9 +1,9 @@
 # coinglacier.org cold storage
 JavaScript Client-Side Bitcoin HD-Wallet Generator
 
-> Coinglacier.org enables the creation of Bitcoin addresses and their corresponding
-> private keys conveniently generated in a web browser. Further convenience is brought
-> by the use of hierarchic deterministic key derivation from 12 words following BIP39.
+> Coinglacier.org is an in-browser application that lets you create Bitcoin addresses and their corresponding
+> private keys for your cold storage. It provides you the tools to create rock-solid, anti-theft Bitcoin
+> addresses that hold your Bitcoins in place, as if they were frozen into a glacier.
 
 The coinglacier.org project provides an all-in-one HTML document with embedded
 JavaScript/Css/Images. The JavaScript is readable not minified and contains no
