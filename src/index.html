@@ -280,28 +280,6 @@ Git Repo: https://github.com/dalitsairio/coinglacier.org.git
                 </label>
             </div>
         </div>
-
-        <div id="address-type" class="page-element paper-wallet">
-            <h5>Address type</h5>
-            <div class="form-check">
-                <input name="address-types" id="non-segwit" class="form-check-input" type="radio">
-                <label class="form-check-label" for="non-segwit">
-                    Non-Segwit
-                </label>
-            </div>
-            <div class="form-check">
-                <input name="address-types" id="segwit" class="form-check-input" type="radio" checked>
-                <label class="form-check-label" for="segwit">
-                    SegWit
-                </label>
-            </div>
-            <div class="form-check disabled">
-                <input name="address-types" id="bech32" class="form-check-input" type="radio">
-                <label class="form-check-label" for="bech32">
-                    Bech32
-                </label>
-            </div>
-        </div>
     </div>
 
 
@@ -313,6 +291,8 @@ Git Repo: https://github.com/dalitsairio/coinglacier.org.git
 
 <script src="js/bundle.js" inline></script>
 <script>
+
+    const bitcoin = bundle.bitcoin;
 
     // //////////////////////////////////////////////////
     // Page Management
@@ -359,23 +339,27 @@ Git Repo: https://github.com/dalitsairio/coinglacier.org.git
     // //////////////////////////////////////////////////
     // Switch beetween mainnet and testnet
     // //////////////////////////////////////////////////
-    const network = 'network';
-    const testnet = 'testnet';
+    const getKeywordNetwork = 'network';
+    const getValueTestnet = 'testnet';
 
-    if(getURLparameter(network) === testnet){
+    if(getURLparameter(getKeywordNetwork) === getValueTestnet){
         initTestnet();
     }else{
         initMainnet();
     }
 
     $("#testnet-link").click(function() {
-        addParamToURL({key: network, value: testnet});
+        addParamToURL({key: getKeywordNetwork, value: getValueTestnet});
         initTestnet();
+        setNetwork();
+        loadWallet();
     });
 
     $("#mainnet-link").click(function() {
-        removeParamFromURL(network);
+        removeParamFromURL(getKeywordNetwork);
         initMainnet();
+        setNetwork();
+        loadWallet();
     });
 
     function initMainnet() {
@@ -449,6 +433,11 @@ Git Repo: https://github.com/dalitsairio/coinglacier.org.git
     }
 
     function getURLparameter(name, url){
+
+        if(!name){
+            return null;
+        }
+
         url = url || window.location.href;
         name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
         var regexS = "[\\?&]"+name+"=([^&#]*)";
@@ -457,11 +446,103 @@ Git Repo: https://github.com/dalitsairio/coinglacier.org.git
         return results == null ? null : results[1];
     }
 
+    // //////////////////////////////////////////////////
+    // Settings
+    // //////////////////////////////////////////////////
+
+    const getKeywordAddressType = 'addressType';
+    const inputNonSegwit = getValueNonSegwit = 'non-segwit';
+    const inputSegwit = getValueSegwit = 'segwit';
+    const inputBech32 = getValueBech32 = 'bech32';
+    const inputsAddressTypesName = 'address-types';
+
+    var network;
+
+    // set checkboxes from GET params
+    if(getURLparameter(getKeywordAddressType)){
+
+        $("input[name='" + inputsAddressTypesName + "']").prop('checked', false);
+
+        switch(getURLparameter(getKeywordAddressType)){//
+            case getValueNonSegwit:
+                $('input#' + inputNonSegwit).prop('checked', true);
+                break;
+            case getValueBech32:
+                $('input#' + inputBech32).prop('checked', true);
+                break;
+            case getValueSegwit:
+            default:
+                $('input#' + inputSegwit).prop('checked', true);
+                break;
+        }
+    }
+
+    // initialize network [default is mainnet, segwit]
+    setNetwork();
+
+    function setNetwork(){
+
+        var addressType = getURLparameter(getKeywordAddressType) || getValueSegwit;
+        var networkGetParam = getURLparameter(getKeywordNetwork);
+
+        switch(networkGetParam){
+            case getValueTestnet:
+                switch(addressType){
+                    case getValueNonSegwit:
+                        network = bitcoin.networks.testnet;
+                        break;
+                    case getValueSegwit:
+                        network = bitcoin.networks.testnet.p2wpkhInP2sh;
+                        break;
+                    case getValueBech32:
+                        network = bitcoin.networks.testnet.p2wpkh;
+                        break;
+                }
+                break;
+            default:
+                switch(addressType){
+                    case getValueNonSegwit:
+                        network = bitcoin.networks.bitcoin;
+                        break;
+                    case getValueSegwit:
+                        network = bitcoin.networks.bitcoin.p2wpkhInP2sh;
+                        break;
+                    case getValueBech32:
+                        network = bitcoin.networks.bitcoin.p2wpkh;
+                        break;
+                }
+                break;
+        }
+    }
+
+    // address type options events
+    $('input#' + inputNonSegwit).click(function () {
+        removeParamFromURL(getKeywordAddressType);
+        addParamToURL({key: getKeywordAddressType, value: getValueNonSegwit});
+        setNetwork();
+        loadWallet();
+    });
+    $('input#' + inputSegwit).click(function () {
+        removeParamFromURL(getKeywordAddressType);
+        addParamToURL({key: getKeywordAddressType, value: getValueSegwit});
+        setNetwork();
+        loadWallet();
+    });
+    $('input#' + inputBech32).click(function () {
+        removeParamFromURL(getKeywordAddressType);
+        addParamToURL({key: getKeywordAddressType, value: getValueBech32});
+        setNetwork();
+        loadWallet();
+    });
+
 
     // //////////////////////////////////////////////////
     // Load Bitcoin Stuff
     // //////////////////////////////////////////////////
-    var bitcoin = bundle.bitcoin;
+
+    loadWallet();
+
+    function loadWallet() {
 
         var mnemonic = bitcoin.initiateHDWallet('curve swear maze domain knock frozen ordinary climb love possible brave market');
 
@@ -470,7 +551,7 @@ Git Repo: https://github.com/dalitsairio/coinglacier.org.git
         var div_tag = document.getElementById('temporary');
 
         var x = {
-            non_segwit_mainnet: bitcoin.createP2PKHaddresses([1], bitcoin.networks.bitcoin),
+            dynamic: bitcoin.createP2PKHaddresses([1], network),
             // non_segwit_mainnet_encrypted: bitcoin.createP2PKHaddresses([1], bitcoin.networks.bitcoin.p2wpkh, 'MoonLambo'),
             // non_segwit_testnet: bitcoin.createP2PKHaddresses([2, 3], bitcoin.networks.testnet),
             // p2sh_p2wpkh_mainnet: bitcoin.createP2PKHaddresses(1, bitcoin.networks.bitcoin.p2wpkhInP2sh),
@@ -481,12 +562,12 @@ Git Repo: https://github.com/dalitsairio/coinglacier.org.git
         }
 
 
-        $.each(x, function(i, dataset){
-            $.each(dataset, function(accountIndex, addresses){
-                $.each(addresses['credentials'], function(index, data){
+        $.each(x, function (i, dataset) {
+            $.each(dataset, function (accountIndex, addresses) {
+                $.each(addresses['credentials'], function (index, data) {
                     html_output += "<h2>" + i + "</h2><table>";
 
-                    $.each(data, function(inner_index, inner_data){
+                    $.each(data, function (inner_index, inner_data) {
                         html_output += "<tr><td><b>" + inner_index + "</b></td><td>" + inner_data + "</td></tr>";
                     });
 
@@ -498,6 +579,8 @@ Git Repo: https://github.com/dalitsairio/coinglacier.org.git
         });
 
         div_tag.innerHTML = html_output;
+
+    }
 </script>
 
 
