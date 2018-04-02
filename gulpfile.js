@@ -54,7 +54,9 @@ gulp.task('javascript', function () {
 
 gulp.task('sass', function () {
     return gulp.src('src/scss/*.scss')
+        .pipe(sourcemaps.init({loadMaps: true}))
         .pipe(sass().on('error', sass.logError))
+        .pipe(sourcemaps.write('../maps/'))
         .pipe(gulp.dest('src/css'))
         .pipe(reload({stream:true}));
 });
