@@ -1,11 +1,8 @@
 <!DOCTYPE html>
 <!--
-This is a skeleton html file that you can use to get you started on each new
-HTML project
-
-Name: Your Name Here
-Class: CIS 3303
-Section: x
+Project: coinglacier.org
+Author: Dalit Sairio
+Git Repo: https://github.com/dalitsairio/coinglacier.org.git
 -->
 <html>
 
@@ -245,21 +242,68 @@ Section: x
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav">
-                <li id="menu-single-wallet" class="nav-item">
-                    <a class="nav-link" href="javascript:void(0);">Single Wallet<span class="sr-only">(current)</span></a>
+                <li id="menu-single-wallet" class="nav-item active">
+                    <a class="nav-link" href="javascript:void(0);">Single Wallet</a>
                 </li>
-                <li id="menu-paper-wallet" class="nav-item active">
+                <li id="menu-paper-wallet" class="nav-item">
                     <a class="nav-link" href="javascript:void(0);">Paper Wallet</a>
                 </li>
-                <li id="menu-paper-walletx" class="nav-item active">
+                <li id="menu-paper-walletx" class="nav-item">
                     <a class="nav-link" href="javascript:void(0);">Entry 3</a>
                 </li>
-                <li id="menu-paper-walletxx" class="nav-item active">
+                <li id="menu-paper-walletxx" class="nav-item">
                     <a class="nav-link" href="javascript:void(0);">Entry 4</a>
                 </li>
             </ul>
         </div>
     </nav>
+
+    <div id="options" class="page-element single-wallet paper-wallet">
+        <div id="address-type" class="page-element single-wallet paper-wallet">
+            <h5>Address type</h5>
+            <div class="form-check">
+                <input name="address-types" id="non-segwit" class="form-check-input" type="radio">
+                <label class="form-check-label" for="non-segwit">
+                    Non-Segwit
+                </label>
+            </div>
+            <div class="form-check">
+                <input name="address-types" id="segwit" class="form-check-input" type="radio" checked>
+                <label class="form-check-label" for="segwit">
+                    SegWit
+                </label>
+            </div>
+            <div class="form-check disabled">
+                <input name="address-types" id="bech32" class="form-check-input" type="radio">
+                <label class="form-check-label" for="bech32">
+                    Bech32
+                </label>
+            </div>
+        </div>
+
+        <div id="address-type" class="page-element paper-wallet">
+            <h5>Address type</h5>
+            <div class="form-check">
+                <input name="address-types" id="non-segwit" class="form-check-input" type="radio">
+                <label class="form-check-label" for="non-segwit">
+                    Non-Segwit
+                </label>
+            </div>
+            <div class="form-check">
+                <input name="address-types" id="segwit" class="form-check-input" type="radio" checked>
+                <label class="form-check-label" for="segwit">
+                    SegWit
+                </label>
+            </div>
+            <div class="form-check disabled">
+                <input name="address-types" id="bech32" class="form-check-input" type="radio">
+                <label class="form-check-label" for="bech32">
+                    Bech32
+                </label>
+            </div>
+        </div>
+    </div>
+
 
     <div id="temporary"></div>
 
@@ -269,6 +313,42 @@ Section: x
 
 <script src="js/bundle.js" inline></script>
 <script>
+
+    // //////////////////////////////////////////////////
+    // Page Management
+    // //////////////////////////////////////////////////
+    const pageElement = 'page-element';
+
+    // page elements
+    const singleWallet = 'single-wallet';
+    const paperWallet = 'paper-wallet';
+
+    // menu elements
+    const menuSingleWallet = 'menu-' + singleWallet;
+    const menuPaperWallet = 'menu-' + paperWallet;
+
+    // set default page
+    changePage(singleWallet);
+
+    // menu events
+    $('#' + menuSingleWallet).click(function() {
+        changePage(singleWallet);
+    });
+    $('#' + menuPaperWallet).click(function() {
+        changePage(paperWallet);
+    });
+
+    // change page function
+    function changePage(newPage){
+        // only show elements from the given page
+        $('.' + pageElement).hide();
+        $('.' + newPage).show();
+
+        // change menu to link to active
+        $('#mainmenu').find('.active').removeClass('active');
+        $('#mainmenu #menu-' + newPage).addClass('active');
+
+    }
 
     // //////////////////////////////////////////////////
     // Initialize Popovers

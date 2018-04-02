@@ -19,6 +19,12 @@ $bootstrap-sm: 768px;
             "primary": $testnet-primary
     );
     @import "libs/bootstrap/bootstrap.scss";
+
+    #mainmenu {
+        .active a {
+            color: darken($testnet-primary, 20);
+        }
+    }
 }
 
 // mainnet theme
@@ -27,6 +33,13 @@ $theme-colors: (
 );
 
 @import "libs/bootstrap/bootstrap.scss";
+
+#mainmenu {
+    .active a {
+        color: darken($mainnet-primary, 20);
+        text-shadow: 0px 0px 3px #000;
+    }
+}
 
 
 // //////////////////////////////////////////////////

@@ -5349,6 +5349,8 @@
     .testnet .table-bordered th,
     .testnet .table-bordered td {
       border: 1px solid #ddd !important; } }
+  .testnet #mainmenu .active a {
+    color: #6ca91d; }
 
 /*!
  * Bootstrap v4.0.0 (https://getbootstrap.com)
@@ -11419,6 +11421,10 @@ a.text-dark:hover, a.text-dark:focus {
   .table-bordered td {
     border: 1px solid #ddd !important; } }
 
+#mainmenu .active a {
+  color: #0b7fd8;
+  text-shadow: 0px 0px 3px #000; }
+
 #switch-network button, #switch-network button:visited {
   color: #495057 !important; }
 
@@ -11462,3 +11468,5 @@ a.text-dark:hover, a.text-dark:focus {
       margin-bottom: -15px; }
       #mainmenu a.navbar-brand img {
         width: 50px; } }
+
+/*# sourceMappingURL=../maps/coinglacier.org.css.map */
