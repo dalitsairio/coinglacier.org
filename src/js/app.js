@@ -316,14 +316,14 @@ function loadWallet() {
 
     $.each(x, function (i, dataset) {
         $.each(dataset, function (accountIndex, addresses) {
-            $.each(addresses['credentials'], function (index, data) {
+            $.each(addresses.credentials, function (index, data) {
                 html_output += "<h2>" + i + "</h2><table>";
 
                 $.each(data, function (inner_index, inner_data) {
                     html_output += "<tr><td><b>" + inner_index + "</b></td><td>" + inner_data + "</td></tr>";
                 });
 
-                html_output += "<tr><td><b>XPUB</b></td><td>" + addresses['xpub'] + "</td></tr>"
+                html_output += "<tr><td><b>XPUB</b></td><td>" + addresses.xpub + "</td></tr>"
 
                 html_output += "</table>";
             });

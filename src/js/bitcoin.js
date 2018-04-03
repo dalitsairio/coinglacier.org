@@ -8,12 +8,11 @@ var root;
 
 function initiateHDWallet (loadMnemonic, password) {
 
-    // create a new mnemonic and return it
     if(!loadMnemonic) {
+        // create a new mnemonic and return it
         mnemonic = bip39.generateMnemonic();
-
-        // import a given mnemonic
     }else{
+        // import a given mnemonic
         if(bip39.validateMnemonic(loadMnemonic)) {
             mnemonic = loadMnemonic;
         }else{
@@ -48,9 +47,9 @@ function createP2PKHaddresses (accounts, targetNetwork, password) {
         var account =  root.derivePath(getAccountPath(targetNetwork, accIndex));
         account.keyPair.network = targetNetwork;
 
-        result[accIndex] = [];
-        result[accIndex]['credentials'] = createAccountCredentials(account, targetNetwork, amount, password);
-        result[accIndex]['xpub'] = account.neutered().toBase58();
+        result[accIndex] = {};
+        result[accIndex].credentials = createAccountCredentials(account, targetNetwork, amount, password);
+        result[accIndex].xpub = account.neutered().toBase58();
 
     }
 

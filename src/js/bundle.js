@@ -59246,14 +59246,14 @@ function loadWallet() {
 
     $.each(x, function (i, dataset) {
         $.each(dataset, function (accountIndex, addresses) {
-            $.each(addresses['credentials'], function (index, data) {
+            $.each(addresses.credentials, function (index, data) {
                 html_output += "<h2>" + i + "</h2><table>";
 
                 $.each(data, function (inner_index, inner_data) {
                     html_output += "<tr><td><b>" + inner_index + "</b></td><td>" + inner_data + "</td></tr>";
                 });
 
-                html_output += "<tr><td><b>XPUB</b></td><td>" + addresses['xpub'] + "</td></tr>"
+                html_output += "<tr><td><b>XPUB</b></td><td>" + addresses.xpub + "</td></tr>"
 
                 html_output += "</table>";
             });
@@ -59354,12 +59354,11 @@ var root;
 
 function initiateHDWallet (loadMnemonic, password) {
 
-    // create a new mnemonic and return it
     if(!loadMnemonic) {
+        // create a new mnemonic and return it
         mnemonic = bip39.generateMnemonic();
-
-        // import a given mnemonic
     }else{
+        // import a given mnemonic
         if(bip39.validateMnemonic(loadMnemonic)) {
             mnemonic = loadMnemonic;
         }else{
@@ -59394,9 +59393,9 @@ function createP2PKHaddresses (accounts, targetNetwork, password) {
         var account =  root.derivePath(getAccountPath(targetNetwork, accIndex));
         account.keyPair.network = targetNetwork;
 
-        result[accIndex] = [];
-        result[accIndex]['credentials'] = createAccountCredentials(account, targetNetwork, amount, password);
-        result[accIndex]['xpub'] = account.neutered().toBase58();
+        result[accIndex] = {};
+        result[accIndex].credentials = createAccountCredentials(account, targetNetwork, amount, password);
+        result[accIndex].xpub = account.neutered().toBase58();
 
     }
 
