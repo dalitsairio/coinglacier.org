@@ -59045,30 +59045,35 @@ DOM.options.addressTypes.bech32.click(changeToBech32);
 // Page Loading
 // //////////////////////////////////////////////////
 
-// set mainnet or testnet
-switch(getURLparameter(GET.network.keyword)) {
-    case GET.network.testnet:
-        initTestnet();
-        break;
-    default:
-        initMainnet();
-}
+function init() {
+    // set mainnet or testnet
+    switch (getURLparameter(GET.network.keyword)) {
+        case GET.network.testnet:
+            initTestnet();
+            break;
+        default:
+            initMainnet();
+    }
 
-// set correct page
-switch(getURLparameter(GET.pages.keyword)) {
-    case GET.pages.paperWallet:
-        changePage(DOM.pageElements.paperWallet, DOM.menuEntry.paperWallet, GET.pages.paperWallet);
-        break;
-    case GET.pages.singleWallet:
-        changePage(DOM.pageElements.singleWallet, DOM.menuEntry.singleWallet, GET.pages.singleWallet);
-    default:
-        changePage(defaultPage.pageElementsDOM, defaultPage.menuEntryDOM, defaultPage.getParam);
-        break;
-}
+    // set correct page
+    switch (getURLparameter(GET.pages.keyword)) {
+        case GET.pages.paperWallet:
+            changePage(DOM.pageElements.paperWallet, DOM.menuEntry.paperWallet, GET.pages.paperWallet);
+            break;
+        case GET.pages.singleWallet:
+            changePage(DOM.pageElements.singleWallet, DOM.menuEntry.singleWallet, GET.pages.singleWallet);
+        default:
+            changePage(defaultPage.pageElementsDOM, defaultPage.menuEntryDOM, defaultPage.getParam);
+            break;
+    }
 
-// initialize popovers
-for (var x in DOM.popovers){
-    DOM.popovers[x].popover();
+    // initialize popovers
+    for (var x in DOM.popovers) {
+        DOM.popovers[x].popover();
+    }
+
+    // unit tests
+    runUnitTests();
 }
 
 
@@ -59330,9 +59335,13 @@ function getURLparameter(name, url){
 // Unit Tests
 // //////////////////////////////////////////////////
 
-mocha.setup('bdd');
-tests.bitcoinJStests();
-mocha.run();
+function runUnitTests() {
+    mocha.setup('bdd');
+    tests.bitcoinJStests();
+    mocha.run();
+}
+
+init();
 
 },{"../../test/bitcoinTest":276,"./bitcoin":274}],274:[function(require,module,exports){
 const bitcoinjs = require('./bitcoinjs-lib_patched').bitcoinjs;
