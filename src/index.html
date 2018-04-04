@@ -28,7 +28,7 @@ Git Repo: https://github.com/dalitsairio/coinglacier.org.git
 
     <div id="testnet-warning" class="alert alert-warning mt-1 text-center" role="warning"
          style="display: none;" data-trigger="hover" data-placement="bottom"
-         title="Don't use real Bitcoin" data-content="The generated addresses must solely be used for testnet-Bitcoins.">
+         title="Don't use real Bitcoin" data-content="<div class='normal-popover'>The generated addresses must solely be used for testnet-Bitcoins.</div>">
         TESTNET VERSION ACTIVATED
     </div>
 
@@ -250,7 +250,8 @@ Git Repo: https://github.com/dalitsairio/coinglacier.org.git
         </div>
     </nav>
 
-    <div id="options" class="page-element single-wallet paper-wallet">
+    <div id="options" class="form-check page-element single-wallet paper-wallet">
+        <!-- address type -->
         <div id="address-type" class="page-element single-wallet paper-wallet">
             <h5>Address type</h5>
             <div class="form-check">
@@ -271,6 +272,22 @@ Git Repo: https://github.com/dalitsairio/coinglacier.org.git
                     Bech32
                 </label>
             </div>
+        </div>
+
+        <!-- show xpub -->
+        <div class="form-check page-element paper-wallet">
+            <input type="checkbox" class="form-check-input" id="showXPUB">
+            <label id="showXPUBlabel" class="form-check-label" for="showXPUB" data-trigger="hover" data-placement="bottom"
+                   title="Benefit & Drawback" data-content="<div id='make-fat-hack'><p>Ext. pubKeys allow you to check the balances of
+                        all your addresses [per account] in one go.</p>
+                        <p>However, when using this feature, <span style='color: #800000; font-style: italic;'>
+                        you must be particularly careful not to leak any of your private keys,
+                        even if you don't have any money on the respective address (anymore)</span>,
+                        since an attacker could find all of your private keys [of an account] given only one leaked private key.</p>
+                        <p>A measure to reduce the risk is to use multiple accounts. If an attacker gets hold of one private key,
+                        he will only be able to retrieve all the private keys from the same account.</p></div>">
+                Show Extended Public Key
+            </label>
         </div>
     </div>
 

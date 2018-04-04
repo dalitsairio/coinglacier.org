@@ -14,6 +14,7 @@ const bitcoin = require('./bitcoin');
 // bitcoin network
 // contains not only network information, but also address type specific information
 var network;
+var showXPUB;
 
 // GET parameters
 var GET = {};
@@ -68,9 +69,11 @@ DOM.options.addressTypes.all = $("input[name='address-types']");
 DOM.options.addressTypes.nonSegwit = $('input#non-segwit');
 DOM.options.addressTypes.segwit = $('input#segwit');
 DOM.options.addressTypes.bech32 = $('input#bech32');
+DOM.options.showXPUB = $('input#showXPUB');
 
 DOM.popovers = {};
 DOM.popovers.testnetWarning = $("#testnet-warning");
+DOM.popovers.showXPUB = $("#showXPUBlabel");
 
 
 // //////////////////////////////////////////////////
@@ -86,6 +89,7 @@ const defaultPage = {
     menuEntryDOM: DOM.menuEntry.singleWallet,
     getParam: GET.pages.singleWallet
 };
+showXPUB = false;
 
 
 // //////////////////////////////////////////////////
@@ -109,6 +113,8 @@ DOM.menuEntry.paperWallet.click(function() {
 DOM.options.addressTypes.nonSegwit.click(changeToNonSegwit);
 DOM.options.addressTypes.segwit.click(changeToSegwit);
 DOM.options.addressTypes.bech32.click(changeToBech32);
+// Show XPUB
+DOM.options.showXPUB.change(optionShowXPUBchanged);
 
 
 // //////////////////////////////////////////////////
@@ -139,7 +145,7 @@ function init() {
 
     // initialize popovers
     for (var x in DOM.popovers) {
-        DOM.popovers[x].popover();
+        DOM.popovers[x].popover({html:true});
     }
 
     // unit tests
@@ -249,6 +255,13 @@ function changeAddressType(newType){
 }
 
 
+// option show extended public key
+function optionShowXPUBchanged(){
+    showXPUB = DOM.options.showXPUB.prop('checked');
+    loadWallet();
+}
+
+
 // //////////////////////////////////////////////////
 // Bitcoin Stuff
 // //////////////////////////////////////////////////
@@ -323,7 +336,10 @@ function loadWallet() {
                     html_output += "<tr><td><b>" + inner_index + "</b></td><td>" + inner_data + "</td></tr>";
                 });
 
-                html_output += "<tr><td><b>XPUB</b></td><td>" + addresses.xpub + "</td></tr>"
+                if(showXPUB) {
+                    html_output += "<tr><td><b>XPUB</b></td><td>" + addresses.xpub + "</td></tr>";
+                }
+
 
                 html_output += "</table>";
             });

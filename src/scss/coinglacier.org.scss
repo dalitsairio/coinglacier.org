@@ -79,6 +79,18 @@ $theme-colors: (
     }
 }
 
+// this is a hack. Usually popovers have a max-width of 276px
+// however some of them should be bigger.
+// therefore we changed the popovers size to 630px.
+// the content of the small popover must always be encapsulated
+// in a div with the class .normal-popover to keep them small
+.popover, .testnet .popover{
+    max-width: 630px;
+}
+.popover .normal-popover{
+    max-width: 276px;
+}
+
 @media screen and (min-width: $bootstrap-sm) and (max-width: $bootstrap-md){
     #mainmenu {
         padding-left: 95px;
