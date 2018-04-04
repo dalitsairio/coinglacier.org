@@ -59350,7 +59350,7 @@ const bip38 = require('bip38');
 const wif = require('wif');
 
 var mnemonic;
-var root;
+var bip32RootKey;
 
 function initiateHDWallet (loadMnemonic, password) {
 
@@ -59367,7 +59367,7 @@ function initiateHDWallet (loadMnemonic, password) {
     }
 
     var seed = bip39.mnemonicToSeed(mnemonic, password);
-    root = bitcoinjs.HDNode.fromSeedBuffer(seed);
+    bip32RootKey = bitcoinjs.HDNode.fromSeedBuffer(seed);
 
     return mnemonic;
 }
@@ -59390,7 +59390,12 @@ function createP2PKHaddresses (accounts, targetNetwork, password) {
     for(var accIndex = 0; accIndex < accounts.length; accIndex++) {
         var amount = accounts[accIndex];
 
-        var account =  root.derivePath(getAccountPath(targetNetwork, accIndex));
+        // check path validity
+        var accountPath = getAccountPath(targetNetwork, accIndex);
+        var pathError = findDerivationPathErrors(accountPath, false, true);
+        if(pathError) throw 'Derivation Path Error: ' + pathError;
+
+        var account =  bip32RootKey.derivePath(accountPath);
         account.keyPair.network = targetNetwork;
 
         result[accIndex] = {};
@@ -59410,7 +59415,11 @@ function createAccountCredentials(account, network, amount, password){
     for (var index = 0; index < amount; index++) {
 
         // PrivKey / BIP44 | BIP49 | BIP84 / Bitcoin | Testnet / Account / External / First Address
-        var addressPath = "0/" + index;
+        //                                                                 ^^^^^^^^^^^^^^^^^^^^^^^^
+        var addressPath = '0/' + index;
+        var pathError = findDerivationPathErrors(addressPath, true, false);
+        if(pathError) throw 'Derivation Path Error: ' + pathError;
+
         var bip32 = account.derivePath(addressPath);
         bip32.keyPair.network = network;
 
@@ -59499,6 +59508,72 @@ function getAccountPath(network, accountIndex){
         default:
             throw ("given network is not a valid network");
     }
+}
+
+// copied from https://github.com/iancoleman/bip39/blob/master/src/js/index.js and adapted
+// PARAMETERS
+// path: the derivation path as a string
+// createXPUB: do you want to create an xpub for the given path?
+// fromMasternode: is the path starting at the masternode level or deeper down the path? (starts with 'm'?)
+function findDerivationPathErrors(path, createXPUB, fromMasternode) {
+
+    if(fromMasternode !== false){
+        fromMasternode = true;
+    }
+
+    // TODO is not perfect but is better than nothing
+    // Inspired by
+    // https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki#test-vectors
+    // and
+    // https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki#extended-keys
+    var maxDepth = 255; // TODO verify this!!
+    var maxIndexValue = Math.pow(2, 31); // TODO verify this!!
+
+    // check first character
+    var invalidFirstChar = path[0].replace(/^[0-9m]/, "");
+    if(invalidFirstChar > 0){
+        return "first charactar must be 'm' or a number, but is " + invalidFirstChar;
+    }
+
+    if (fromMasternode && path[0] != 'm') {
+        return "First character must be 'm'";
+    }else if(!fromMasternode && path[0] == 'm'){
+        return 'The path starts at masternode, but the third param is set to false';
+    }
+
+    if (path.length > 1) {
+        if (path[1] != '/') {
+            return "Separator must be '/'";
+        }
+        var indexes = path.split('/');
+        if (indexes.length > maxDepth) {
+            return 'Derivation depth is ' + indexes.length + ', must be less than '  + maxDepth;
+        }
+        for (var depth = 1; depth<indexes.length; depth++) {
+            var index = indexes[depth];
+            var invalidChars = index.replace(/^[0-9]+'?$/g, "")
+            if (invalidChars.length > 0) {
+                return "Invalid characters " + invalidChars + " found at depth " + depth;
+            }
+            var indexValue = parseInt(index.replace("'", ""));
+            if (isNaN(depth)) {
+                return "Invalid number at depth " + depth;
+            }
+            if (indexValue > maxIndexValue) {
+                return "Value of " + indexValue + " at depth " + depth + " must be less than " + maxIndexValue;
+            }
+        }
+    }
+    // Check root key exists or else derivation path is useless!
+    if (!bip32RootKey) {
+        return "No root key";
+    }
+    // Check no hardened derivation path when using xpub keys
+    var isHardenedPath = path.indexOf("'") > -1;
+    if (isHardenedPath && createXPUB) {
+        return "Hardened derivation path is invalid with xpub key";
+    }
+    return false;
 }
 
 module.exports = {
