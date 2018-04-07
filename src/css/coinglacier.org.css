@@ -11453,6 +11453,31 @@ a.text-dark:hover, a.text-dark:focus {
 .popover .normal-popover {
   max-width: 276px; }
 
+#account-row-template {
+  display: none; }
+
+.account-row .form-check span {
+  font-weight: bold;
+  margin-left: -0.6rem; }
+
+.account-row .form-check label {
+  margin-left: 1.2rem; }
+
+.account-row .form-check input {
+  margin-left: 0.6rem;
+  width: 5rem; }
+
+.account-row .form-check button {
+  padding: 0.1rem 0.5rem;
+  font-size: 1.5rem;
+  line-height: 1.1; }
+
+.account-row .form-check button.account-add {
+  margin-left: 0.3rem; }
+
+.account-row .form-check button.account-remove {
+  padding: 0.1rem 0.65rem; }
+
 @media screen and (min-width: 768px) and (max-width: 992px) {
   #mainmenu {
     padding-left: 95px; }

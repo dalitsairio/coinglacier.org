@@ -58945,6 +58945,8 @@ const bitcoin = require('./bitcoin');
 // contains not only network information, but also address type specific information
 var network;
 var showXPUB;
+var accounts = [];
+var amountAddressesPerAccount;
 
 // GET parameters
 var GET = {};
@@ -58979,8 +58981,8 @@ var DOM = {};
 DOM.body = $('body');
 
 DOM.network = {};
-DOM.network.mainnet = $("#mainnet-link");
-DOM.network.testnet = $("#testnet-link");
+DOM.network.mainnet = $('#mainnet-link');
+DOM.network.testnet = $('#testnet-link');
 DOM.network.testnetWarning = $('#testnet-warning');
 
 DOM.menu = $('#mainmenu');
@@ -59000,10 +59002,11 @@ DOM.options.addressTypes.nonSegwit = $('input#non-segwit');
 DOM.options.addressTypes.segwit = $('input#segwit');
 DOM.options.addressTypes.bech32 = $('input#bech32');
 DOM.options.showXPUB = $('input#showXPUB');
+DOM.options.accountTemplate = $('#account-row-template');
 
 DOM.popovers = {};
-DOM.popovers.testnetWarning = $("#testnet-warning");
-DOM.popovers.showXPUB = $("#showXPUBlabel");
+DOM.popovers.testnetWarning = $('#testnet-warning');
+DOM.popovers.showXPUB = $('#showXPUBlabel');
 
 
 // //////////////////////////////////////////////////
@@ -59020,6 +59023,7 @@ const defaultPage = {
     getParam: GET.pages.singleWallet
 };
 showXPUB = false;
+amountAddressesPerAccount = 3;
 
 
 // //////////////////////////////////////////////////
@@ -59078,6 +59082,10 @@ function init() {
         DOM.popovers[x].popover({html:true});
     }
 
+    showAccountsOptions();
+    addAccount(0, 2);
+    addAccount(1, 4);
+
     // unit tests
     runUnitTests();
 }
@@ -59088,6 +59096,7 @@ function init() {
 // //////////////////////////////////////////////////
 
 function changePage(pageElementsDOM, menuEntryDOM, pageKeyword){
+    setupPageOptions(pageKeyword);
     changePageElements(pageElementsDOM);
     switchMenuLink(menuEntryDOM);
     switchURLparam({key: GET.pages.keyword, value: pageKeyword});
@@ -59188,9 +59197,125 @@ function changeAddressType(newType){
 // option show extended public key
 function optionShowXPUBchanged(){
     showXPUB = DOM.options.showXPUB.prop('checked');
+    if(showXPUB){
+        enableAccounts();
+    }else{
+        disableAccounts();
+    }
     loadWallet();
 }
 
+function setupPageOptions(pageKeyword){
+    switch (pageKeyword){
+        case GET.pages.singleWallet:
+            disableAccounts();
+            break;
+        case GET.pages.paperWallet:
+            if(DOM.options.showXPUB.prop('checked')) {
+                enableAccounts();
+            }
+            break;
+    }
+}
+
+function enableAccounts(){
+    $('.account-row.not-template span.title').show();
+    $('.account-row.not-template button.account-insertion').show();
+}
+
+function disableAccounts(){
+    $('.account-row.not-template span.title').hide();
+    $('.account-row.not-template button.account-insertion').hide();
+}
+
+function initAccounts(){
+    accounts.push({next: Number.MAX_VALUE, addresses: amountAddressesPerAccount});
+}
+function addAccount(prev, amountOfAddresses){
+
+    var arrayLength = accounts.length;
+
+    accounts[arrayLength] = {};
+    accounts[arrayLength].next = accounts[prev].next;
+    accounts[arrayLength].addresses = amountOfAddresses;
+    accounts[prev].next = arrayLength;
+
+    // reload the view
+    showAccountsOptions();
+}
+function removeAccount(position){
+
+    var previousAccount = getPreviousAccount(position);
+
+    if(previousAccount >= 0) {
+        accounts[getPreviousAccount(position)] = accounts[position].next;
+    }
+
+    // remove the element from array
+    accounts.splice(position, 1);
+
+    // reload the view
+    showAccountsOptions();
+}
+function getPreviousAccount(position){
+    for (var x = 0; x < accounts.length; x++){
+        if(accounts[x].next === position){
+            return x;
+        }
+    }
+    return -1; // First account --> has no previous account
+}
+
+function getFirstAccountIndex(){
+    var indexFirstElement = 0;
+    while(getPreviousAccount(indexFirstElement) >= 0){
+        indexFirstElement ++;
+    }
+
+    return indexFirstElement;
+}
+function sortAccounts(){
+    var newArray = [];
+    var nextAccountIndex = getFirstAccountIndex();
+
+    while(nextAccountIndex < Number.MAX_VALUE){
+        newArray.push(accounts[nextAccountIndex]);
+        nextAccountIndex = accounts[nextAccountIndex].next;
+    }
+
+    accounts = newArray;
+}
+function showAccountsOptions(){
+
+    if(isAccountsEmpty()){
+        initAccounts();
+    }else{
+        sortAccounts();
+    }
+
+    // remove all accounts to add them again
+    $('.account-row.not-template').remove();
+
+    // todo change direction of loop
+    for(var index = accounts.length -1; index >= 0; index--){
+        var accountDiv = DOM.options.accountTemplate.clone();
+        accountDiv.prop('id', 'account-row-' + index);
+        accountDiv.addClass('not-template');
+
+        accountDiv.find('.title').text('Account ' + (index +1));
+        accountDiv.find('input').prop('id', 'addresses-amount-' + index);
+        accountDiv.find('input').val(accounts[index].addresses);
+        accountDiv.find('label').prop('for', 'addresses-amount-' + index);
+
+
+
+
+        DOM.options.accountTemplate.after(accountDiv);
+    }
+}
+function isAccountsEmpty(){
+    return typeof accounts === 'undefined' || accounts.length === 0;
+}
 
 // //////////////////////////////////////////////////
 // Bitcoin Stuff

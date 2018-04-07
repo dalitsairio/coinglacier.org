@@ -91,6 +91,41 @@ $theme-colors: (
     max-width: 276px;
 }
 
+
+#account-row-template{
+    display: none;
+}
+
+.account-row .form-check{
+    span {
+        font-weight: bold;
+        margin-left: -0.6rem;
+    }
+
+    label {
+        margin-left: 1.2rem;
+    }
+
+    input {
+        margin-left: 0.6rem;
+        width: 5rem;
+    }
+
+    button {
+        padding: 0.1rem 0.5rem;
+        font-size: 1.5rem;
+        line-height: 1.1;
+    }
+    button.account-add {
+        margin-left: 0.3rem;
+    }
+    button.account-remove{
+        padding: 0.1rem 0.65rem;
+    }
+}
+
+
+
 @media screen and (min-width: $bootstrap-sm) and (max-width: $bootstrap-md){
     #mainmenu {
         padding-left: 95px;
