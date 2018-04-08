@@ -153,8 +153,6 @@ function init() {
     }
 
     showAccountsOptions();
-    addAccount(0, 2);
-    addAccount(1, 4);
 
     // unit tests
     runUnitTests();
@@ -294,90 +292,78 @@ function enableAccounts(){
 }
 
 function disableAccounts(){
+    accounts.splice(1, accounts.length - 1); // remove all entries but the first
+    showAccountsOptions();
     $('.account-row.not-template span.title').hide();
     $('.account-row.not-template button.account-insertion').hide();
+    loadWallet();
 }
 
 function initAccounts(){
-    accounts.push({next: Number.MAX_VALUE, addresses: amountAddressesPerAccount});
+    accounts.push(amountAddressesPerAccount);
 }
-function addAccount(prev, amountOfAddresses){
-
-    var arrayLength = accounts.length;
-
-    accounts[arrayLength] = {};
-    accounts[arrayLength].next = accounts[prev].next;
-    accounts[arrayLength].addresses = amountOfAddresses;
-    accounts[prev].next = arrayLength;
+function addAccount(prev){
+    accounts.splice(prev + 1, 0, amountAddressesPerAccount);
 
     // reload the view
     showAccountsOptions();
 }
 function removeAccount(position){
-
-    var previousAccount = getPreviousAccount(position);
-
-    if(previousAccount >= 0) {
-        accounts[getPreviousAccount(position)] = accounts[position].next;
-    }
-
     // remove the element from array
     accounts.splice(position, 1);
 
     // reload the view
     showAccountsOptions();
 }
-function getPreviousAccount(position){
-    for (var x = 0; x < accounts.length; x++){
-        if(accounts[x].next === position){
-            return x;
-        }
+function setAddressesPerAccount(index, amount){
+    if(amount > 0) {
+        accounts[index] = amount;
     }
-    return -1; // First account --> has no previous account
-}
-
-function getFirstAccountIndex(){
-    var indexFirstElement = 0;
-    while(getPreviousAccount(indexFirstElement) >= 0){
-        indexFirstElement ++;
-    }
-
-    return indexFirstElement;
-}
-function sortAccounts(){
-    var newArray = [];
-    var nextAccountIndex = getFirstAccountIndex();
-
-    while(nextAccountIndex < Number.MAX_VALUE){
-        newArray.push(accounts[nextAccountIndex]);
-        nextAccountIndex = accounts[nextAccountIndex].next;
-    }
-
-    accounts = newArray;
 }
 function showAccountsOptions(){
 
     if(isAccountsEmpty()){
         initAccounts();
-    }else{
-        sortAccounts();
     }
 
     // remove all accounts to add them again
     $('.account-row.not-template').remove();
 
-    // todo change direction of loop
     for(var index = accounts.length -1; index >= 0; index--){
+
         var accountDiv = DOM.options.accountTemplate.clone();
         accountDiv.prop('id', 'account-row-' + index);
         accountDiv.addClass('not-template');
 
         accountDiv.find('.title').text('Account ' + (index +1));
         accountDiv.find('input').prop('id', 'addresses-amount-' + index);
-        accountDiv.find('input').val(accounts[index].addresses);
+        accountDiv.find('input').val(accounts[index]);
         accountDiv.find('label').prop('for', 'addresses-amount-' + index);
 
+        if(showXPUB) {
+            accountDiv.find('.title').show();
+            accountDiv.find('button').show();
+        }
 
+        if(accounts.length <= 1){
+            accountDiv.find('button.account-remove').prop('disabled', true);
+        }
+
+        // events on buttons and on input change
+        (function(accIndex, accDiv){
+            accountDiv.find('button.account-add').click(function () {
+                addAccount(accIndex, amountAddressesPerAccount);
+                loadWallet();
+            });
+            accountDiv.find('button.account-remove').click(function () {
+                removeAccount(accIndex);
+                loadWallet();
+            });
+            accountDiv.find('input#addresses-amount-' + accIndex).change(function () {
+                setAddressesPerAccount(accIndex, parseInt(accDiv.find('input#addresses-amount-' + accIndex).val()));
+                loadWallet();
+            });
+        })(index, accountDiv); // pass as argument to anonymous function - this will introduce a new scope
 
 
         DOM.options.accountTemplate.after(accountDiv);
@@ -441,7 +427,7 @@ function loadWallet() {
     var div_tag = document.getElementById('temporary');
 
     var x = {
-        dynamic: bitcoin.createP2PKHaddresses([1], network),
+        dynamic: bitcoin.createP2PKHaddresses(accounts, network),
         // non_segwit_mainnet_encrypted: bitcoin.createP2PKHaddresses([1], bitcoin.networks.bitcoin.p2wpkh, 'MoonLambo'),
         // non_segwit_testnet: bitcoin.createP2PKHaddresses([2, 3], bitcoin.networks.testnet),
         // p2sh_p2wpkh_mainnet: bitcoin.createP2PKHaddresses(1, bitcoin.networks.bitcoin.p2wpkhInP2sh),
