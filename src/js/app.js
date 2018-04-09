@@ -75,7 +75,7 @@ DOM.options.showXPUB = $('input#showXPUB');
 DOM.options.accountTemplate = $('#account-row-template');
 DOM.options.encryption = {};
 DOM.options.encryption.pass = $('input#password');
-DOM.options.encryption.hidePass = $('input#hidePass');
+DOM.options.encryption.hidePass = $('span#hidePass');
 
 DOM.popovers = {};
 DOM.popovers.testnetWarning = $('#testnet-warning');
@@ -376,10 +376,12 @@ function showAccountsOptions(){
 }
 
 function togglePasswordVisibility(){
-    if(DOM.options.encryption.hidePass.prop('checked')){
-        $(DOM.options.encryption.pass).prop('type', 'password');
+    if(DOM.options.encryption.pass.prop('type') === 'text'){
+        DOM.options.encryption.pass.prop('type', 'password');
+        DOM.options.encryption.hidePass.html('Show');
     }else{
-        $(DOM.options.encryption.pass).prop('type', 'text');
+        DOM.options.encryption.pass.prop('type', 'text');
+        DOM.options.encryption.hidePass.html('Hide');
     }
 };
 

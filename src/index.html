@@ -306,15 +306,19 @@ Git Repo: https://github.com/dalitsairio/coinglacier.org.git
         <div id="wallet-encryption">
             <div class="form-check">
                 <label class="form-check-label" for="password">Encrypt with Password</label>
-                <input id="password" data-toggle="Not Encrypted" class="form-control" type="text" placeholder="Not Encrypted"
-                       data-trigger="hover" data-placement="bottom" title="Never forget your password!"
-                       data-content="<div class='normal-popover'>Both the mnemonic and the resulting private keys get encrypted
-                       (using standards BIP39 resp. BIP38). <span class='popover-highlight'>If you lose your password,
-                       you lose all of your funds!</span><br /><br/>
-                       This option is resource-intensive and might slow down or even corrupt this service,
-                       depending on how many addresses you need and what device you are on.</div>">
-                <label class="form-check-label" for="hidePass">Hide</label>
-                <input type="checkbox" class="form-check-input" id="hidePass">
+                <div class="input-group mb-3">
+                    <div class="input-group-append">
+                        <span class="input-group-text text-center" id="hidePass">Hide</span>
+                    </div>
+                    <input id="password" data-toggle="Not Encrypted" class="form-control" type="text" placeholder="Not Encrypted"
+                           data-trigger="hover" data-placement="bottom" title="Never forget your password!"
+                           data-content="<div class='normal-popover'>Both the mnemonic and the resulting private keys get encrypted
+                           (using standards BIP39 resp. BIP38). <span class='popover-highlight'>If you lose your password,
+                           you lose all of your funds!</span><br /><br/>
+                           This option is resource-intensive and might slow down or even corrupt this service,
+                           depending on how many addresses you need and what device you are on.</div>"
+                           aria-label="Hide Password" aria-describedby="hidePass">
+                </div>
             </div>
         </div>
 

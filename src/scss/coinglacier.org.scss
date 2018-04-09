@@ -91,6 +91,11 @@ $theme-colors: (
     max-width: 276px;
 }
 
+.popover-highlight{
+    color: #800000;
+    font-style: italic;
+}
+
 
 #account-row-template{
     display: none;
@@ -124,9 +129,10 @@ $theme-colors: (
     }
 }
 
-.popover-highlight{
-    color: #800000;
-    font-style: italic;
+span#hidePass{
+    min-width: 68px;
+    text-transform: uppercase;
+    font-size: smaller;
 }
 
 @media screen and (min-width: $bootstrap-sm) and (max-width: $bootstrap-md){

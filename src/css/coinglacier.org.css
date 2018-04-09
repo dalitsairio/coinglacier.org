@@ -11453,6 +11453,10 @@ a.text-dark:hover, a.text-dark:focus {
 .popover .normal-popover {
   max-width: 276px; }
 
+.popover-highlight {
+  color: #800000;
+  font-style: italic; }
+
 #account-row-template {
   display: none; }
 
@@ -11478,9 +11482,10 @@ a.text-dark:hover, a.text-dark:focus {
 .account-row .form-check button.account-remove {
   padding: 0.1rem 0.65rem; }
 
-.popover-highlight {
-  color: #800000;
-  font-style: italic; }
+span#hidePass {
+  min-width: 68px;
+  text-transform: uppercase;
+  font-size: smaller; }
 
 @media screen and (min-width: 768px) and (max-width: 992px) {
   #mainmenu {
