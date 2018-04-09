@@ -11,7 +11,7 @@ Git Repo: https://github.com/dalitsairio/coinglacier.org.git
 
     <!-- mocha -->
     <link rel="stylesheet" href="css/libs/mocha.css" inline>
-    
+
     <link rel="stylesheet" href="css/coinglacier.org.css" inline>
 
 <title>coinglacier.org | Bitcoin Cold Storage & Paper Wallets</title>
@@ -280,7 +280,7 @@ Git Repo: https://github.com/dalitsairio/coinglacier.org.git
             <label id="showXPUBlabel" class="form-check-label" for="showXPUB" data-trigger="hover" data-placement="bottom"
                    title="Benefit & Drawback" data-content="<div id='make-fat-hack'><p>Ext. pubKeys allow you to check the balances of
                         all your addresses [per account] in one go.</p>
-                        <p>However, when using this feature, <span style='color: #800000; font-style: italic;'>
+                        <p>However, when using this feature, <span class='popover-highlight'>
                         you must be particularly careful not to leak any of your private keys,
                         even if you don't have any money on the respective address (anymore)</span>,
                         since an attacker could find all of your private keys [of an account] given only one leaked private key.</p>
@@ -301,6 +301,23 @@ Git Repo: https://github.com/dalitsairio/coinglacier.org.git
             </div>
         </div>
 
+
+        <!-- encrypt private keys and mnemonic -->
+        <div id="wallet-encryption">
+            <div class="form-check">
+                <label class="form-check-label" for="password">Encrypt with Password</label>
+                <input id="password" data-toggle="Not Encrypted" class="form-control" type="text" placeholder="Not Encrypted"
+                       data-trigger="hover" data-placement="bottom" title="Never forget your password!"
+                       data-content="<div class='normal-popover'>Both the mnemonic and the resulting private keys get encrypted
+                       (using standards BIP39 resp. BIP38). <span class='popover-highlight'>If you lose your password,
+                       you lose all of your funds!</span><br /><br/>
+                       This option is resource-intensive and might slow down or even corrupt this service,
+                       depending on how many addresses you need and what device you are on.</div>">
+                <label class="form-check-label" for="hidePass">Hide</label>
+                <input type="checkbox" class="form-check-input" id="hidePass">
+            </div>
+        </div>
+
     </div>
 
 
@@ -313,6 +330,7 @@ Git Repo: https://github.com/dalitsairio/coinglacier.org.git
 <script src="js/libs/jquery.js" inline></script>
 <script src="js/libs/bootstrap.bundle.js" inline></script>
 <script src="js/libs/mocha.js" inline></script>
+
 <script src="js/bundle.js" inline></script>
 
 </body>

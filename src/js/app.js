@@ -73,10 +73,14 @@ DOM.options.addressTypes.segwit = $('input#segwit');
 DOM.options.addressTypes.bech32 = $('input#bech32');
 DOM.options.showXPUB = $('input#showXPUB');
 DOM.options.accountTemplate = $('#account-row-template');
+DOM.options.encryption = {};
+DOM.options.encryption.pass = $('input#password');
+DOM.options.encryption.hidePass = $('input#hidePass');
 
 DOM.popovers = {};
 DOM.popovers.testnetWarning = $('#testnet-warning');
 DOM.popovers.showXPUB = $('#showXPUBlabel');
+DOM.popovers.encryption = $('input#password');
 
 
 // //////////////////////////////////////////////////
@@ -119,7 +123,8 @@ DOM.options.addressTypes.segwit.click(changeToSegwit);
 DOM.options.addressTypes.bech32.click(changeToBech32);
 // Show XPUB
 DOM.options.showXPUB.change(optionShowXPUBchanged);
-
+// Encryption
+DOM.options.encryption.hidePass.click(togglePasswordVisibility);
 
 // //////////////////////////////////////////////////
 // Page Loading
@@ -369,6 +374,15 @@ function showAccountsOptions(){
         DOM.options.accountTemplate.after(accountDiv);
     }
 }
+
+function togglePasswordVisibility(){
+    if(DOM.options.encryption.hidePass.prop('checked')){
+        $(DOM.options.encryption.pass).prop('type', 'password');
+    }else{
+        $(DOM.options.encryption.pass).prop('type', 'text');
+    }
+};
+
 function isAccountsEmpty(){
     return typeof accounts === 'undefined' || accounts.length === 0;
 }

@@ -124,7 +124,10 @@ $theme-colors: (
     }
 }
 
-
+.popover-highlight{
+    color: #800000;
+    font-style: italic;
+}
 
 @media screen and (min-width: $bootstrap-sm) and (max-width: $bootstrap-md){
     #mainmenu {

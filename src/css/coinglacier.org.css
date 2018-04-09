@@ -11478,6 +11478,10 @@ a.text-dark:hover, a.text-dark:focus {
 .account-row .form-check button.account-remove {
   padding: 0.1rem 0.65rem; }
 
+.popover-highlight {
+  color: #800000;
+  font-style: italic; }
+
 @media screen and (min-width: 768px) and (max-width: 992px) {
   #mainmenu {
     padding-left: 95px; }
