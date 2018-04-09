@@ -75,16 +75,16 @@ gulp.task('move-dependencies', function () {
         ])
         .pipe(gulp.dest('src/js/libs'));
 
-    gulp.src(['node_modules/mocha/mocha.css'])
+    gulp.src('node_modules/mocha/mocha.css')
         .pipe(gulp.dest('src/css/libs'));
 
-    gulp.src(['node_modules/bootstrap/scss/*.scss'])
+    gulp.src('node_modules/bootstrap/scss/*.scss')
         .pipe(gulp.dest('src/scss/libs/bootstrap'));
 
-    gulp.src(['node_modules/bootstrap/scss/mixins/*.scss'])
+    gulp.src('node_modules/bootstrap/scss/mixins/*.scss')
         .pipe(gulp.dest('src/scss/libs/bootstrap/mixins'));
 
-    return gulp.src(['node_modules/bootstrap/scss/utilities/*.scss'])
+    return gulp.src('node_modules/bootstrap/scss/utilities/*.scss')
         .pipe(gulp.dest('src/scss/libs/bootstrap/utilities'));
 
 });
