@@ -58947,6 +58947,8 @@ var network;
 var showXPUB;
 var accounts = [];
 var amountAddressesPerAccount;
+var password;
+var defaultPassword;
 
 // GET parameters
 var GET = {};
@@ -59028,6 +59030,7 @@ const defaultPage = {
 };
 showXPUB = false;
 amountAddressesPerAccount = 3;
+defaultPassword = '';
 
 
 // //////////////////////////////////////////////////
@@ -59055,6 +59058,7 @@ DOM.options.addressTypes.bech32.click(changeToBech32);
 DOM.options.showXPUB.change(optionShowXPUBchanged);
 // Encryption
 DOM.options.encryption.hidePass.click(togglePasswordVisibility);
+DOM.options.encryption.pass.change(changePassword);
 
 // //////////////////////////////////////////////////
 // Page Loading
@@ -59088,6 +59092,10 @@ function init() {
     }
 
     showAccountsOptions();
+
+    password = defaultPassword;
+
+    loadWallet();
 
     // unit tests
     runUnitTests();
@@ -59212,11 +59220,13 @@ function setupPageOptions(pageKeyword){
     switch (pageKeyword){
         case GET.pages.singleWallet:
             disableAccounts();
+            password = '';
             break;
         case GET.pages.paperWallet:
             if(DOM.options.showXPUB.prop('checked')) {
                 enableAccounts();
             }
+            password = defaultPassword;
             break;
     }
 }
@@ -59315,6 +59325,11 @@ function togglePasswordVisibility(){
     }
 };
 
+function changePassword(){
+    password = DOM.options.encryption.pass.val();
+    loadWallet();
+};
+
 function isAccountsEmpty(){
     return typeof accounts === 'undefined' || accounts.length === 0;
 }
@@ -59373,7 +59388,7 @@ function loadWallet() {
     var div_tag = document.getElementById('temporary');
 
     var x = {
-        dynamic: bitcoin.createP2PKHaddresses(accounts, network),
+        dynamic: bitcoin.createP2PKHaddresses(accounts, network, password),
         // non_segwit_mainnet_encrypted: bitcoin.createP2PKHaddresses([1], bitcoin.networks.bitcoin.p2wpkh, 'MoonLambo'),
         // non_segwit_testnet: bitcoin.createP2PKHaddresses([2, 3], bitcoin.networks.testnet),
         // p2sh_p2wpkh_mainnet: bitcoin.createP2PKHaddresses(1, bitcoin.networks.bitcoin.p2wpkhInP2sh),
