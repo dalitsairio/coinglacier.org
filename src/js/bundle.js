@@ -59334,6 +59334,7 @@ function isAccountsEmpty(){
     return typeof accounts === 'undefined' || accounts.length === 0;
 }
 
+
 // //////////////////////////////////////////////////
 // Bitcoin Stuff
 // //////////////////////////////////////////////////
@@ -59379,9 +59380,10 @@ function recalculateWallet(){
 }
 
 // todo this function will be replaced properly
-function loadWallet() {
 
-    var mnemonic = bitcoin.initiateHDWallet('curve swear maze domain knock frozen ordinary climb love possible brave market');
+var mnemonic = bitcoin.initiateHDWallet('curve swear maze domain knock frozen ordinary climb love possible brave market', password, true);
+
+function loadWallet() {
 
     html_output = "<h1>" + mnemonic + "</h1>";
 
@@ -59509,8 +59511,13 @@ const wif = require('wif');
 
 var mnemonic;
 var bip32RootKey;
+var useCache;
+var cache;
 
-function initiateHDWallet (loadMnemonic, password) {
+function initiateHDWallet (loadMnemonic, password, cacheResults) {
+
+    useCache = (cacheResults ? true : false);
+    cache = [];
 
     if(!loadMnemonic) {
         // create a new mnemonic and return it
@@ -59556,21 +59563,50 @@ function createP2PKHaddresses (accounts, targetNetwork, password) {
         var account =  bip32RootKey.derivePath(accountPath);
         account.keyPair.network = targetNetwork;
 
-        result[accIndex] = {};
-        result[accIndex].credentials = createAccountCredentials(account, targetNetwork, amount, password);
-        result[accIndex].xpub = account.neutered().toBase58();
+        var accountResults;
 
+        // read data from cache
+        var cachedData = getCachedResults(accountPath, password);
+        if(cachedData){
+            var cachedAmount = cachedData.credentials.length;
+
+            if(cachedAmount >= amount){
+                // clone the cache object
+                var cacheCopy = {};
+                cacheCopy.xpub = cachedData.xpub;
+                cacheCopy.credentials = cachedData.credentials;
+                cacheCopy.credentials.splice(amount); // from the clone, remove the data that is not needed
+
+                result[accIndex] = cacheCopy;
+                continue;
+            }else{
+                // remove result from cache (to afterwards write the bigger cache)
+                removeCachedResult(accountPath, password);
+
+                // prepend to the cached results so not all the calculations need to be done anymore
+                accountResults = cachedData;
+                var newCredentials = createAccountCredentials(account, targetNetwork, amount, password, cachedAmount);
+                accountResults.credentials = accountResults.credentials.concat(newCredentials);
+            }
+        }else{
+            accountResults = {};
+            accountResults.credentials = createAccountCredentials(account, targetNetwork, amount, password);
+            accountResults.xpub = account.neutered().toBase58();
+        }
+
+        result[accIndex] = accountResults;
+        cacheResults(accountPath, password, accountResults);
     }
 
     return result;
 }
 
 // creates addresses and privKeys on the level of a BIP32 account
-function createAccountCredentials(account, network, amount, password){
+function createAccountCredentials(account, network, amount, password, startIndex){
 
     var credentials = [];
 
-    for (var index = 0; index < amount; index++) {
+    for (var index = startIndex || 0; index < amount; index++) {
 
         // PrivKey / BIP44 | BIP49 | BIP84 / Bitcoin | Testnet / Account / External / First Address
         //                                                                 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -59733,6 +59769,46 @@ function findDerivationPathErrors(path, createXPUB, fromMasternode) {
     }
     return false;
 }
+
+
+// //////////////////////////////////////////////////
+// Result Caching
+// Caching is only done per mnemonic and is resetted
+// on the creation of a new mnemonic.
+// //////////////////////////////////////////////////
+
+function cacheResults(accountPath, password, accountResults){
+    if(useCache) {
+        cache.push({
+                accountPath: accountPath,
+                password: password,
+                xpub: accountResults.xpub,
+                credentials: accountResults.credentials
+            });
+    }
+}
+
+function getCachedResults(accountPath, password){
+    if(useCache) {
+        for (var i = 0; i < cache.length; i++) {
+            if (cache[i].accountPath === accountPath && cache[i].password === password) {
+                return cache[i];
+            }
+        }
+    }
+
+    return false;
+}
+
+function removeCachedResult(accountPath, password){
+    for (var i = 0; i < cache.length; i++) {
+        if (cache[i].accountPath === accountPath && cache[i].password === password) {
+            cache.splice(i, 1);
+        }
+    }
+}
+
+
 
 module.exports = {
     initiateHDWallet,
@@ -60145,7 +60221,90 @@ function bitcoinJStests() {
 
         });
     });
-}
+    describe('Result Caching', function () {
+        describe('Credentials', function () {
+            it('Same Amount in Cache', function () {
+                // create 4 addresses without the use of caching
+                bitcoin.initiateHDWallet(testing_mnemonic);
+                var credentialsUncached = bitcoin.createP2PKHaddresses([4], bitcoin.networks.bitcoin);
+
+                // use caching, create 4 addresses and then read them from cache
+                bitcoin.initiateHDWallet(testing_mnemonic, false, true);
+                bitcoin.createP2PKHaddresses([4], bitcoin.networks.bitcoin);
+                var credentialsCached = bitcoin.createP2PKHaddresses([4], bitcoin.networks.bitcoin);
+
+                assert.deepEqual(credentialsUncached.credentials, credentialsCached.credentials);
+            });
+
+            it('Less Addresses in Cache', function () {
+                // create 4 addresses without the use of caching
+                bitcoin.initiateHDWallet(testing_mnemonic);
+                var credentialsUncached = bitcoin.createP2PKHaddresses([4], bitcoin.networks.bitcoin);
+
+                // use caching, create 2 addresses and then add 2 more
+                bitcoin.initiateHDWallet(testing_mnemonic, false, true);
+                bitcoin.createP2PKHaddresses([2], bitcoin.networks.bitcoin);
+                var credentialsCached = bitcoin.createP2PKHaddresses([4], bitcoin.networks.bitcoin);
+
+                assert.deepEqual(credentialsUncached.credentials, credentialsCached.credentials);
+            });
+
+            it('More Addresses in Cache', function () {
+                // create 4 addresses without the use of caching
+                bitcoin.initiateHDWallet(testing_mnemonic);
+                var credentialsUncached = bitcoin.createP2PKHaddresses([4], bitcoin.networks.bitcoin);
+
+                // use caching, create 6 addresses but then read only 4
+                bitcoin.initiateHDWallet(testing_mnemonic, false, true);
+                bitcoin.createP2PKHaddresses([6], bitcoin.networks.bitcoin);
+                var credentialsCached = bitcoin.createP2PKHaddresses([4], bitcoin.networks.bitcoin);
+
+                assert.deepEqual(credentialsUncached.credentials, credentialsCached.credentials);
+            });
+        })
+        describe('XPUB', function () {
+            it('Same Amount in Cache', function () {
+                // create 4 addresses without the use of caching
+                bitcoin.initiateHDWallet(testing_mnemonic);
+                var credentialsUncached = bitcoin.createP2PKHaddresses([4], bitcoin.networks.bitcoin);
+
+                // use caching, create 4 addresses and then read them from cache
+                bitcoin.initiateHDWallet(testing_mnemonic, false, true);
+                bitcoin.createP2PKHaddresses([4], bitcoin.networks.bitcoin);
+                var credentialsCached = bitcoin.createP2PKHaddresses([4], bitcoin.networks.bitcoin);
+
+                assert.deepEqual(credentialsUncached.xpub, credentialsCached.xpub);
+            });
+
+            it('Less Addresses in Cache', function () {
+                // create 4 addresses without the use of caching
+                bitcoin.initiateHDWallet(testing_mnemonic);
+                var credentialsUncached = bitcoin.createP2PKHaddresses([4], bitcoin.networks.bitcoin);
+
+                // use caching, create 2 addresses and then add 2 more
+                bitcoin.initiateHDWallet(testing_mnemonic, false, true);
+                bitcoin.createP2PKHaddresses([2], bitcoin.networks.bitcoin);
+                var credentialsCached = bitcoin.createP2PKHaddresses([4], bitcoin.networks.bitcoin);
+
+                assert.deepEqual(credentialsUncached.xpub, credentialsCached.xpub);
+            });
+
+            it('More Addresses in Cache', function () {
+                // create 4 addresses without the use of caching
+                bitcoin.initiateHDWallet(testing_mnemonic);
+                var credentialsUncached = bitcoin.createP2PKHaddresses([4], bitcoin.networks.bitcoin);
+
+                // use caching, create 6 addresses but then read only 4
+                bitcoin.initiateHDWallet(testing_mnemonic, false, true);
+                bitcoin.createP2PKHaddresses([6], bitcoin.networks.bitcoin);
+                var credentialsCached = bitcoin.createP2PKHaddresses([4], bitcoin.networks.bitcoin);
+
+                assert.deepEqual(credentialsUncached.xpub, credentialsCached.xpub);
+            });
+        });
+    });
+
+    }
 
 module.exports = {
     bitcoinJStests

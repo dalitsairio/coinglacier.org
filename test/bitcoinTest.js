@@ -322,7 +322,90 @@ function bitcoinJStests() {
 
         });
     });
-}
+    describe('Result Caching', function () {
+        describe('Credentials', function () {
+            it('Same Amount in Cache', function () {
+                // create 4 addresses without the use of caching
+                bitcoin.initiateHDWallet(testing_mnemonic);
+                var credentialsUncached = bitcoin.createP2PKHaddresses([4], bitcoin.networks.bitcoin);
+
+                // use caching, create 4 addresses and then read them from cache
+                bitcoin.initiateHDWallet(testing_mnemonic, false, true);
+                bitcoin.createP2PKHaddresses([4], bitcoin.networks.bitcoin);
+                var credentialsCached = bitcoin.createP2PKHaddresses([4], bitcoin.networks.bitcoin);
+
+                assert.deepEqual(credentialsUncached.credentials, credentialsCached.credentials);
+            });
+
+            it('Less Addresses in Cache', function () {
+                // create 4 addresses without the use of caching
+                bitcoin.initiateHDWallet(testing_mnemonic);
+                var credentialsUncached = bitcoin.createP2PKHaddresses([4], bitcoin.networks.bitcoin);
+
+                // use caching, create 2 addresses and then add 2 more
+                bitcoin.initiateHDWallet(testing_mnemonic, false, true);
+                bitcoin.createP2PKHaddresses([2], bitcoin.networks.bitcoin);
+                var credentialsCached = bitcoin.createP2PKHaddresses([4], bitcoin.networks.bitcoin);
+
+                assert.deepEqual(credentialsUncached.credentials, credentialsCached.credentials);
+            });
+
+            it('More Addresses in Cache', function () {
+                // create 4 addresses without the use of caching
+                bitcoin.initiateHDWallet(testing_mnemonic);
+                var credentialsUncached = bitcoin.createP2PKHaddresses([4], bitcoin.networks.bitcoin);
+
+                // use caching, create 6 addresses but then read only 4
+                bitcoin.initiateHDWallet(testing_mnemonic, false, true);
+                bitcoin.createP2PKHaddresses([6], bitcoin.networks.bitcoin);
+                var credentialsCached = bitcoin.createP2PKHaddresses([4], bitcoin.networks.bitcoin);
+
+                assert.deepEqual(credentialsUncached.credentials, credentialsCached.credentials);
+            });
+        })
+        describe('XPUB', function () {
+            it('Same Amount in Cache', function () {
+                // create 4 addresses without the use of caching
+                bitcoin.initiateHDWallet(testing_mnemonic);
+                var credentialsUncached = bitcoin.createP2PKHaddresses([4], bitcoin.networks.bitcoin);
+
+                // use caching, create 4 addresses and then read them from cache
+                bitcoin.initiateHDWallet(testing_mnemonic, false, true);
+                bitcoin.createP2PKHaddresses([4], bitcoin.networks.bitcoin);
+                var credentialsCached = bitcoin.createP2PKHaddresses([4], bitcoin.networks.bitcoin);
+
+                assert.deepEqual(credentialsUncached.xpub, credentialsCached.xpub);
+            });
+
+            it('Less Addresses in Cache', function () {
+                // create 4 addresses without the use of caching
+                bitcoin.initiateHDWallet(testing_mnemonic);
+                var credentialsUncached = bitcoin.createP2PKHaddresses([4], bitcoin.networks.bitcoin);
+
+                // use caching, create 2 addresses and then add 2 more
+                bitcoin.initiateHDWallet(testing_mnemonic, false, true);
+                bitcoin.createP2PKHaddresses([2], bitcoin.networks.bitcoin);
+                var credentialsCached = bitcoin.createP2PKHaddresses([4], bitcoin.networks.bitcoin);
+
+                assert.deepEqual(credentialsUncached.xpub, credentialsCached.xpub);
+            });
+
+            it('More Addresses in Cache', function () {
+                // create 4 addresses without the use of caching
+                bitcoin.initiateHDWallet(testing_mnemonic);
+                var credentialsUncached = bitcoin.createP2PKHaddresses([4], bitcoin.networks.bitcoin);
+
+                // use caching, create 6 addresses but then read only 4
+                bitcoin.initiateHDWallet(testing_mnemonic, false, true);
+                bitcoin.createP2PKHaddresses([6], bitcoin.networks.bitcoin);
+                var credentialsCached = bitcoin.createP2PKHaddresses([4], bitcoin.networks.bitcoin);
+
+                assert.deepEqual(credentialsUncached.xpub, credentialsCached.xpub);
+            });
+        });
+    });
+
+    }
 
 module.exports = {
     bitcoinJStests

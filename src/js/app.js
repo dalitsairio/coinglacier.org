@@ -404,6 +404,7 @@ function isAccountsEmpty(){
     return typeof accounts === 'undefined' || accounts.length === 0;
 }
 
+
 // //////////////////////////////////////////////////
 // Bitcoin Stuff
 // //////////////////////////////////////////////////
@@ -449,9 +450,10 @@ function recalculateWallet(){
 }
 
 // todo this function will be replaced properly
-function loadWallet() {
 
-    var mnemonic = bitcoin.initiateHDWallet('curve swear maze domain knock frozen ordinary climb love possible brave market');
+var mnemonic = bitcoin.initiateHDWallet('curve swear maze domain knock frozen ordinary climb love possible brave market', password, true);
+
+function loadWallet() {
 
     html_output = "<h1>" + mnemonic + "</h1>";
 
