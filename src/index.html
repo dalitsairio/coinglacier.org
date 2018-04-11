@@ -28,7 +28,8 @@ Git Repo: https://github.com/dalitsairio/coinglacier.org.git
 
     <div id="testnet-warning" class="alert alert-warning mt-1 text-center" role="warning"
          style="display: none;" data-trigger="hover" data-placement="bottom"
-         title="Don't use real Bitcoin" data-content="<div class='normal-popover'>The generated addresses must solely be used for testnet-Bitcoins.</div>">
+         title="Don't use real Bitcoin" data-content="<div class='normal-popover'>
+         The generated addresses must solely be used for testnet-Bitcoins.</div>">
         TESTNET VERSION ACTIVATED
     </div>
 
@@ -301,7 +302,6 @@ Git Repo: https://github.com/dalitsairio/coinglacier.org.git
             </div>
         </div>
 
-
         <!-- encrypt private keys and mnemonic -->
         <div id="wallet-encryption">
             <div class="form-check page-element paper-wallet">
@@ -319,6 +319,18 @@ Git Repo: https://github.com/dalitsairio/coinglacier.org.git
                            depending on how many addresses you need and what device you are on.</div>"
                            aria-label="Hide Password" aria-describedby="hidePass">
                 </div>
+            </div>
+        </div>
+
+        <!-- encrypt private keys and mnemonic -->
+        <div id="address-numbering">
+            <div class="form-check page-element paper-wallet">
+                <label id="address-numbering-label" class="form-check-label" for="number-addresses" data-trigger="hover" data-placement="bottom"
+                       title="Purely Informative Feature" data-content="<div class='normal-popover'>
+                            This option merely adds a consecutive numbering to your addresses, without introducing any technical implications.</div>">
+                    Number Addresses Consecutively
+                </label>
+                <input id="number-addresses" class="form-control" type="checkbox" checked>
             </div>
         </div>
 

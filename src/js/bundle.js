@@ -58949,6 +58949,7 @@ var accounts = [];
 var amountAddressesPerAccount;
 var password;
 var defaultPassword;
+var numberAddresses;
 
 // GET parameters
 var GET = {};
@@ -59008,15 +59009,17 @@ DOM.options.accountTemplate = $('#account-row-template');
 DOM.options.encryption = {};
 DOM.options.encryption.pass = $('input#password');
 DOM.options.encryption.hidePass = $('span#hidePass');
+DOM.options.numberAddresses = $('input#number-addresses');
 
 DOM.popovers = {};
 DOM.popovers.testnetWarning = $('#testnet-warning');
 DOM.popovers.showXPUB = $('#showXPUBlabel');
 DOM.popovers.encryption = $('input#password');
+DOM.popovers.encryption = $('#address-numbering-label');
 
 
 // //////////////////////////////////////////////////
-// Options
+// Config / Settings / Options
 // //////////////////////////////////////////////////
 
 const defaultAddressType = {
@@ -59031,6 +59034,7 @@ const defaultPage = {
 showXPUB = false;
 amountAddressesPerAccount = 3;
 defaultPassword = '';
+numberAddresses = true;
 
 
 // //////////////////////////////////////////////////
@@ -59057,8 +59061,11 @@ DOM.options.addressTypes.bech32.click(changeToBech32);
 // Show XPUB
 DOM.options.showXPUB.change(optionShowXPUBchanged);
 // Encryption
-DOM.options.encryption.hidePass.click(togglePasswordVisibility);
+DOM.options.encryption.hidePass.change(togglePasswordVisibility);
 DOM.options.encryption.pass.change(changePassword);
+// Address Numbering
+DOM.options.numberAddresses.change(toggleAddressNumbering);
+
 
 // //////////////////////////////////////////////////
 // Page Loading
@@ -59325,6 +59332,11 @@ function togglePasswordVisibility(){
     }
 };
 
+function toggleAddressNumbering(){
+    numberAddresses = DOM.options.numberAddresses.prop('checked');
+    loadWallet();
+};
+
 function changePassword(){
     password = DOM.options.encryption.pass.val();
     loadWallet();
@@ -59404,7 +59416,12 @@ function loadWallet() {
     $.each(x, function (i, dataset) {
         $.each(dataset, function (accountIndex, addresses) {
             $.each(addresses.credentials, function (index, data) {
-                html_output += "<h2>" + i + "</h2><table>";
+
+                var title = i;
+                if(numberAddresses){
+                    title += ' [Address ' + index + ']';
+                }
+                html_output += "<h2>" + title + "</h2><table>";
 
                 $.each(data, function (inner_index, inner_data) {
                     html_output += "<tr><td><b>" + inner_index + "</b></td><td>" + inner_data + "</td></tr>";
