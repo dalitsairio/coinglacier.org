@@ -68,7 +68,7 @@ function createP2PKHaddresses (accounts, targetNetwork, password) {
                 // clone the cache object
                 var cacheCopy = {};
                 cacheCopy.xpub = cachedData.xpub;
-                cacheCopy.credentials = cachedData.credentials;
+                cacheCopy.credentials = JSON.parse(JSON.stringify(cachedData.credentials)); // hack: copy by value instead of reference
                 cacheCopy.credentials.splice(amount); // from the clone, remove the data that is not needed
 
                 result[accIndex] = cacheCopy;

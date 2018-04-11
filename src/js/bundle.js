@@ -59574,7 +59574,7 @@ function createP2PKHaddresses (accounts, targetNetwork, password) {
                 // clone the cache object
                 var cacheCopy = {};
                 cacheCopy.xpub = cachedData.xpub;
-                cacheCopy.credentials = cachedData.credentials;
+                cacheCopy.credentials = JSON.parse(JSON.stringify(cachedData.credentials)); // hack: copy by value instead of reference
                 cacheCopy.credentials.splice(amount); // from the clone, remove the data that is not needed
 
                 result[accIndex] = cacheCopy;
@@ -60222,12 +60222,13 @@ function bitcoinJStests() {
         });
     });
     describe('Result Caching', function () {
+
+        // create 4 addresses without the use of caching
+        bitcoin.initiateHDWallet(testing_mnemonic);
+        var credentialsUncached = bitcoin.createP2PKHaddresses([4], bitcoin.networks.bitcoin);
+
         describe('Credentials', function () {
             it('Same Amount in Cache', function () {
-                // create 4 addresses without the use of caching
-                bitcoin.initiateHDWallet(testing_mnemonic);
-                var credentialsUncached = bitcoin.createP2PKHaddresses([4], bitcoin.networks.bitcoin);
-
                 // use caching, create 4 addresses and then read them from cache
                 bitcoin.initiateHDWallet(testing_mnemonic, false, true);
                 bitcoin.createP2PKHaddresses([4], bitcoin.networks.bitcoin);
@@ -60237,10 +60238,6 @@ function bitcoinJStests() {
             });
 
             it('Less Addresses in Cache', function () {
-                // create 4 addresses without the use of caching
-                bitcoin.initiateHDWallet(testing_mnemonic);
-                var credentialsUncached = bitcoin.createP2PKHaddresses([4], bitcoin.networks.bitcoin);
-
                 // use caching, create 2 addresses and then add 2 more
                 bitcoin.initiateHDWallet(testing_mnemonic, false, true);
                 bitcoin.createP2PKHaddresses([2], bitcoin.networks.bitcoin);
@@ -60250,10 +60247,6 @@ function bitcoinJStests() {
             });
 
             it('More Addresses in Cache', function () {
-                // create 4 addresses without the use of caching
-                bitcoin.initiateHDWallet(testing_mnemonic);
-                var credentialsUncached = bitcoin.createP2PKHaddresses([4], bitcoin.networks.bitcoin);
-
                 // use caching, create 6 addresses but then read only 4
                 bitcoin.initiateHDWallet(testing_mnemonic, false, true);
                 bitcoin.createP2PKHaddresses([6], bitcoin.networks.bitcoin);
@@ -60264,10 +60257,6 @@ function bitcoinJStests() {
         })
         describe('XPUB', function () {
             it('Same Amount in Cache', function () {
-                // create 4 addresses without the use of caching
-                bitcoin.initiateHDWallet(testing_mnemonic);
-                var credentialsUncached = bitcoin.createP2PKHaddresses([4], bitcoin.networks.bitcoin);
-
                 // use caching, create 4 addresses and then read them from cache
                 bitcoin.initiateHDWallet(testing_mnemonic, false, true);
                 bitcoin.createP2PKHaddresses([4], bitcoin.networks.bitcoin);
@@ -60277,10 +60266,6 @@ function bitcoinJStests() {
             });
 
             it('Less Addresses in Cache', function () {
-                // create 4 addresses without the use of caching
-                bitcoin.initiateHDWallet(testing_mnemonic);
-                var credentialsUncached = bitcoin.createP2PKHaddresses([4], bitcoin.networks.bitcoin);
-
                 // use caching, create 2 addresses and then add 2 more
                 bitcoin.initiateHDWallet(testing_mnemonic, false, true);
                 bitcoin.createP2PKHaddresses([2], bitcoin.networks.bitcoin);
@@ -60290,10 +60275,6 @@ function bitcoinJStests() {
             });
 
             it('More Addresses in Cache', function () {
-                // create 4 addresses without the use of caching
-                bitcoin.initiateHDWallet(testing_mnemonic);
-                var credentialsUncached = bitcoin.createP2PKHaddresses([4], bitcoin.networks.bitcoin);
-
                 // use caching, create 6 addresses but then read only 4
                 bitcoin.initiateHDWallet(testing_mnemonic, false, true);
                 bitcoin.createP2PKHaddresses([6], bitcoin.networks.bitcoin);
