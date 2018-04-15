@@ -292,19 +292,21 @@ Git Repo: https://github.com/dalitsairio/coinglacier.org.git
         </div>
 
         <!-- amount of accounts and addresses -->
-        <div id="account-row-template" class="account-row">
-            <div class="form-check">
-                <span class="title" style="display: none;">Account 1</span>
-                <label class="form-check-label" for="addresses-amount-template" >Amount of Addresses</label>
-                <input id="addresses-amount-template" type="number" class="addresses-amounts-input" min="1" placeholder="1" />
-                <button class="btn btn-success btn-sm account-insertion account-add" href="javascript:void(0);" style="display: none;">+</button>
-                <button class="btn btn-danger btn-sm account-insertion account-remove" href="javascript:void(0);" style="display: none;">-</button>
+        <div class="page-element paper-wallet">
+            <div id="account-row-template" class="account-row">
+                <div class="form-check">
+                    <span class="title" style="display: none;">Account 1</span>
+                    <label class="form-check-label" for="addresses-amount-template" >Amount of Addresses</label>
+                    <input id="addresses-amount-template" type="number" class="addresses-amounts-input" min="1" placeholder="1" />
+                    <button class="btn btn-success btn-sm account-insertion account-add" href="javascript:void(0);" style="display: none;">+</button>
+                    <button class="btn btn-danger btn-sm account-insertion account-remove" href="javascript:void(0);" style="display: none;">-</button>
+                </div>
             </div>
         </div>
 
         <!-- encrypt private keys and mnemonic -->
-        <div id="wallet-encryption">
-            <div class="form-check page-element paper-wallet">
+        <div id="wallet-encryption" class= "page-element paper-wallet">
+            <div class="form-check">
                 <label class="form-check-label" for="password">Encrypt with Password</label>
                 <div class="input-group mb-3">
                     <div class="input-group-append">

@@ -58928,7 +58928,6 @@ module.exports = {
 }).call(this,require("buffer").Buffer)
 
 },{"bs58check":106,"buffer":109}],273:[function(require,module,exports){
-
 // //////////////////////////////////////////////////
 // requires
 // //////////////////////////////////////////////////
@@ -58944,12 +58943,9 @@ const bitcoin = require('./bitcoin');
 // bitcoin network
 // contains not only network information, but also address type specific information
 var network;
-var showXPUB;
-var accounts = [];
-var amountAddressesPerAccount;
+var accounts;
+var currentPage;
 var password;
-var defaultPassword;
-var numberAddresses;
 
 // GET parameters
 var GET = {};
@@ -59019,22 +59015,40 @@ DOM.popovers.encryption = $('#address-numbering-label');
 
 
 // //////////////////////////////////////////////////
-// Config / Settings / Options
+// Pages / Page Options
+// //////////////////////////////////////////////////
+
+var pages = {};
+pages.singleWallet = {};
+pages.singleWallet.pageElementsDOM = DOM.pageElements.singleWallet;
+pages.singleWallet.menuEntryDOM = DOM.menuEntry.singleWallet;
+pages.singleWallet.getParam = GET.pages.singleWallet;
+// set default values
+pages.singleWallet.addressesPerAccount = 1;
+pages.singleWallet.showXPUB = false;
+pages.singleWallet.numberAddresses = false;
+pages.singleWallet.defaultPassword = '';
+
+pages.paperWallet = {};
+pages.paperWallet.pageElementsDOM = DOM.pageElements.paperWallet;
+pages.paperWallet.menuEntryDOM = DOM.menuEntry.paperWallet;
+pages.paperWallet.getParam = GET.pages.paperWallet;
+// set default values
+pages.paperWallet.addressesPerAccount = 3;
+pages.paperWallet.showXPUB = false;
+pages.paperWallet.numberAddresses = true;
+pages.paperWallet.defaultPassword = '';
+
+
+// //////////////////////////////////////////////////
+// Global Options
 // //////////////////////////////////////////////////
 
 const defaultAddressType = {
     getParam: GET.addressTypes.segwit,
     optionsDOM: DOM.options.addressTypes.segwit
 };
-const defaultPage = {
-    pageElementsDOM: DOM.pageElements.singleWallet,
-    menuEntryDOM: DOM.menuEntry.singleWallet,
-    getParam: GET.pages.singleWallet
-};
-showXPUB = false;
-amountAddressesPerAccount = 3;
-defaultPassword = '';
-numberAddresses = true;
+currentPage = pages.singleWallet;
 
 
 // //////////////////////////////////////////////////
@@ -59046,11 +59060,11 @@ DOM.network.testnet.click(initTestnet);
 DOM.network.mainnet.click(initMainnet);
 
 // Menu
-DOM.menuEntry.singleWallet.click(function() {
-    changePage(DOM.pageElements.singleWallet, DOM.menuEntry.singleWallet, GET.pages.singleWallet)
+DOM.menuEntry.singleWallet.click(function () {
+    changePage(pages.singleWallet);
 });
-DOM.menuEntry.paperWallet.click(function() {
-    changePage(DOM.pageElements.paperWallet, DOM.menuEntry.paperWallet, GET.pages.paperWallet)
+DOM.menuEntry.paperWallet.click(function () {
+    changePage(pages.paperWallet);
 });
 
 // Options
@@ -59084,23 +59098,23 @@ function init() {
     // set correct page
     switch (getURLparameter(GET.pages.keyword)) {
         case GET.pages.paperWallet:
-            changePage(DOM.pageElements.paperWallet, DOM.menuEntry.paperWallet, GET.pages.paperWallet);
+            changePage(pages.paperWallet);
             break;
         case GET.pages.singleWallet:
-            changePage(DOM.pageElements.singleWallet, DOM.menuEntry.singleWallet, GET.pages.singleWallet);
+            changePage(pages.singleWallet);
         default:
-            changePage(defaultPage.pageElementsDOM, defaultPage.menuEntryDOM, defaultPage.getParam);
+            changePage(currentPage);
             break;
     }
 
     // initialize popovers
     for (var x in DOM.popovers) {
-        DOM.popovers[x].popover({html:true});
+        DOM.popovers[x].popover({html: true});
     }
 
     showAccountsOptions();
 
-    password = defaultPassword;
+    password = currentPage.defaultPassword;
 
     loadWallet();
 
@@ -59113,24 +59127,30 @@ function init() {
 // Page Management
 // //////////////////////////////////////////////////
 
-function changePage(pageElementsDOM, menuEntryDOM, pageKeyword){
-    setupPageOptions(pageKeyword);
-    changePageElements(pageElementsDOM);
-    switchMenuLink(menuEntryDOM);
-    switchURLparam({key: GET.pages.keyword, value: pageKeyword});
+function changePage(newPage) {
+    currentPage = newPage;
+
+    setupPageOptions();
+    changePageElements();
+    switchMenuLink();
+    switchURLparam({key: GET.pages.keyword, value: currentPage.getParam});
+
+    // reload the page
+    showAccountsOptions(true);
+    loadWallet();
 }
 
 // set new menu link to active
-function switchMenuLink(DOMtoActivate){
+function switchMenuLink() {
     DOM.menu.find('.' + classes.activeMenuItem).removeClass(classes.activeMenuItem);
-    DOMtoActivate.addClass(classes.activeMenuItem);
+    currentPage.menuEntryDOM.addClass(classes.activeMenuItem);
 }
 
 // change page function
-function changePageElements(DOMtoShow){
+function changePageElements() {
     // only show elements that are getting activated with this call
     DOM.pageElements.all.hide();
-    DOMtoShow.show();
+    currentPage.pageElementsDOM.show();
 }
 
 
@@ -59176,11 +59196,11 @@ function initTestnet() {
 // //////////////////////////////////////////////////
 
 // set checkboxes from GET params
-if(getURLparameter(GET.addressTypes.keyword)){
+if (getURLparameter(GET.addressTypes.keyword)) {
 
     DOM.options.addressTypes.all.prop('checked', false);
 
-    switch(getURLparameter(GET.addressTypes.keyword)){
+    switch (getURLparameter(GET.addressTypes.keyword)) {
         case GET.addressTypes.nonSegwit:
             DOM.options.addressTypes.nonSegwit.prop('checked', true);
             break;
@@ -59199,112 +59219,127 @@ if(getURLparameter(GET.addressTypes.keyword)){
 function changeToNonSegwit() {
     changeAddressType(GET.addressTypes.nonSegwit);
 }
+
 function changeToSegwit() {
     changeAddressType(GET.addressTypes.segwit);
 }
+
 function changeToBech32() {
     changeAddressType(GET.addressTypes.bech32);
 }
 
-function changeAddressType(newType){
+function changeAddressType(newType) {
     switchURLparam({key: GET.addressTypes.keyword, value: newType});
     recalculateWallet();
 }
 
 
 // option show extended public key
-function optionShowXPUBchanged(){
-    showXPUB = DOM.options.showXPUB.prop('checked');
-    if(showXPUB){
+function optionShowXPUBchanged() {
+    currentPage.showXPUB = DOM.options.showXPUB.prop('checked');
+    if (currentPage.showXPUB) {
         enableAccounts();
-    }else{
+    } else {
         disableAccounts();
     }
     loadWallet();
 }
 
-function setupPageOptions(pageKeyword){
-    switch (pageKeyword){
-        case GET.pages.singleWallet:
+function setupPageOptions() {
+    switch (currentPage) {
+        case pages.singleWallet:
             disableAccounts();
-            password = '';
             break;
-        case GET.pages.paperWallet:
-            if(DOM.options.showXPUB.prop('checked')) {
+        case pages.paperWallet:
+            if (DOM.options.showXPUB.prop('checked')) {
                 enableAccounts();
+            }else {
+                disableAccounts();
             }
-            password = defaultPassword;
+            currentPage.numberAddresses = DOM.options.numberAddresses.prop('checked');
             break;
     }
+
+    password = currentPage.defaultPassword;
 }
 
-function enableAccounts(){
+function enableAccounts() {
     $('.account-row.not-template span.title').show();
     $('.account-row.not-template button.account-insertion').show();
 }
 
-function disableAccounts(){
-    accounts.splice(1, accounts.length - 1); // remove all entries but the first
+function disableAccounts() {
+    if (isAccountsEmpty()) {
+        initAccounts();
+    }else {
+        accounts.splice(1, accounts.length - 1); // remove all entries but the first
+    }
+
     showAccountsOptions();
     $('.account-row.not-template span.title').hide();
     $('.account-row.not-template button.account-insertion').hide();
     loadWallet();
 }
 
-function initAccounts(){
-    accounts.push(amountAddressesPerAccount);
+function initAccounts() {
+    accounts = [];
+    accounts.push(currentPage.addressesPerAccount);
 }
-function addAccount(prev){
-    accounts.splice(prev + 1, 0, amountAddressesPerAccount);
+
+function addAccount(prev) {
+    accounts.splice(prev + 1, 0, currentPage.addressesPerAccount);
 
     // reload the view
     showAccountsOptions();
 }
-function removeAccount(position){
+
+function removeAccount(position) {
     // remove the element from array
     accounts.splice(position, 1);
 
     // reload the view
     showAccountsOptions();
 }
-function setAddressesPerAccount(index, amount){
-    if(amount > 0) {
+
+function setAddressesPerAccount(index, amount) {
+    if (amount > 0) {
         accounts[index] = amount;
     }
 }
-function showAccountsOptions(){
 
-    if(isAccountsEmpty()){
+function showAccountsOptions(reset) {
+
+    if (isAccountsEmpty() || reset) {
         initAccounts();
     }
 
     // remove all accounts to add them again
     $('.account-row.not-template').remove();
 
-    for(var index = accounts.length -1; index >= 0; index--){
+    for (var index = accounts.length - 1; index >= 0; index--) {
 
         var accountDiv = DOM.options.accountTemplate.clone();
         accountDiv.prop('id', 'account-row-' + index);
         accountDiv.addClass('not-template');
 
-        accountDiv.find('.title').text('Account ' + (index +1));
+        accountDiv.find('.title').text('Account ' + (index + 1));
         accountDiv.find('input').prop('id', 'addresses-amount-' + index);
         accountDiv.find('input').val(accounts[index]);
         accountDiv.find('label').prop('for', 'addresses-amount-' + index);
 
-        if(showXPUB) {
+        if (currentPage.showXPUB) {
             accountDiv.find('.title').show();
             accountDiv.find('button').show();
         }
 
-        if(accounts.length <= 1){
+        if (accounts.length <= 1) {
             accountDiv.find('button.account-remove').prop('disabled', true);
         }
 
         // events on buttons and on input change
-        (function(accIndex, accDiv){
+        (function (accIndex, accDiv) {
             accountDiv.find('button.account-add').click(function () {
-                addAccount(accIndex, amountAddressesPerAccount);
+                addAccount(accIndex, currentPage.addressesPerAccount);
                 loadWallet();
             });
             accountDiv.find('button.account-remove').click(function () {
@@ -59322,27 +59357,27 @@ function showAccountsOptions(){
     }
 }
 
-function togglePasswordVisibility(){
-    if(DOM.options.encryption.pass.prop('type') === 'text'){
+function togglePasswordVisibility() {
+    if (DOM.options.encryption.pass.prop('type') === 'text') {
         DOM.options.encryption.pass.prop('type', 'password');
         DOM.options.encryption.hidePass.html('Show');
-    }else{
+    } else {
         DOM.options.encryption.pass.prop('type', 'text');
         DOM.options.encryption.hidePass.html('Hide');
     }
 };
 
-function toggleAddressNumbering(){
-    numberAddresses = DOM.options.numberAddresses.prop('checked');
+function toggleAddressNumbering() {
+    currentPage.numberAddresses = DOM.options.numberAddresses.prop('checked');
     loadWallet();
 };
 
-function changePassword(){
+function changePassword() {
     password = DOM.options.encryption.pass.val();
     loadWallet();
 };
 
-function isAccountsEmpty(){
+function isAccountsEmpty() {
     return typeof accounts === 'undefined' || accounts.length === 0;
 }
 
@@ -59351,13 +59386,13 @@ function isAccountsEmpty(){
 // Bitcoin Stuff
 // //////////////////////////////////////////////////
 
-function setNetwork(){
+function setNetwork() {
 
     var addressType = getURLparameter(GET.addressTypes.keyword) || defaultAddressType.getParam;
 
-    switch(getURLparameter(GET.network.keyword)){
+    switch (getURLparameter(GET.network.keyword)) {
         case GET.network.testnet:
-            switch(addressType){
+            switch (addressType) {
                 case GET.addressTypes.nonSegwit:
                     network = bitcoin.networks.testnet;
                     break;
@@ -59370,7 +59405,7 @@ function setNetwork(){
             }
             break;
         default:
-            switch(addressType){
+            switch (addressType) {
                 case GET.addressTypes.nonSegwit:
                     network = bitcoin.networks.bitcoin;
                     break;
@@ -59386,7 +59421,7 @@ function setNetwork(){
 }
 
 
-function recalculateWallet(){
+function recalculateWallet() {
     setNetwork();
     loadWallet();
 }
@@ -59418,7 +59453,7 @@ function loadWallet() {
             $.each(addresses.credentials, function (index, data) {
 
                 var title = i;
-                if(numberAddresses){
+                if (currentPage.numberAddresses) {
                     title += ' [Address ' + index + ']';
                 }
                 html_output += "<h2>" + title + "</h2><table>";
@@ -59427,7 +59462,7 @@ function loadWallet() {
                     html_output += "<tr><td><b>" + inner_index + "</b></td><td>" + inner_data + "</td></tr>";
                 });
 
-                if(showXPUB) {
+                if (currentPage.showXPUB) {
                     html_output += "<tr><td><b>XPUB</b></td><td>" + addresses.xpub + "</td></tr>";
                 }
 
@@ -59447,16 +59482,16 @@ function loadWallet() {
 // //////////////////////////////////////////////////
 
 // param requires object {key: key, value: value}
-function switchURLparam(param){
+function switchURLparam(param) {
     removeParamFromURL(param.key)
     addParamToURL(param);
 }
 
 // param requires object {key: key, value: value}
-function addParamToURL(param){
+function addParamToURL(param) {
 
     // check if URL already contains param
-    if(getURLparameter(param.key)){
+    if (getURLparameter(param.key)) {
         return;
     }
 
@@ -59465,43 +59500,43 @@ function addParamToURL(param){
         var paramConcat = (url.indexOf('?') === -1 ? "?" : "&");
         var newURL = url + paramConcat + param.key + "=" + param.value;
 
-        window.history.pushState({path:newURL},'',newURL);
+        window.history.pushState({path: newURL}, '', newURL);
     }
 }
 
-function removeParamFromURL(param){
+function removeParamFromURL(param) {
     if (history.pushState) {
         var url = window.location.href;
 
         // check whether the given parameter is actually in the URL
-        if(url.indexOf(param) < 0){
+        if (url.indexOf(param) < 0) {
             return;
         }
 
-        var startParam = url.indexOf(param) -1;
+        var startParam = url.indexOf(param) - 1;
         var endParam = (url.indexOf('&', startParam) <= startParam) ? url.length : url.indexOf('&', startParam);
         var toBeRemoved = url.substring(startParam, endParam);
 
         var newURL = url.replace(toBeRemoved, '');
 
         // if there are params left, make sure the first one starts with '?'
-        if(newURL.indexOf('&') >= 0 && newURL.indexOf('?') < 0){
+        if (newURL.indexOf('&') >= 0 && newURL.indexOf('?') < 0) {
             newURL = newURL.replace('&', '?'); // replace first occurrence of & with ?
         }
 
-        window.history.pushState({path:newURL},'',newURL);
+        window.history.pushState({path: newURL}, '', newURL);
     }
 }
 
-function getURLparameter(name, url){
+function getURLparameter(name, url) {
 
-    if(!name){
+    if (!name) {
         return null;
     }
 
     url = url || window.location.href;
-    name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
-    var regexS = "[\\?&]"+name+"=([^&#]*)";
+    name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+    var regexS = "[\\?&]" + name + "=([^&#]*)";
     var regex = new RegExp(regexS);
     var results = regex.exec(url);
     return results == null ? null : results[1];
