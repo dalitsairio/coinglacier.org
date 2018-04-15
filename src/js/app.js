@@ -145,7 +145,7 @@ DOM.options.addressTypes.bech32.click(changeToBech32);
 // Show XPUB
 DOM.options.showXPUB.change(optionShowXPUBchanged);
 // Encryption
-DOM.options.encryption.hidePass.change(togglePasswordVisibility);
+DOM.options.encryption.hidePass.click(togglePasswordVisibility);
 DOM.options.encryption.pass.change(changePassword);
 // Address Numbering
 DOM.options.numberAddresses.change(toggleAddressNumbering);

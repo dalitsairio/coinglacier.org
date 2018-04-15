@@ -4324,7 +4324,7 @@ module.exports={
   "_args": [
     [
       "bigi@^1.2.0",
-      "/home/gcom/gitland/coinglacier.org/node_modules/bip38"
+      "/home/gcom/gitland/tempo/coinglacier.org/node_modules/bip38"
     ]
   ],
   "_from": "bigi@>=1.2.0 <2.0.0",
@@ -4360,7 +4360,7 @@ module.exports={
   "_shasum": "9c665a95f88b8b08fc05cfd731f561859d725825",
   "_shrinkwrap": null,
   "_spec": "bigi@^1.2.0",
-  "_where": "/home/gcom/gitland/coinglacier.org/node_modules/bip38",
+  "_where": "/home/gcom/gitland/tempo/coinglacier.org/node_modules/bip38",
   "bugs": {
     "url": "https://github.com/cryptocoinjs/bigi/issues"
   },
@@ -48037,7 +48037,7 @@ module.exports={
   "_args": [
     [
       "elliptic@^6.0.0",
-      "/home/gcom/gitland/coinglacier.org/node_modules/browserify-sign"
+      "/home/gcom/gitland/tempo/coinglacier.org/node_modules/browserify-sign"
     ]
   ],
   "_from": "elliptic@>=6.0.0 <7.0.0",
@@ -48072,7 +48072,7 @@ module.exports={
   "_shasum": "cac9af8762c85836187003c8dfe193e5e2eae5df",
   "_shrinkwrap": null,
   "_spec": "elliptic@^6.0.0",
-  "_where": "/home/gcom/gitland/coinglacier.org/node_modules/browserify-sign",
+  "_where": "/home/gcom/gitland/tempo/coinglacier.org/node_modules/browserify-sign",
   "author": {
     "email": "fedor@indutny.com",
     "name": "Fedor Indutny"
@@ -58907,7 +58907,7 @@ DOM.options.addressTypes.bech32.click(changeToBech32);
 // Show XPUB
 DOM.options.showXPUB.change(optionShowXPUBchanged);
 // Encryption
-DOM.options.encryption.hidePass.change(togglePasswordVisibility);
+DOM.options.encryption.hidePass.click(togglePasswordVisibility);
 DOM.options.encryption.pass.change(changePassword);
 // Address Numbering
 DOM.options.numberAddresses.change(toggleAddressNumbering);
