@@ -96,36 +96,36 @@ $theme-colors: (
     font-style: italic;
 }
 
+#options{
+    font-size: smaller;
+}
 
 #account-row-template{
     display: none;
 }
 
-.account-row .form-check{
+.account-row .form-text{
     span {
         font-weight: bold;
-        margin-left: -0.6rem;
-    }
-
-    label {
-        margin-left: 1.2rem;
+        margin-right: 1rem;
     }
 
     input {
-        margin-left: 0.6rem;
-        width: 5rem;
+        margin-left: 0.4rem;
+        width: 4rem;
     }
 
     button {
-        padding: 0.1rem 0.5rem;
-        font-size: 1.5rem;
-        line-height: 1.1;
+        padding: 0.05rem 0.25rem;
+        font-size: 1.2rem;
+        line-height: 1;
+        margin-bottom: 0.25rem;
     }
     button.account-add {
-        margin-left: 0.3rem;
+        margin-left: 0.5rem;
     }
     button.account-remove{
-        padding: 0.1rem 0.65rem;
+        padding: 0.05rem 0.42rem;
     }
 }
 

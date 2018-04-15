@@ -392,7 +392,7 @@ function showAccountsOptions(reset) {
         accountDiv.prop('id', 'account-row-' + index);
         accountDiv.addClass('not-template');
 
-        accountDiv.find('.title').text('Account ' + (index + 1));
+        accountDiv.find('.title').text('# ' + (index + 1));
         accountDiv.find('input').prop('id', 'addresses-amount-' + index);
         accountDiv.find('input').val(accounts[index]);
         accountDiv.find('label').prop('for', 'addresses-amount-' + index);
