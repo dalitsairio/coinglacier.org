@@ -14,7 +14,7 @@ Git Repo: https://github.com/dalitsairio/coinglacier.org.git
 
     <link rel="stylesheet" href="css/coinglacier.org.css" inline>
 
-<title>coinglacier.org | Bitcoin Cold Storage & Paper Wallets</title>
+    <title>coinglacier.org | Bitcoin Cold Storage & Paper Wallets</title>
 </head>
 
 <body>
@@ -33,7 +33,7 @@ Git Repo: https://github.com/dalitsairio/coinglacier.org.git
         TESTNET VERSION ACTIVATED
     </div>
 
-    <nav id="mainmenu" class="navbar navbar-expand-md bg-dark mb-3">
+    <nav id="mainmenu" class="navbar navbar-expand-md bg-dark">
         <a class="navbar-brand" href="javascript:void(0);">
             <span id="service-name" class="d-inline d-md-none d-lg-inline">COINGLACIER.ORG</span>
             <img id="coinglacier-logo" alt="Logo" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiI
@@ -230,7 +230,7 @@ Git Repo: https://github.com/dalitsairio/coinglacier.org.git
                     2l0eTowLjQ1NDAwMDAyO2VuYWJsZS1iYWNrZ3JvdW5kOm5ldyIgLz48L2c+PGcgICBpZD0ibGF5ZXI1IiAvPjwvc3ZnPg==" />
         </a>
         <button class="navbar-toggler navbar-toggler-right bg-primary navbar-light" type="button" data-toggle="collapse" data-target="#navbarNav"
-                        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
@@ -251,101 +251,118 @@ Git Repo: https://github.com/dalitsairio/coinglacier.org.git
         </div>
     </nav>
 
-    <div id="options" class="form-check page-element single-wallet paper-wallet">
+    <div id="options" class="form page-element single-wallet paper-wallet">
         <div class="row">
-            <div class="col-sm-2">
+            <div class="col-xl">
+                <div class="row">
+                    <div class="col-xl-5 col-md-6">
 
-                <!-- address type -->
-                <div id="address-type" class="page-element single-wallet paper-wallet">
-                    <h6>Address type</h6>
-                    <div class="form-check">
-                        <input name="address-types" id="non-segwit" class="form-check-input" type="radio">
-                        <label class="form-check-label" for="non-segwit">
-                            Non-Segwit
-                        </label>
-                    </div>
-                    <div class="form-check">
-                        <input name="address-types" id="segwit" class="form-check-input" type="radio" checked>
-                        <label class="form-check-label" for="segwit">
-                            SegWit
-                        </label>
-                    </div>
-                    <div class="form-check disabled">
-                        <input name="address-types" id="bech32" class="form-check-input" type="radio">
-                        <label class="form-check-label" for="bech32">
-                            Bech32
-                        </label>
-                    </div>
-                </div>
-
-            </div>
-            <div class="col-sm-5">
-
-                <!-- amount of accounts and addresses -->
-                <div class="page-element paper-wallet">
-                    <h6>Accounts</h6>
-                    <div id="account-row-template" class="account-row">
-                        <div class="form-text">
-                            <span class="title" style="display: none;">Account 1</span>
-                            <label class="form-check-label" for="addresses-amount-template" >Addresses:</label>
-                            <input id="addresses-amount-template" type="number" class="addresses-amounts-input" min="1" placeholder="1" />
-                            <button class="btn btn-success btn-sm account-insertion account-add" href="javascript:void(0);" style="display: none;">+</button>
-                            <button class="btn btn-danger btn-sm account-insertion account-remove" href="javascript:void(0);" style="display: none;">-</button>
-                        </div>
-                    </div>
-                </div>
-
-             </div>
-            <div class="col-sm-5">
-
-                <!-- show xpub -->
-                <div class="form-check page-element paper-wallet">
-                    <input type="checkbox" class="form-check-input" id="showXPUB">
-                    <label id="showXPUBlabel" class="form-check-label" for="showXPUB" data-trigger="hover" data-placement="bottom"
-                           title="Benefit & Drawback" data-content="<div id='make-fat-hack'><p>Ext. pubKeys allow you to check the balances of
-                                all your addresses [per account] in one go.</p>
-                                <p>However, when using this feature, <span class='popover-highlight'>
-                                you must be particularly careful not to leak any of your private keys,
-                                even if you don't have any money on the respective address (anymore)</span>,
-                                since an attacker could find all of your private keys [of an account] given only one leaked private key.</p>
-                                <p>A measure to reduce the risk is to use multiple accounts. If an attacker gets hold of one private key,
-                                he will only be able to retrieve all the private keys from the same account.</p></div>">
-                        Show Extended Public Key
-                    </label>
-                </div>
-
-                <!-- encrypt private keys and mnemonic -->
-                <div id="wallet-encryption" class= "page-element paper-wallet">
-                    <div class="form-check">
-                        <label class="form-check-label" for="password">Encrypt with Password</label>
-                        <div class="input-group mb-3">
-                            <div class="input-group-append">
-                                <span class="input-group-text text-center" id="hidePass">Hide</span>
+                        <!-- address type -->
+                        <div id="address-type" class="page-element single-wallet paper-wallet">
+                            <h6>Address type</h6>
+                            <div class="form-check">
+                                <input name="address-types" id="non-segwit" class="form-check-input" type="radio">
+                                <label class="form-check-label" for="non-segwit">
+                                    Non-Segwit
+                                </label>
                             </div>
-                            <input id="password" data-toggle="Not Encrypted" class="form-control form-control-sm" type="text" placeholder="Not Encrypted"
-                                   data-trigger="hover" data-placement="bottom" title="Never forget your password!"
-                                   data-content="<div class='normal-popover'>Both the mnemonic and the resulting private keys get encrypted
-                                   (using standards BIP39 resp. BIP38). <span class='popover-highlight'>If you lose your password,
-                                   you lose all of your funds!</span><br /><br/>
-                                   This option is resource-intensive and might slow down or even corrupt this service,
-                                   depending on how many addresses you need and what device you are on.</div>"
-                                   aria-label="Hide Password" aria-describedby="hidePass">
+                            <div class="form-check">
+                                <input name="address-types" id="segwit" class="form-check-input" type="radio" checked>
+                                <label class="form-check-label" for="segwit">
+                                    SegWit
+                                </label>
+                            </div>
+                            <div class="form-check disabled">
+                                <input name="address-types" id="bech32" class="form-check-input" type="radio">
+                                <label class="form-check-label" for="bech32">
+                                    Bech32
+                                </label>
+                            </div>
                         </div>
+
+                    </div>
+                    <div class="col-xl-7 col-md-6">
+
+                        <div id="wallet-encryption" class= "page-element paper-wallet">
+                            <h6>Encrypt with Password</h6>
+
+                            <!-- encrypt private keys and mnemonic -->
+                            <div class="form-inline">
+                                <div id="password-input-group" class="input-group"
+                                     data-trigger="hover" data-placement="bottom" title="Never forget your password!"
+                                     data-content="<div class='normal-popover'>Both the mnemonic and the resulting private keys get encrypted
+                                           (using standards BIP39 resp. BIP38). <span class='popover-highlight'>If you lose your password,
+                                           you lose all of your funds!</span><br /><br/>
+                                           This option is resource-intensive and might slow down or even corrupt this service,
+                                           depending on how many addresses you need and what device you are on.</div>"
+                                     aria-label="Hide Password" aria-describedby="hidePass">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text text-center" id="hidePass">Hide</span>
+                                    </div>
+                                    <input id="password" data-toggle="Not Encrypted" class="form-control form-control-sm" type="text" placeholder="Not Encrypted">
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
+            </div>
+            <div class="col-xl">
+                <div class="row">
+                    <div class="col-md">
 
-                <!-- encrypt private keys and mnemonic -->
-                <div id="address-numbering">
-                    <div class="form-check page-element paper-wallet">
-                        <label id="address-numbering-label" class="form-check-label" for="number-addresses" data-trigger="hover" data-placement="bottom"
-                               title="Purely Informative Feature" data-content="<div class='normal-popover'>
-                                    This option merely adds a consecutive numbering to your addresses, without introducing any technical implications.</div>">
-                            Number Addresses Consecutively
-                        </label>
-                        <input id="number-addresses" class="form-control" type="checkbox" checked>
+                        <div id="checkmark-options" class= "page-element paper-wallet">
+                            <h6>Features</h6>
+
+                            <!-- show xpub -->
+                            <div id="show-xpub">
+                                <div class="form-check page-element paper-wallet">
+                                    <label id="showXPUBlabel" class="form-check-label" for="showXPUB" data-trigger="hover" data-placement="bottom"
+                                           title="Benefit & Drawback" data-content="<div id='make-fat-hack'><p>Ext. pubKeys allow you to check the balances of
+                                                all your addresses [per account] in one go.</p>
+                                                <p>However, when using this feature, <span class='popover-highlight'>
+                                                you must be particularly careful not to leak any of your private keys,
+                                                even if you don't have any money on the respective address (anymore)</span>,
+                                                since an attacker could find all of your private keys [of an account] given only one leaked private key.</p>
+                                                <p>A measure to reduce the risk is to use multiple accounts. If an attacker gets hold of one private key,
+                                                he will only be able to retrieve all the private keys from the same account.</p></div>">
+                                        <input id="showXPUB" type="checkbox">&nbsp;Show Extended Public Key
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- number the addresses consecutively -->
+                            <div id="address-numbering">
+                                <div class="form-check page-element paper-wallet">
+                                    <label id="address-numbering-label" class="form-check-label" for="number-addresses" data-trigger="hover" data-placement="bottom"
+                                           title="Purely Informative Feature" data-content="<div class='normal-popover'>
+                                                This option merely adds a consecutive numbering to your addresses, without introducing any technical implications.</div>">
+                                        <input id="number-addresses" type="checkbox" checked>&nbsp;Number Addresses Consecutively
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-md">
+
+                        <!-- amount of accounts and addresses -->
+                        <div class="page-element paper-wallet" class="form-control">
+                            <h6 id="options-accounts-title" style="display: none;">Accounts</h6>
+                            <h6 id="options-addresses-amount-title">Amount of addresses</h6>
+                            <div id="account-row-template" class="account-row">
+                                <div class="form-text">
+                                    <span class="title" style="display: none;">Account 1</span>
+                                    <label class="form-check-label" for="addresses-amount-template" >Addresses:</label>
+                                    <input id="addresses-amount-template" type="number" class="addresses-amounts-input" min="1" placeholder="1" />
+                                    <button class="btn btn-success btn-sm account-insertion account-add" href="javascript:void(0);" style="display: none;">+</button>
+                                    <button class="btn btn-danger btn-sm account-insertion account-remove" href="javascript:void(0);" style="display: none;">-</button>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
-
             </div>
         </div>
     </div>

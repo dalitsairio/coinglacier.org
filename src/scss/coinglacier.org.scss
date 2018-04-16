@@ -25,6 +25,9 @@ $bootstrap-sm: 768px;
             color: darken($testnet-primary, 20);
         }
     }
+    #options {
+        background: lighten($testnet-primary, 30);
+    }
 }
 
 // mainnet theme
@@ -40,7 +43,11 @@ $theme-colors: (
         text-shadow: 0px 0px 3px #000;
     }
 }
-
+#options {
+    background: lighten($mainnet-primary, 30);
+    border: 1px solid $dark;
+    border-top: none;
+}
 
 // //////////////////////////////////////////////////
 // Main Menu
@@ -98,6 +105,11 @@ $theme-colors: (
 
 #options{
     font-size: smaller;
+    padding: 0rem 0rem 0.8rem 1.2rem;
+
+    h6{
+        margin-top: 1.2rem;
+    }
 }
 
 #account-row-template{
@@ -130,9 +142,23 @@ $theme-colors: (
 }
 
 span#hidePass{
-    min-width: 68px;
+    min-width: 60px;
     text-transform: uppercase;
     font-size: smaller;
+}
+input#password{
+    width: 11rem;
+}
+
+#address-numbering .form-check, #show-xpub .form-check{
+    padding-left: 0px;
+}
+
+#wallet-encryption {
+
+    label {
+        margin: 5px;
+    }
 }
 
 @media screen and (min-width: $bootstrap-sm) and (max-width: $bootstrap-md){

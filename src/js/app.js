@@ -71,7 +71,10 @@ DOM.options.addressTypes.nonSegwit = $('input#non-segwit');
 DOM.options.addressTypes.segwit = $('input#segwit');
 DOM.options.addressTypes.bech32 = $('input#bech32');
 DOM.options.showXPUB = $('input#showXPUB');
-DOM.options.accountTemplate = $('#account-row-template');
+DOM.options.accounts = {};
+DOM.options.accounts.accountTemplate = $('#account-row-template');
+DOM.options.accounts.titleAccounts = $('#options-addresses-amount-title');
+DOM.options.accounts.titleAddresses = $('#options-accounts-title');
 DOM.options.encryption = {};
 DOM.options.encryption.pass = $('input#password');
 DOM.options.encryption.hidePass = $('span#hidePass');
@@ -80,8 +83,8 @@ DOM.options.numberAddresses = $('input#number-addresses');
 DOM.popovers = {};
 DOM.popovers.testnetWarning = $('#testnet-warning');
 DOM.popovers.showXPUB = $('#showXPUBlabel');
-DOM.popovers.encryption = $('input#password');
-DOM.popovers.encryption = $('#address-numbering-label');
+DOM.popovers.encryption = $('#password-input-group');
+DOM.popovers.numberAddresses = $('#address-numbering-label');
 
 
 // //////////////////////////////////////////////////
@@ -334,11 +337,21 @@ function setupPageOptions() {
 }
 
 function enableAccounts() {
+
+    // set correct options title
+    DOM.options.accounts.titleAccounts.hide();
+    DOM.options.accounts.titleAddresses.show();
+
     $('.account-row.not-template span.title').show();
     $('.account-row.not-template button.account-insertion').show();
 }
 
 function disableAccounts() {
+
+    // set correct options title
+    DOM.options.accounts.titleAccounts.show();
+    DOM.options.accounts.titleAddresses.hide();
+
     if (isAccountsEmpty()) {
         initAccounts();
     }else {
@@ -388,7 +401,7 @@ function showAccountsOptions(reset) {
 
     for (var index = accounts.length - 1; index >= 0; index--) {
 
-        var accountDiv = DOM.options.accountTemplate.clone();
+        var accountDiv = DOM.options.accounts.accountTemplate.clone();
         accountDiv.prop('id', 'account-row-' + index);
         accountDiv.addClass('not-template');
 
@@ -423,7 +436,7 @@ function showAccountsOptions(reset) {
         })(index, accountDiv); // pass as argument to anonymous function - this will introduce a new scope
 
 
-        DOM.options.accountTemplate.after(accountDiv);
+        DOM.options.accounts.accountTemplate.after(accountDiv);
     }
 }
 
@@ -524,7 +537,7 @@ function loadWallet() {
 
                 var title = i;
                 if (currentPage.numberAddresses) {
-                    title += ' [Address ' + index + ']';
+                    title += ' [Address ' + (index + 1) + ']';
                 }
                 html_output += "<h2>" + title + "</h2><table>";
 
