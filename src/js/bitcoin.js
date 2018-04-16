@@ -54,9 +54,6 @@ function createP2PKHaddresses (accounts, targetNetwork, password) {
         var pathError = findDerivationPathErrors(accountPath, false, true);
         if(pathError) throw 'Derivation Path Error: ' + pathError;
 
-        var account =  bip32RootKey.derivePath(accountPath);
-        account.keyPair.network = targetNetwork;
-
         var accountResults;
 
         // read data from cache
@@ -74,6 +71,9 @@ function createP2PKHaddresses (accounts, targetNetwork, password) {
                 result[accIndex] = cacheCopy;
                 continue;
             }else{
+                var account =  bip32RootKey.derivePath(accountPath);
+                account.keyPair.network = targetNetwork;
+
                 // remove result from cache (to afterwards write the bigger cache)
                 removeCachedResult(accountPath, password);
 
@@ -83,6 +83,9 @@ function createP2PKHaddresses (accounts, targetNetwork, password) {
                 accountResults.credentials = accountResults.credentials.concat(newCredentials);
             }
         }else{
+            var account =  bip32RootKey.derivePath(accountPath);
+            account.keyPair.network = targetNetwork;
+
             accountResults = {};
             accountResults.credentials = createAccountCredentials(account, targetNetwork, amount, password);
             accountResults.xpub = account.neutered().toBase58();
