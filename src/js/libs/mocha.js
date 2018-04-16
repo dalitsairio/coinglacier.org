@@ -336,7 +336,9 @@ exports.getWindowSize = function getWindowSize () {
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{}],5:[function(require,module,exports){
 'use strict';
-
+/**
+ * @module Context
+ */
 /**
  * Expose `Context`.
  */
@@ -355,7 +357,7 @@ function Context () {}
  *
  * @api private
  * @param {Runnable} runnable
- * @return {Context}
+ * @return {Context} context
  */
 Context.prototype.runnable = function (runnable) {
   if (!arguments.length) {
@@ -437,7 +439,10 @@ Context.prototype.retries = function (n) {
 
 },{}],6:[function(require,module,exports){
 'use strict';
-
+/**
+ * @module Hook
+ *
+ */
 /**
  * Module dependencies.
  */
@@ -452,8 +457,12 @@ var inherits = require('./utils').inherits;
 module.exports = Hook;
 
 /**
- * Initialize a new `Hook` with the given `title` and callback `fn`.
+ * Initialize a new `Hook` with the given `title` and callback `fn`. Derived from
+ * `Runnable`.
  *
+ * @memberof Mocha
+ * @public
+ * @class
  * @param {String} title
  * @param {Function} fn
  * @api private
@@ -471,6 +480,8 @@ inherits(Hook, Runnable);
 /**
  * Get or set the test `err`.
  *
+ * @memberof Mocha.Hook
+ * @public
  * @param {Error} err
  * @return {Error}
  * @api public
@@ -1052,7 +1063,10 @@ module.exports = function (suite) {
  * Copyright(c) 2011 TJ Holowaychuk <tj@vision-media.ca>
  * MIT Licensed
  */
-
+/**
+ * @namespace Mocha
+ * @module Mocha
+ */
 /**
  * Module dependencies.
  */
@@ -1081,11 +1095,25 @@ if (!process.browser) {
  * Expose internals.
  */
 
+/**
+ * @public
+ * @class utils
+ * @memberof Mocha
+ */
 exports.utils = utils;
 exports.interfaces = require('./interfaces');
+/**
+ *
+ * @memberof Mocha
+ * @public
+ */
 exports.reporters = reporters;
 exports.Runnable = require('./runnable');
 exports.Context = require('./context');
+/**
+ *
+ * @memberof Mocha
+ */
 exports.Runner = require('./runner');
 exports.Suite = require('./suite');
 exports.Hook = require('./hook');
@@ -1118,6 +1146,8 @@ function image (name) {
  *   - `fullTrace` display the full stack-trace on failing
  *   - `grep` string or regexp to filter tests with
  *
+ * @public
+ * @class Mocha
  * @param {Object} options
  * @api public
  */
@@ -1153,6 +1183,7 @@ function Mocha (options) {
 /**
  * Enable or disable bailing on the first failure.
  *
+ * @public
  * @api public
  * @param {boolean} [bail]
  */
@@ -1167,6 +1198,7 @@ Mocha.prototype.bail = function (bail) {
 /**
  * Add test `file`.
  *
+ * @public
  * @api public
  * @param {string} file
  */
@@ -1178,6 +1210,7 @@ Mocha.prototype.addFile = function (file) {
 /**
  * Set reporter to `reporter`, defaults to "spec".
  *
+ * @public
  * @param {String|Function} reporter name or constructor
  * @param {Object} reporterOptions optional options
  * @api public
@@ -1228,7 +1261,7 @@ Mocha.prototype.reporter = function (reporter, reporterOptions) {
 
 /**
  * Set test UI `name`, defaults to "bdd".
- *
+ * @public
  * @api public
  * @param {string} bdd
  */
@@ -1307,6 +1340,7 @@ Mocha.prototype._growl = function (runner, reporter) {
 /**
  * Escape string and add it to grep as a regexp.
  *
+ * @public
  * @api public
  * @param str
  * @returns {Mocha}
@@ -1318,6 +1352,7 @@ Mocha.prototype.fgrep = function (str) {
 /**
  * Add regexp to grep, if `re` is a string it is escaped.
  *
+ * @public
  * @param {RegExp|String} re
  * @return {Mocha}
  * @api public
@@ -1337,6 +1372,7 @@ Mocha.prototype.grep = function (re) {
 /**
  * Invert `.grep()` matches.
  *
+ * @public
  * @return {Mocha}
  * @api public
  */
@@ -1348,6 +1384,7 @@ Mocha.prototype.invert = function () {
 /**
  * Ignore global leaks.
  *
+ * @public
  * @param {Boolean} ignore
  * @return {Mocha}
  * @api public
@@ -1364,6 +1401,7 @@ Mocha.prototype.ignoreLeaks = function (ignore) {
  *
  * @return {Mocha}
  * @api public
+ * @public
  */
 Mocha.prototype.checkLeaks = function () {
   this.options.ignoreLeaks = false;
@@ -1375,6 +1413,7 @@ Mocha.prototype.checkLeaks = function () {
  *
  * @return {Mocha}
  * @api public
+ * @public
  */
 Mocha.prototype.fullTrace = function () {
   this.options.fullStackTrace = true;
@@ -1386,6 +1425,7 @@ Mocha.prototype.fullTrace = function () {
  *
  * @return {Mocha}
  * @api public
+ * @public
  */
 Mocha.prototype.growl = function () {
   this.options.growl = true;
@@ -1398,6 +1438,7 @@ Mocha.prototype.growl = function () {
  * @param {Array|String} globals
  * @return {Mocha}
  * @api public
+ * @public
  * @param {Array|string} globals
  * @return {Mocha}
  */
@@ -1412,6 +1453,7 @@ Mocha.prototype.globals = function (globals) {
  * @param {Boolean} colors
  * @return {Mocha}
  * @api public
+ * @public
  * @param {boolean} colors
  * @return {Mocha}
  */
@@ -1428,6 +1470,7 @@ Mocha.prototype.useColors = function (colors) {
  * @param {Boolean} inlineDiffs
  * @return {Mocha}
  * @api public
+ * @public
  * @param {boolean} inlineDiffs
  * @return {Mocha}
  */
@@ -1442,6 +1485,7 @@ Mocha.prototype.useInlineDiffs = function (inlineDiffs) {
  * @param {Boolean} hideDiff
  * @return {Mocha}
  * @api public
+ * @public
  * @param {boolean} hideDiff
  * @return {Mocha}
  */
@@ -1456,6 +1500,7 @@ Mocha.prototype.hideDiff = function (hideDiff) {
  * @param {Number} timeout
  * @return {Mocha}
  * @api public
+ * @public
  * @param {number} timeout
  * @return {Mocha}
  */
@@ -1470,6 +1515,7 @@ Mocha.prototype.timeout = function (timeout) {
  * @param {Number} retry times
  * @return {Mocha}
  * @api public
+ * @public
  */
 Mocha.prototype.retries = function (n) {
   this.suite.retries(n);
@@ -1482,6 +1528,7 @@ Mocha.prototype.retries = function (n) {
  * @param {Number} slow
  * @return {Mocha}
  * @api public
+ * @public
  * @param {number} slow
  * @return {Mocha}
  */
@@ -1496,6 +1543,7 @@ Mocha.prototype.slow = function (slow) {
  * @param {Boolean} enabled
  * @return {Mocha}
  * @api public
+ * @public
  * @param {boolean} enabled
  * @return {Mocha}
  */
@@ -1509,6 +1557,7 @@ Mocha.prototype.enableTimeouts = function (enabled) {
  *
  * @return {Mocha}
  * @api public
+ * @public
  */
 Mocha.prototype.asyncOnly = function () {
   this.options.asyncOnly = true;
@@ -1519,6 +1568,7 @@ Mocha.prototype.asyncOnly = function () {
  * Disable syntax highlighting (in browser).
  *
  * @api public
+ * @public
  */
 Mocha.prototype.noHighlighting = function () {
   this.options.noHighlighting = true;
@@ -1530,6 +1580,7 @@ Mocha.prototype.noHighlighting = function () {
  *
  * @return {Mocha}
  * @api public
+ * @public
  */
 Mocha.prototype.allowUncaught = function () {
   this.options.allowUncaught = true;
@@ -1575,6 +1626,7 @@ Mocha.prototype.forbidPending = function () {
  * cache first in whichever manner best suits your needs.
  *
  * @api public
+ * @public
  * @param {Function} fn
  * @return {Runner}
  */
@@ -1622,7 +1674,9 @@ Mocha.prototype.run = function (fn) {
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},"/lib")
 },{"./context":5,"./hook":6,"./interfaces":10,"./reporters":20,"./runnable":32,"./runner":33,"./suite":34,"./test":35,"./utils":36,"_process":56,"escape-string-regexp":46,"growl":2,"path":40}],14:[function(require,module,exports){
 'use strict';
-
+/**
+ * @module milliseconds
+ */
 /**
  * Helpers.
  */
@@ -1636,6 +1690,8 @@ var y = d * 365.25;
 /**
  * Parse or format the given `val`.
  *
+ * @memberof Mocha
+ * @public
  * @api public
  * @param {string|number} val
  * @return {string|number}
@@ -1733,7 +1789,9 @@ function Pending (message) {
 },{}],16:[function(require,module,exports){
 (function (process,global){
 'use strict';
-
+/**
+ * @module Base
+ */
 /**
  * Module dependencies.
  */
@@ -1919,6 +1977,9 @@ var generateDiff = exports.generateDiff = function (actual, expected) {
 /**
  * Output the given `failures` as a list.
  *
+ * @public
+ * @memberof Mocha.reporters.Base
+ * @variation 1
  * @param {Array} failures
  * @api public
  */
@@ -1995,6 +2056,9 @@ exports.list = function (failures) {
  * stats such as test duration, number
  * of tests passed / failed etc.
  *
+ * @memberof Mocha.reporters
+ * @public
+ * @class
  * @param {Runner} runner
  * @api public
  */
@@ -2062,6 +2126,8 @@ function Base (runner) {
  * Output common epilogue used by many of
  * the bundled reporters.
  *
+ * @memberof Mocha.reporters.Base
+ * @public
  * @api public
  */
 Base.prototype.epilogue = function () {
@@ -2238,7 +2304,9 @@ function sameType (a, b) {
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"../ms":14,"../utils":36,"_process":56,"diff":45,"supports-color":40,"tty":4}],17:[function(require,module,exports){
 'use strict';
-
+/**
+ * @module Doc
+ */
 /**
  * Module dependencies.
  */
@@ -2255,6 +2323,10 @@ exports = module.exports = Doc;
 /**
  * Initialize a new `Doc` reporter.
  *
+ * @class
+ * @memberof Mocha.reporters
+ * @extends {Base}
+ * @public
  * @param {Runner} runner
  * @api public
  */
@@ -2305,7 +2377,9 @@ function Doc (runner) {
 },{"../utils":36,"./base":16}],18:[function(require,module,exports){
 (function (process){
 'use strict';
-
+/**
+ * @module Dot
+ */
 /**
  * Module dependencies.
  */
@@ -2323,6 +2397,10 @@ exports = module.exports = Dot;
 /**
  * Initialize a new `Dot` matrix test reporter.
  *
+ * @class
+ * @memberof Mocha.reporters
+ * @extends Mocha.reporters.Base
+ * @public
  * @api public
  * @param {Runner} runner
  */
@@ -2379,7 +2457,9 @@ inherits(Dot, Base);
 'use strict';
 
 /* eslint-env browser */
-
+/**
+ * @module HTML
+ */
 /**
  * Module dependencies.
  */
@@ -2424,6 +2504,10 @@ var playIcon = '&#x2023;';
 /**
  * Initialize a new `HTML` reporter.
  *
+ * @public
+ * @class
+ * @memberof Mocha.reporters
+ * @extends Mocha.reporters.Base
  * @api public
  * @param {Runner} runner
  */
@@ -2750,7 +2834,9 @@ exports.JSONStream = exports['json-stream'] = require('./json-stream');
 },{"./base":16,"./doc":17,"./dot":18,"./html":19,"./json":22,"./json-stream":21,"./landing":23,"./list":24,"./markdown":25,"./min":26,"./nyan":27,"./progress":28,"./spec":29,"./tap":30,"./xunit":31}],21:[function(require,module,exports){
 (function (process){
 'use strict';
-
+/**
+ * @module JSONStream
+ */
 /**
  * Module dependencies.
  */
@@ -2764,8 +2850,13 @@ var Base = require('./base');
 exports = module.exports = List;
 
 /**
- * Initialize a new `List` test reporter.
+ * Initialize a new `JSONStream` test reporter.
  *
+ * @public
+ * @name JSONStream
+ * @class JSONStream
+ * @memberof Mocha.reporters
+ * @extends Mocha.reporters.Base
  * @api public
  * @param {Runner} runner
  */
@@ -2816,7 +2907,9 @@ function clean (test) {
 },{"./base":16,"_process":56}],22:[function(require,module,exports){
 (function (process){
 'use strict';
-
+/**
+ * @module JSON
+ */
 /**
  * Module dependencies.
  */
@@ -2832,6 +2925,10 @@ exports = module.exports = JSONReporter;
 /**
  * Initialize a new `JSON` reporter.
  *
+ * @public
+ * @class JSON
+ * @memberof Mocha.reporters
+ * @extends Mocha.reporters.Base
  * @api public
  * @param {Runner} runner
  */
@@ -2884,17 +2981,44 @@ function JSONReporter (runner) {
  * @return {Object}
  */
 function clean (test) {
+  var err = test.err || {};
+  if (err instanceof Error) {
+    err = errorJSON(err);
+  }
+
   return {
     title: test.title,
     fullTitle: test.fullTitle(),
     duration: test.duration,
     currentRetry: test.currentRetry(),
-    err: errorJSON(test.err || {})
+    err: cleanCycles(err)
   };
 }
 
 /**
- * Transform `error` into a JSON object.
+ * Replaces any circular references inside `obj` with '[object Object]'
+ *
+ * @api private
+ * @param {Object} obj
+ * @return {Object}
+ */
+function cleanCycles (obj) {
+  var cache = [];
+  return JSON.parse(JSON.stringify(obj, function (key, value) {
+    if (typeof value === 'object' && value !== null) {
+      if (cache.indexOf(value) !== -1) {
+        // Instead of going in a circle, we'll print [object Object]
+        return '' + value;
+      }
+      cache.push(value);
+    }
+
+    return value;
+  }));
+}
+
+/**
+ * Transform an Error object into a JSON object.
  *
  * @api private
  * @param {Error} err
@@ -2912,7 +3036,9 @@ function errorJSON (err) {
 },{"./base":16,"_process":56}],23:[function(require,module,exports){
 (function (process){
 'use strict';
-
+/**
+ * @module Landing
+ */
 /**
  * Module dependencies.
  */
@@ -2949,6 +3075,10 @@ Base.colors.runway = 90;
 /**
  * Initialize a new `Landing` reporter.
  *
+ * @public
+ * @class
+ * @memberof Mocha.reporters
+ * @extends Mocha.reporters.Base
  * @api public
  * @param {Runner} runner
  */
@@ -3010,7 +3140,9 @@ inherits(Landing, Base);
 },{"../utils":36,"./base":16,"_process":56}],24:[function(require,module,exports){
 (function (process){
 'use strict';
-
+/**
+ * @module List
+ */
 /**
  * Module dependencies.
  */
@@ -3029,6 +3161,10 @@ exports = module.exports = List;
 /**
  * Initialize a new `List` test reporter.
  *
+ * @public
+ * @class
+ * @memberof Mocha.reporters
+ * @extends Mocha.reporters.Base
  * @api public
  * @param {Runner} runner
  */
@@ -3077,7 +3213,9 @@ inherits(List, Base);
 },{"../utils":36,"./base":16,"_process":56}],25:[function(require,module,exports){
 (function (process){
 'use strict';
-
+/**
+ * @module Markdown
+ */
 /**
  * Module dependencies.
  */
@@ -3100,6 +3238,10 @@ exports = module.exports = Markdown;
 /**
  * Initialize a new `Markdown` reporter.
  *
+ * @public
+ * @class
+ * @memberof Mocha.reporters
+ * @extends Mocha.reporters.Base
  * @api public
  * @param {Runner} runner
  */
@@ -3180,7 +3322,9 @@ function Markdown (runner) {
 },{"../utils":36,"./base":16,"_process":56}],26:[function(require,module,exports){
 (function (process){
 'use strict';
-
+/**
+ * @module Min
+ */
 /**
  * Module dependencies.
  */
@@ -3197,6 +3341,10 @@ exports = module.exports = Min;
 /**
  * Initialize a new `Min` minimal test reporter (best used with --watch).
  *
+ * @public
+ * @class
+ * @memberof Mocha.reporters
+ * @extends Mocha.reporters.Base
  * @api public
  * @param {Runner} runner
  */
@@ -3222,7 +3370,9 @@ inherits(Min, Base);
 },{"../utils":36,"./base":16,"_process":56}],27:[function(require,module,exports){
 (function (process){
 'use strict';
-
+/**
+ * @module Nyan
+ */
 /**
  * Module dependencies.
  */
@@ -3241,6 +3391,10 @@ exports = module.exports = NyanCat;
  *
  * @param {Runner} runner
  * @api public
+ * @public
+ * @class Nyan
+ * @memberof Mocha.reporters
+ * @extends Mocha.reporters.Base
  */
 
 function NyanCat (runner) {
@@ -3489,7 +3643,9 @@ function write (string) {
 },{"../utils":36,"./base":16,"_process":56}],28:[function(require,module,exports){
 (function (process){
 'use strict';
-
+/**
+ * @module Progress
+ */
 /**
  * Module dependencies.
  */
@@ -3514,6 +3670,10 @@ Base.colors.progress = 90;
 /**
  * Initialize a new `Progress` bar test reporter.
  *
+ * @public
+ * @class
+ * @memberof Mocha.reporters
+ * @extends Mocha.reporters.Base
  * @api public
  * @param {Runner} runner
  * @param {Object} options
@@ -3585,7 +3745,9 @@ inherits(Progress, Base);
 }).call(this,require('_process'))
 },{"../utils":36,"./base":16,"_process":56}],29:[function(require,module,exports){
 'use strict';
-
+/**
+ * @module Spec
+ */
 /**
  * Module dependencies.
  */
@@ -3603,6 +3765,10 @@ exports = module.exports = Spec;
 /**
  * Initialize a new `Spec` test reporter.
  *
+ * @public
+ * @class
+ * @memberof Mocha.reporters
+ * @extends Mocha.reporters.Base
  * @api public
  * @param {Runner} runner
  */
@@ -3668,7 +3834,9 @@ inherits(Spec, Base);
 
 },{"../utils":36,"./base":16}],30:[function(require,module,exports){
 'use strict';
-
+/**
+ * @module TAP
+ */
 /**
  * Module dependencies.
  */
@@ -3684,6 +3852,10 @@ exports = module.exports = TAP;
 /**
  * Initialize a new `TAP` reporter.
  *
+ * @public
+ * @class
+ * @memberof Mocha.reporters
+ * @extends Mocha.reporters.Base
  * @api public
  * @param {Runner} runner
  */
@@ -3741,7 +3913,9 @@ function title (test) {
 },{"./base":16}],31:[function(require,module,exports){
 (function (process,global){
 'use strict';
-
+/**
+ * @module XUnit
+ */
 /**
  * Module dependencies.
  */
@@ -3775,6 +3949,10 @@ exports = module.exports = XUnit;
 /**
  * Initialize a new `XUnit` reporter.
  *
+ * @public
+ * @class
+ * @memberof Mocha.reporters
+ * @extends Mocha.reporters.Base
  * @api public
  * @param {Runner} runner
  */
@@ -3928,11 +4106,12 @@ function tag (name, attrs, close, content) {
 },{"../utils":36,"./base":16,"_process":56,"fs":40,"mkdirp":53,"path":40}],32:[function(require,module,exports){
 (function (global){
 'use strict';
-
+/**
+ * @module Runnable
+ */
 /**
  * Module dependencies.
  */
-
 var EventEmitter = require('events').EventEmitter;
 var Pending = require('./pending');
 var debug = require('debug')('mocha:runnable');
@@ -3964,12 +4143,12 @@ var toString = Object.prototype.toString;
 module.exports = Runnable;
 
 /**
- * Initialize a new `Runnable` with the given `title` and callback `fn`.
+ * Initialize a new `Runnable` with the given `title` and callback `fn`.  Derived from [EventEmitter](https://nodejs.org/api/events.html#events_class_eventemitter)
  *
+ * @memberof Mocha
+ * @public
+ * @class
  * @param {String} title
- * @param {Function} fn
- * @api private
- * @param {string} title
  * @param {Function} fn
  */
 function Runnable (title, fn) {
@@ -4056,6 +4235,8 @@ Runnable.prototype.enableTimeouts = function (enabled) {
 /**
  * Halt and mark as pending.
  *
+ * @memberof Mocha.Runnable
+ * @public
  * @api public
  */
 Runnable.prototype.skip = function () {
@@ -4117,6 +4298,8 @@ Runnable.prototype.currentRetry = function (n) {
  * Return the full title generated by recursively concatenating the parent's
  * full title.
  *
+ * @memberof Mocha.Runnable
+ * @public
  * @api public
  * @return {string}
  */
@@ -4127,6 +4310,8 @@ Runnable.prototype.fullTitle = function () {
 /**
  * Return the title path generated by concatenating the parent's title path with the title.
  *
+ * @memberof Mocha.Runnable
+ * @public
  * @api public
  * @return {string}
  */
@@ -4181,8 +4366,7 @@ Runnable.prototype.resetTimeout = function () {
     if (!self._enableTimeouts) {
       return;
     }
-    self.callback(new Error('Timeout of ' + ms +
-      'ms exceeded. For async tests and hooks, ensure "done()" is called; if returning a Promise, ensure it resolves.'));
+    self.callback(self._timeoutError(ms));
     self.timedOut = true;
   }, ms);
 };
@@ -4248,8 +4432,7 @@ Runnable.prototype.run = function (fn) {
     self.duration = new Date() - start;
     finished = true;
     if (!err && self.duration > ms && self._enableTimeouts) {
-      err = new Error('Timeout of ' + ms +
-      'ms exceeded. For async tests and hooks, ensure "done()" is called; if returning a Promise, ensure it resolves.');
+      err = self._timeoutError(ms);
     }
     fn(err);
   }
@@ -4347,15 +4530,32 @@ Runnable.prototype.run = function (fn) {
   }
 };
 
+/**
+ * Instantiates a "timeout" error
+ *
+ * @param {number} ms - Timeout (in milliseconds)
+ * @returns {Error} a "timeout" error
+ * @private
+ */
+Runnable.prototype._timeoutError = function (ms) {
+  var msg = 'Timeout of ' + ms + 'ms exceeded. For async tests and hooks, ensure "done()" is called; if returning a Promise, ensure it resolves.';
+  if (this.file) {
+    msg += ' (' + this.file + ')';
+  }
+  return new Error(msg);
+};
+
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"./ms":14,"./pending":15,"./utils":36,"debug":43,"events":47}],33:[function(require,module,exports){
 (function (process,global){
 'use strict';
 
 /**
+ * @module Runner
+ */
+/**
  * Module dependencies.
  */
-
 var EventEmitter = require('events').EventEmitter;
 var Pending = require('./pending');
 var utils = require('./utils');
@@ -4389,7 +4589,7 @@ var globals = [
 module.exports = Runner;
 
 /**
- * Initialize a `Runner` for the given `suite`.
+ * Initialize a `Runner` for the given `suite`. Derived from [EventEmitter](https://nodejs.org/api/events.html#events_class_eventemitter)
  *
  * Events:
  *
@@ -4405,8 +4605,11 @@ module.exports = Runner;
  *   - `fail`  (test, err) test failed
  *   - `pending`  (test) test pending
  *
+ * @memberof Mocha
+ * @public
+ * @class
  * @api public
- * @param {Suite} suite Root suite
+ * @param {Suite} [suite] Root suite
  * @param {boolean} [delay] Whether or not to delay execution of root suite
  * until ready.
  */
@@ -4447,10 +4650,9 @@ inherits(Runner, EventEmitter);
  * Run tests with full titles matching `re`. Updates runner.total
  * with number of tests matched.
  *
- * @param {RegExp} re
- * @param {Boolean} invert
- * @return {Runner} for chaining
  * @api public
+ * @public
+ * @memberof Mocha.Runner
  * @param {RegExp} re
  * @param {boolean} invert
  * @return {Runner} Runner instance.
@@ -4467,9 +4669,9 @@ Runner.prototype.grep = function (re, invert) {
  * Returns the number of tests matching the grep search for the
  * given suite.
  *
- * @param {Suite} suite
- * @return {Number}
+ * @memberof Mocha.Runner
  * @api public
+ * @public
  * @param {Suite} suite
  * @return {number}
  */
@@ -4513,9 +4715,9 @@ Runner.prototype.globalProps = function () {
 /**
  * Allow the given `arr` of globals.
  *
- * @param {Array} arr
- * @return {Runner} for chaining
  * @api public
+ * @public
+ * @memberof Mocha.Runner
  * @param {Array} arr
  * @return {Runner} Runner instance.
  */
@@ -5156,9 +5358,9 @@ function cleanSuiteReferences (suite) {
  * Run the root suite and invoke `fn(failures)`
  * on completion.
  *
- * @param {Function} fn
- * @return {Runner} for chaining
  * @api public
+ * @public
+ * @memberof Mocha.Runner
  * @param {Function} fn
  * @return {Runner} Runner instance.
  */
@@ -5215,6 +5417,8 @@ Runner.prototype.run = function (fn) {
 /**
  * Cleanly abort execution.
  *
+ * @memberof Mocha.Runner
+ * @public
  * @api public
  * @return {Runner} Runner instance.
  */
@@ -5336,11 +5540,13 @@ function extraGlobals () {
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"./pending":15,"./runnable":32,"./utils":36,"_process":56,"debug":43,"events":47}],34:[function(require,module,exports){
 'use strict';
+/**
+ * @module Suite
+ */
 
 /**
  * Module dependencies.
  */
-
 var EventEmitter = require('events').EventEmitter;
 var Hook = require('./hook');
 var utils = require('./utils');
@@ -5359,6 +5565,8 @@ exports = module.exports = Suite;
  * with the same title is already present, that suite is returned to provide
  * nicer reporter and more flexible meta-testing.
  *
+ * @memberof Mocha
+ * @public
  * @api public
  * @param {Suite} parent
  * @param {string} title
@@ -5373,9 +5581,11 @@ exports.create = function (parent, title) {
 };
 
 /**
- * Initialize a new `Suite` with the given `title` and `ctx`.
+ * Initialize a new `Suite` with the given `title` and `ctx`. Derived from [EventEmitter](https://nodejs.org/api/events.html#events_class_eventemitter)
  *
- * @api private
+ * @memberof Mocha
+ * @public
+ * @class
  * @param {string} title
  * @param {Context} parentContext
  */
@@ -5527,6 +5737,25 @@ Suite.prototype.isPending = function () {
 };
 
 /**
+ * Generic hook-creator.
+ * @private
+ * @param {string} title - Title of hook
+ * @param {Function} fn - Hook callback
+ * @returns {Hook} A new hook
+ */
+Suite.prototype._createHook = function (title, fn) {
+  var hook = new Hook(title, fn);
+  hook.parent = this;
+  hook.timeout(this.timeout());
+  hook.retries(this.retries());
+  hook.enableTimeouts(this.enableTimeouts());
+  hook.slow(this.slow());
+  hook.ctx = this.ctx;
+  hook.file = this.file;
+  return hook;
+};
+
+/**
  * Run `fn(test[, done])` before running tests.
  *
  * @api private
@@ -5544,13 +5773,7 @@ Suite.prototype.beforeAll = function (title, fn) {
   }
   title = '"before all" hook' + (title ? ': ' + title : '');
 
-  var hook = new Hook(title, fn);
-  hook.parent = this;
-  hook.timeout(this.timeout());
-  hook.retries(this.retries());
-  hook.enableTimeouts(this.enableTimeouts());
-  hook.slow(this.slow());
-  hook.ctx = this.ctx;
+  var hook = this._createHook(title, fn);
   this._beforeAll.push(hook);
   this.emit('beforeAll', hook);
   return this;
@@ -5574,13 +5797,7 @@ Suite.prototype.afterAll = function (title, fn) {
   }
   title = '"after all" hook' + (title ? ': ' + title : '');
 
-  var hook = new Hook(title, fn);
-  hook.parent = this;
-  hook.timeout(this.timeout());
-  hook.retries(this.retries());
-  hook.enableTimeouts(this.enableTimeouts());
-  hook.slow(this.slow());
-  hook.ctx = this.ctx;
+  var hook = this._createHook(title, fn);
   this._afterAll.push(hook);
   this.emit('afterAll', hook);
   return this;
@@ -5604,13 +5821,7 @@ Suite.prototype.beforeEach = function (title, fn) {
   }
   title = '"before each" hook' + (title ? ': ' + title : '');
 
-  var hook = new Hook(title, fn);
-  hook.parent = this;
-  hook.timeout(this.timeout());
-  hook.retries(this.retries());
-  hook.enableTimeouts(this.enableTimeouts());
-  hook.slow(this.slow());
-  hook.ctx = this.ctx;
+  var hook = this._createHook(title, fn);
   this._beforeEach.push(hook);
   this.emit('beforeEach', hook);
   return this;
@@ -5634,13 +5845,7 @@ Suite.prototype.afterEach = function (title, fn) {
   }
   title = '"after each" hook' + (title ? ': ' + title : '');
 
-  var hook = new Hook(title, fn);
-  hook.parent = this;
-  hook.timeout(this.timeout());
-  hook.retries(this.retries());
-  hook.enableTimeouts(this.enableTimeouts());
-  hook.slow(this.slow());
-  hook.ctx = this.ctx;
+  var hook = this._createHook(title, fn);
   this._afterEach.push(hook);
   this.emit('afterEach', hook);
   return this;
@@ -5688,6 +5893,8 @@ Suite.prototype.addTest = function (test) {
  * Return the full title generated by recursively concatenating the parent's
  * full title.
  *
+ * @memberof Mocha.Suite
+ * @public
  * @api public
  * @return {string}
  */
@@ -5699,6 +5906,8 @@ Suite.prototype.fullTitle = function () {
  * Return the title path generated by recursively concatenating the parent's
  * title path.
  *
+ * @memberof Mocha.Suite
+ * @public
  * @api public
  * @return {string}
  */
@@ -5716,6 +5925,8 @@ Suite.prototype.titlePath = function () {
 /**
  * Return the total number of tests.
  *
+ * @memberof Mocha.Suite
+ * @public
  * @api public
  * @return {number}
  */
@@ -5805,6 +6016,10 @@ Test.prototype.clone = function () {
 },{"./runnable":32,"./utils":36}],36:[function(require,module,exports){
 (function (process,Buffer){
 'use strict';
+
+/**
+ * @module
+ */
 
 /**
  * Module dependencies.
@@ -6267,6 +6482,8 @@ exports.canonicalize = function canonicalize (value, stack, typeHint) {
 /**
  * Lookup file names at the given `path`.
  *
+ * @memberof Mocha.utils
+ * @public
  * @api public
  * @param {string} filepath Base path to start searching from.
  * @param {string[]} extensions File extensions to look for.
