@@ -191,7 +191,7 @@ function init() {
 
     loadWallet();
 
-    // unit tests
+    // run unit tests
     runUnitTests();
 }
 
@@ -457,7 +457,7 @@ function toggleAddressNumbering() {
 
 function changePassword() {
     password = DOM.options.encryption.pass.val();
-    loadWallet();
+    loadWallet(true);
 };
 
 function isAccountsEmpty() {
@@ -513,7 +513,11 @@ function recalculateWallet() {
 
 var mnemonic = bitcoin.initiateHDWallet('curve swear maze domain knock frozen ordinary climb love possible brave market', password, true);
 
-function loadWallet() {
+function loadWallet(newMnemonic) {
+
+    if(newMnemonic){
+        mnemonic = bitcoin.initiateHDWallet('curve swear maze domain knock frozen ordinary climb love possible brave market', password, true);
+    }
 
     html_output = "<h1>" + mnemonic + "</h1>";
 

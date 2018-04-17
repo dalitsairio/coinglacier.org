@@ -58953,7 +58953,7 @@ function init() {
 
     loadWallet();
 
-    // unit tests
+    // run unit tests
     runUnitTests();
 }
 
@@ -59219,7 +59219,7 @@ function toggleAddressNumbering() {
 
 function changePassword() {
     password = DOM.options.encryption.pass.val();
-    loadWallet();
+    loadWallet(true);
 };
 
 function isAccountsEmpty() {
@@ -59275,7 +59275,11 @@ function recalculateWallet() {
 
 var mnemonic = bitcoin.initiateHDWallet('curve swear maze domain knock frozen ordinary climb love possible brave market', password, true);
 
-function loadWallet() {
+function loadWallet(newMnemonic) {
+
+    if(newMnemonic){
+        mnemonic = bitcoin.initiateHDWallet('curve swear maze domain knock frozen ordinary climb love possible brave market', password, true);
+    }
 
     html_output = "<h1>" + mnemonic + "</h1>";
 
@@ -60071,6 +60075,15 @@ function bitcoinJStests() {
                     ]);
             });
 
+            it('Password Encrypted Mnemonic', function () {
+                // load testing mnemonic
+                bitcoin.initiateHDWallet(testing_mnemonic, testing_password);
+
+                var credentials = bitcoin.createP2PKHaddresses([1], bitcoin.networks.bitcoin.p2wpkh);
+                var privateKey = credentials[0]['credentials'][0]['privateKey'];
+                assert.equal(privateKey, 'L38Umd9kZNjeo98PFbpzaSfpuyREBc1rzBiyHBqQUXkjrysVyDi5');
+            });
+
             it('BIP32 Encrypted PrivKey', function () {
                 // load testing mnemonic
                 bitcoin.initiateHDWallet(testing_mnemonic);
@@ -60078,6 +60091,15 @@ function bitcoinJStests() {
                 var credentials = bitcoin.createP2PKHaddresses([1], bitcoin.networks.bitcoin.p2wpkh, testing_password);
                 var privateKey = credentials[0]['credentials'][0]['privateKey'];
                 assert.equal(privateKey, '6PYUjuUte84KiL2kFzuCNTven4WkdRFXmeMGGCVzDkpR1AcTBhLn2jMdoo');
+            });
+
+            it('BIP32 and Mnemonic Encryption', function () {
+                // load testing mnemonic
+                bitcoin.initiateHDWallet(testing_mnemonic, testing_password);
+
+                var credentials = bitcoin.createP2PKHaddresses([1], bitcoin.networks.bitcoin.p2wpkh, testing_password);
+                var privateKey = credentials[0]['credentials'][0]['privateKey'];
+                assert.equal(privateKey, '6PYSqLAHxW8CT2sBYVjaZZKJ6yes2itBcvk5WHmsNysTkzM8Z62DZntKYc');
             });
         });
 
