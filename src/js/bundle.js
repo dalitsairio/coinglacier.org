@@ -2460,65 +2460,97 @@ for (var i = 0, len = code.length; i < len; ++i) {
 revLookup['-'.charCodeAt(0)] = 62
 revLookup['_'.charCodeAt(0)] = 63
 
-function placeHoldersCount (b64) {
+function getLens (b64) {
   var len = b64.length
+
   if (len % 4 > 0) {
     throw new Error('Invalid string. Length must be a multiple of 4')
   }
 
-  // the number of equal signs (place holders)
-  // if there are two placeholders, than the two characters before it
-  // represent one byte
-  // if there is only one, then the three characters before it represent 2 bytes
-  // this is just a cheap hack to not do indexOf twice
-  return b64[len - 2] === '=' ? 2 : b64[len - 1] === '=' ? 1 : 0
+  // Trim off extra bytes after placeholder bytes are found
+  // See: https://github.com/beatgammit/base64-js/issues/42
+  var validLen = b64.indexOf('=')
+  if (validLen === -1) validLen = len
+
+  var placeHoldersLen = validLen === len
+    ? 0
+    : 4 - (validLen % 4)
+
+  return [validLen, placeHoldersLen]
 }
 
+// base64 is 4/3 + up to two characters of the original data
 function byteLength (b64) {
-  // base64 is 4/3 + up to two characters of the original data
-  return (b64.length * 3 / 4) - placeHoldersCount(b64)
+  var lens = getLens(b64)
+  var validLen = lens[0]
+  var placeHoldersLen = lens[1]
+  return ((validLen + placeHoldersLen) * 3 / 4) - placeHoldersLen
+}
+
+function _byteLength (b64, validLen, placeHoldersLen) {
+  return ((validLen + placeHoldersLen) * 3 / 4) - placeHoldersLen
 }
 
 function toByteArray (b64) {
-  var i, l, tmp, placeHolders, arr
-  var len = b64.length
-  placeHolders = placeHoldersCount(b64)
+  var tmp
+  var lens = getLens(b64)
+  var validLen = lens[0]
+  var placeHoldersLen = lens[1]
 
-  arr = new Arr((len * 3 / 4) - placeHolders)
+  var arr = new Arr(_byteLength(b64, validLen, placeHoldersLen))
+
+  var curByte = 0
 
   // if there are placeholders, only get up to the last complete 4 chars
-  l = placeHolders > 0 ? len - 4 : len
+  var len = placeHoldersLen > 0
+    ? validLen - 4
+    : validLen
 
-  var L = 0
-
-  for (i = 0; i < l; i += 4) {
-    tmp = (revLookup[b64.charCodeAt(i)] << 18) | (revLookup[b64.charCodeAt(i + 1)] << 12) | (revLookup[b64.charCodeAt(i + 2)] << 6) | revLookup[b64.charCodeAt(i + 3)]
-    arr[L++] = (tmp >> 16) & 0xFF
-    arr[L++] = (tmp >> 8) & 0xFF
-    arr[L++] = tmp & 0xFF
+  for (var i = 0; i < len; i += 4) {
+    tmp =
+      (revLookup[b64.charCodeAt(i)] << 18) |
+      (revLookup[b64.charCodeAt(i + 1)] << 12) |
+      (revLookup[b64.charCodeAt(i + 2)] << 6) |
+      revLookup[b64.charCodeAt(i + 3)]
+    arr[curByte++] = (tmp >> 16) & 0xFF
+    arr[curByte++] = (tmp >> 8) & 0xFF
+    arr[curByte++] = tmp & 0xFF
   }
 
-  if (placeHolders === 2) {
-    tmp = (revLookup[b64.charCodeAt(i)] << 2) | (revLookup[b64.charCodeAt(i + 1)] >> 4)
-    arr[L++] = tmp & 0xFF
-  } else if (placeHolders === 1) {
-    tmp = (revLookup[b64.charCodeAt(i)] << 10) | (revLookup[b64.charCodeAt(i + 1)] << 4) | (revLookup[b64.charCodeAt(i + 2)] >> 2)
-    arr[L++] = (tmp >> 8) & 0xFF
-    arr[L++] = tmp & 0xFF
+  if (placeHoldersLen === 2) {
+    tmp =
+      (revLookup[b64.charCodeAt(i)] << 2) |
+      (revLookup[b64.charCodeAt(i + 1)] >> 4)
+    arr[curByte++] = tmp & 0xFF
+  }
+
+  if (placeHoldersLen === 1) {
+    tmp =
+      (revLookup[b64.charCodeAt(i)] << 10) |
+      (revLookup[b64.charCodeAt(i + 1)] << 4) |
+      (revLookup[b64.charCodeAt(i + 2)] >> 2)
+    arr[curByte++] = (tmp >> 8) & 0xFF
+    arr[curByte++] = tmp & 0xFF
   }
 
   return arr
 }
 
 function tripletToBase64 (num) {
-  return lookup[num >> 18 & 0x3F] + lookup[num >> 12 & 0x3F] + lookup[num >> 6 & 0x3F] + lookup[num & 0x3F]
+  return lookup[num >> 18 & 0x3F] +
+    lookup[num >> 12 & 0x3F] +
+    lookup[num >> 6 & 0x3F] +
+    lookup[num & 0x3F]
 }
 
 function encodeChunk (uint8, start, end) {
   var tmp
   var output = []
   for (var i = start; i < end; i += 3) {
-    tmp = ((uint8[i] << 16) & 0xFF0000) + ((uint8[i + 1] << 8) & 0xFF00) + (uint8[i + 2] & 0xFF)
+    tmp =
+      ((uint8[i] << 16) & 0xFF0000) +
+      ((uint8[i + 1] << 8) & 0xFF00) +
+      (uint8[i + 2] & 0xFF)
     output.push(tripletToBase64(tmp))
   }
   return output.join('')
@@ -2528,30 +2560,33 @@ function fromByteArray (uint8) {
   var tmp
   var len = uint8.length
   var extraBytes = len % 3 // if we have 1 byte left, pad 2 bytes
-  var output = ''
   var parts = []
   var maxChunkLength = 16383 // must be multiple of 3
 
   // go through the array every three bytes, we'll deal with trailing stuff later
   for (var i = 0, len2 = len - extraBytes; i < len2; i += maxChunkLength) {
-    parts.push(encodeChunk(uint8, i, (i + maxChunkLength) > len2 ? len2 : (i + maxChunkLength)))
+    parts.push(encodeChunk(
+      uint8, i, (i + maxChunkLength) > len2 ? len2 : (i + maxChunkLength)
+    ))
   }
 
   // pad the end with zeros, but make sure to not forget the extra bytes
   if (extraBytes === 1) {
     tmp = uint8[len - 1]
-    output += lookup[tmp >> 2]
-    output += lookup[(tmp << 4) & 0x3F]
-    output += '=='
+    parts.push(
+      lookup[tmp >> 2] +
+      lookup[(tmp << 4) & 0x3F] +
+      '=='
+    )
   } else if (extraBytes === 2) {
-    tmp = (uint8[len - 2] << 8) + (uint8[len - 1])
-    output += lookup[tmp >> 10]
-    output += lookup[(tmp >> 4) & 0x3F]
-    output += lookup[(tmp << 2) & 0x3F]
-    output += '='
+    tmp = (uint8[len - 2] << 8) + uint8[len - 1]
+    parts.push(
+      lookup[tmp >> 10] +
+      lookup[(tmp >> 4) & 0x3F] +
+      lookup[(tmp << 2) & 0x3F] +
+      '='
+    )
   }
-
-  parts.push(output)
 
   return parts.join('')
 }
@@ -58760,6 +58795,340 @@ module.exports = {
 }).call(this,require("buffer").Buffer)
 
 },{"bs58check":106,"buffer":109}],271:[function(require,module,exports){
+const bitcoinjs = require('./bitcoinjs-lib_patched').bitcoinjs;
+const bip39 = require('bip39');
+const bip38 = require('bip38');
+const wif = require('wif');
+
+var mnemonic;
+var bip32RootKey;
+
+function initiateHDWallet(loadMnemonic, password) {
+
+    if (!loadMnemonic) {
+        // create a new mnemonic and return it
+        mnemonic = bip39.generateMnemonic();
+    } else {
+        // import a given mnemonic
+        if (bip39.validateMnemonic(loadMnemonic)) {
+            mnemonic = loadMnemonic;
+        } else {
+            throw ('given mnemonic [' + loadMnemonic + '] is not a valid 12 word mnemonic');
+        }
+    }
+
+    var seed = bip39.mnemonicToSeed(mnemonic, password);
+    bip32RootKey = bitcoinjs.HDNode.fromSeedBuffer(seed);
+
+    return mnemonic;
+}
+
+function createAccount(networkID, index) {
+
+    index = index || 0;
+
+    // check path validity
+    var accountPath = getAccountPath(networkID, index);
+    var pathError = findDerivationPathErrors(accountPath, false, true);
+    if (pathError) throw 'Derivation Path Error: ' + pathError;
+
+    var account = bip32RootKey.derivePath(accountPath);
+    account.keyPair.network = getNetworkByID(networkID);
+
+    var result = {};
+    result.account = account;
+    result.xpub = account.neutered().toBase58();
+    result.credentials = [];
+
+    return result;
+}
+
+
+// creates addresses and privKeys on the level of a BIP32 account
+function createCredentials(account, addressIndex, password) {
+
+    var credentials;
+
+    // Masternode / BIP44 | BIP49 | BIP84 / Bitcoin | Testnet / Account / External / First Address
+    //                                                                    ^^^^^^^^^^^^^^^^^^^^^^^^
+    var addressPath = '0/' + addressIndex;
+    var pathError = findDerivationPathErrors(addressPath, true, false);
+    if (pathError) throw 'Derivation Path Error: ' + pathError;
+
+    var bip32 = account.derivePath(addressPath);
+
+    var privateKey = bip32.keyPair.toWIF();
+    if (password) {
+        // encrypt the privateKey
+        var decoded = wif.decode(privateKey);
+        privateKey = bip38.encrypt(decoded.privateKey, decoded.compressed, password);
+    }
+
+    switch (bip32.keyPair.network) {
+        case bitcoinjs.networks.bitcoin:
+        case bitcoinjs.networks.testnet:
+
+            credentials = {privateKey: privateKey, address: bip32.getAddress()};
+            break;
+        case bitcoinjs.networks.bitcoin.p2wpkhInP2sh:
+        case bitcoinjs.networks.testnet.p2wpkhInP2sh:
+
+            var pubKey = bip32.getPublicKeyBuffer();
+            var redeemScript = bitcoinjs.script.witnessPubKeyHash.output.encode(bitcoinjs.crypto.hash160(pubKey));
+            var scriptPubKey = bitcoinjs.script.scriptHash.output.encode(bitcoinjs.crypto.hash160(redeemScript));
+
+            credentials = {
+                privateKey: privateKey,
+                address: bitcoinjs.address.fromOutputScript(scriptPubKey, bip32.keyPair.network)
+            };
+            break;
+        case bitcoinjs.networks.bitcoin.p2wpkh:
+        case bitcoinjs.networks.testnet.p2wpkh:
+
+            var pubKey = bip32.getPublicKeyBuffer();
+            var scriptPubKey = bitcoinjs.script.witnessPubKeyHash.output.encode(bitcoinjs.crypto.hash160(pubKey));
+
+            credentials = {
+                privateKey: privateKey,
+                address: bitcoinjs.address.fromOutputScript(scriptPubKey, bip32.keyPair.network)
+            };
+            break;
+        default:
+            throw ("given network is not a valid network");
+    }
+
+    return credentials;
+}
+
+function getNetworkByID(networkID) {
+
+    switch (networkID) {
+        case bitcoinjs.networks.bitcoin.id:
+            return bitcoinjs.networks.bitcoin;
+        case bitcoinjs.networks.bitcoin.p2wpkhInP2sh.id:
+            return bitcoinjs.networks.bitcoin.p2wpkhInP2sh;
+        case bitcoinjs.networks.bitcoin.p2wpkh.id:
+            return bitcoinjs.networks.bitcoin.p2wpkh;
+        case bitcoinjs.networks.testnet.id:
+            return bitcoinjs.networks.testnet;
+        case bitcoinjs.networks.testnet.p2wpkhInP2sh.id:
+            return bitcoinjs.networks.testnet.p2wpkhInP2sh;
+        case bitcoinjs.networks.testnet.p2wpkh.id:
+            return bitcoinjs.networks.testnet.p2wpkh;
+    }
+
+    throw ('There is no network with the id ' + networkID);
+}
+
+
+function getBip44testnetOrMainnet(networkID) {
+    if (networkID >= 10) {
+        return 1;
+    }
+    return 0;
+}
+
+function getAccountPath(networkID, accountIndex) {
+
+    // https://github.com/satoshilabs/slips/blob/master/slip-0044.md
+    var mainnetORtestnet = getBip44testnetOrMainnet(networkID);
+
+    // get extended public key of each account
+    switch (networkID) {
+        case bitcoinjs.networks.bitcoin.id:
+        case bitcoinjs.networks.testnet.id:
+
+            // PrivKey / BIP44 / Bitcoin | Testnet / Account
+            return "m/44'/" + mainnetORtestnet + "'/" + accountIndex + "'";
+
+        case bitcoinjs.networks.bitcoin.p2wpkhInP2sh.id:
+        case bitcoinjs.networks.testnet.p2wpkhInP2sh.id:
+
+            // PrivKey / BIP49 / Bitcoin | Testnet / Account
+            return "m/49'/" + mainnetORtestnet + "'/" + accountIndex + "'";
+
+        case bitcoinjs.networks.bitcoin.p2wpkh.id:
+        case bitcoinjs.networks.testnet.p2wpkh.id:
+
+            // PrivKey / BIP84 / Bitcoin | Testnet / Account
+            return "m/84'/" + mainnetORtestnet + "'/" + accountIndex + "'";
+
+        default:
+            throw ("given network is not a valid network");
+    }
+}
+
+// copied from https://github.com/iancoleman/bip39/blob/master/src/js/index.js and adapted
+// PARAMETERS
+// path: the derivation path as a string
+// createXPUB: do you want to create an xpub for the given path?
+// fromMasternode: is the path starting at the masternode level or deeper down the path? (starts with 'm'?)
+function findDerivationPathErrors(path, createXPUB, fromMasternode) {
+
+    if (fromMasternode !== false) {
+        fromMasternode = true;
+    }
+
+    // TODO is not perfect but is better than nothing
+    // Inspired by
+    // https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki#test-vectors
+    // and
+    // https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki#extended-keys
+    var maxDepth = 255; // TODO verify this!!
+    var maxIndexValue = Math.pow(2, 31); // TODO verify this!!
+
+    // check first character
+    var invalidFirstChar = path[0].replace(/^[0-9m]/, "");
+    if (invalidFirstChar > 0) {
+        return "first charactar must be 'm' or a number, but is " + invalidFirstChar;
+    }
+
+    if (fromMasternode && path[0] != 'm') {
+        return "First character must be 'm'";
+    } else if (!fromMasternode && path[0] == 'm') {
+        return 'The path starts at masternode, but the third param is set to false';
+    }
+
+    if (path.length > 1) {
+        if (path[1] != '/') {
+            return "Separator must be '/'";
+        }
+        var indexes = path.split('/');
+        if (indexes.length > maxDepth) {
+            return 'Derivation depth is ' + indexes.length + ', must be less than ' + maxDepth;
+        }
+        for (var depth = 1; depth < indexes.length; depth++) {
+            var index = indexes[depth];
+            var invalidChars = index.replace(/^[0-9]+'?$/g, "")
+            if (invalidChars.length > 0) {
+                return "Invalid characters " + invalidChars + " found at depth " + depth;
+            }
+            var indexValue = parseInt(index.replace("'", ""));
+            if (isNaN(depth)) {
+                return "Invalid number at depth " + depth;
+            }
+            if (indexValue > maxIndexValue) {
+                return "Value of " + indexValue + " at depth " + depth + " must be less than " + maxIndexValue;
+            }
+        }
+    }
+    // Check root key exists or else derivation path is useless!
+    if (!bip32RootKey) {
+        return "No root key";
+    }
+    // Check no hardened derivation path when using xpub keys
+    var isHardenedPath = path.indexOf("'") > -1;
+    if (isHardenedPath && createXPUB) {
+        return "Hardened derivation path is invalid with xpub key";
+    }
+    return false;
+}
+
+
+module.exports = {
+    initiateHDWallet,
+    createAccount,
+    createCredentials
+};
+
+},{"./bitcoinjs-lib_patched":272,"bip38":24,"bip39":25,"wif":270}],272:[function(require,module,exports){
+var bitcoinjs = require('bitcoinjs-lib');
+
+// extensions copied from https://github.com/iancoleman/bip39/blob/master/src/js/segwit-parameters.js
+(function() {
+
+// add id's to existing networks
+bitcoinjs.networks.bitcoin.id = 0;
+bitcoinjs.networks.testnet.id = 10;
+
+
+// p2wpkh
+
+bitcoinjs.networks.bitcoin.p2wpkh = {
+    id: 2,
+    baseNetwork: "bitcoin",
+    messagePrefix: '\x18Bitcoin Signed Message:\n',
+    bech32: 'bc',
+    bip32: {
+        public: 0x04b24746,
+        private: 0x04b2430c
+    },
+    pubKeyHash: 0x00,
+    scriptHash: 0x05,
+    wif: 0x80
+};
+
+bitcoinjs.networks.testnet.p2wpkh = {
+    id: 12,
+    baseNetwork: "testnet",
+    messagePrefix: '\x18Bitcoin Signed Message:\n',
+    bech32: 'tb',
+    bip32: {
+        public: 0x045f1cf6,
+        private: 0x045f18bc
+    },
+    pubKeyHash: 0x6f,
+    scriptHash: 0xc4,
+    wif: 0xef
+};
+
+// p2wpkh in p2sh
+
+bitcoinjs.networks.bitcoin.p2wpkhInP2sh = {
+    id: 1,
+    baseNetwork: "bitcoin",
+    messagePrefix: '\x18Bitcoin Signed Message:\n',
+    bech32: 'bc',
+    bip32: {
+        public: 0x049d7cb2,
+        private: 0x049d7878
+    },
+    pubKeyHash: 0x00,
+    scriptHash: 0x05,
+    wif: 0x80
+};
+
+bitcoinjs.networks.testnet.p2wpkhInP2sh = {
+    id: 11,
+    baseNetwork: "testnet",
+    messagePrefix: '\x18Bitcoin Signed Message:\n',
+    bech32: 'tb',
+    bip32: {
+        public: 0x044a5262,
+        private: 0x044a4e28
+    },
+    pubKeyHash: 0x6f,
+    scriptHash: 0xc4,
+    wif: 0xef
+};
+
+bitcoinjs.networks.litecoin.p2wpkhInP2sh = {
+    baseNetwork: "litecoin",
+    messagePrefix: '\x19Litecoin Signed Message:\n',
+    bip32: {
+        public: 0x01b26ef6,
+        private: 0x01b26792
+    },
+    pubKeyHash: 0x30,
+    scriptHash: 0x32,
+    wif: 0xb0
+};
+
+})();
+
+module.exports = {
+    bitcoinjs
+}
+
+},{"bitcoinjs-lib":45}],273:[function(require,module,exports){
+/*
+    Adds multi-threading (with web workers) and caching for the bitcoin library
+
+    // Result Caching
+    Caching is only done per mnemonic and is resetted
+    on the creation of a new mnemonic.
+ */
+
 // //////////////////////////////////////////////////
 // requires
 // //////////////////////////////////////////////////
@@ -58772,12 +59141,147 @@ const bitcoin = require('./bitcoin');
 // Constants and Variables
 // //////////////////////////////////////////////////
 
+var amountOfWebWorkers;
+var wpool;
+var cache;
+
+
+// //////////////////////////////////////////////////
+// Global Options
+// //////////////////////////////////////////////////
+
+amountOfWebWorkers = 8;
+
+// //////////////////////////////////////////////////
+// functions
+// //////////////////////////////////////////////////
+
+function initiateHDWallet(mnemonic, password) {
+
+    wpool = new WorkerPool('js/xy.js', amountOfWebWorkers);
+    // always reset the cache on new wallets
+    cache = [];
+
+    return bitcoin.initiateHDWallet(mnemonic, password);
+}
+
+function createAccount (networkID, index) {
+
+    index = index || 0;
+    cache[networkID] = cache[networkID] || []; // initialize array if that didn't happen before
+
+    if(typeof cache[networkID][index] === 'undefined') {
+        cache[networkID][index] = bitcoin.createAccount(networkID, index);
+    }
+
+    return cache[networkID][index];
+}
+
+function createCredentials(networkID, accountIndex, addressIndex, password, callback){
+
+    var account = createAccount(networkID, accountIndex, addressIndex, password).account;
+
+    // initiate cache array for all credentials under the given password
+    cache[networkID][accountIndex].credentials[password] = cache[networkID][accountIndex].credentials[password] || [];
+
+    if(!cache[networkID][accountIndex].credentials[password][addressIndex]) {
+        cache[networkID][accountIndex].credentials[password][addressIndex] = bitcoin.createCredentials(account, addressIndex, password);
+    }
+
+    callback(cache[networkID][accountIndex].credentials[password][addressIndex]);
+}
+
+// copy from https://github.com/gonzalo123/workerpool/blob/master/www/js/workerpool.js
+
+var WorkerPool;
+
+WorkerPool = (function () {
+    var pool = {};
+    var poolIds = [];
+
+    function WorkerPool(worker, numberOfWorkers) {
+        this.worker = worker;
+        this.numberOfWorkers = numberOfWorkers;
+
+        for (var i = 0; i < this.numberOfWorkers; i++) {
+            poolIds.push(i);
+            var myWorker = new Worker(worker);
+
+            +function (i) {
+                myWorker.addEventListener('message', function (e) {
+                    var data = e.data;
+                    console.log("Worker #" + i + " finished. status: " + data.status);
+                    pool[i].status = true;
+                    poolIds.push(i);
+                });
+            }(i);
+
+            pool[i] = {status: true, worker: myWorker};
+        }
+
+        this.getFreeWorkerId = function (callback) {
+            if (poolIds.length > 0) {
+                return callback(poolIds.pop());
+            } else {
+                var that = this;
+                setTimeout(function () {
+                    that.getFreeWorkerId(callback);
+                }, 100);
+            }
+        }
+    }
+
+    WorkerPool.prototype.postMessage = function (data) {
+        this.getFreeWorkerId(function (workerId) {
+            pool[workerId].status = false;
+            var worker = pool[workerId].worker;
+            console.log("postMessage with worker #" + workerId);
+            worker.postMessage(data);
+        });
+    };
+
+    WorkerPool.prototype.registerOnMessage = function (callback) {
+        for (var i = 0; i < this.numberOfWorkers; i++) {
+            pool[i].worker.addEventListener('message', callback);
+        }
+    };
+
+    WorkerPool.prototype.getFreeIds = function () {
+        return poolIds;
+    };
+
+    return WorkerPool;
+})();
+
+
+// //////////////////////////////////////////////////
+// Unit Tests
+// //////////////////////////////////////////////////
+
+function runUnitTests() {
+    mocha.setup('bdd');
+    tests.bitcoinJStests();
+    mocha.run();
+}
+// //////////////////////////////////////////////////
+// Constants and Variables
+// //////////////////////////////////////////////////
+
 // bitcoin network
-// contains not only network information, but also address type specific information
 var network;
-var accounts;
 var currentPage;
 var password;
+var accountsForm;
+var mnemonic;
+
+
+// identical to the id's set in bitcoinjs-lib_patched.js
+const MAINNET_NONSEGWIT = 0;
+const MAINNET_SEGWIT = 1;
+const MAINNET_BECH32 = 2;
+const TESTNET_NONSEGWIT = 10;
+const TESTNET_SEGWIT = 11;
+const TESTNET_BECH32 = 12;
 
 // GET parameters
 var GET = {};
@@ -58790,6 +59294,7 @@ GET.pages.paperWallet = 'paper-wallet';
 GET.network = {};
 GET.network.keyword = 'network';
 GET.network.testnet = 'testnet';
+GET.network.mainnet = 'mainnet';
 // GET address types
 GET.addressTypes = {};
 GET.addressTypes.keyword = 'addressType';
@@ -58885,14 +59390,13 @@ const defaultAddressType = {
 };
 currentPage = pages.singleWallet;
 
-
 // //////////////////////////////////////////////////
 // Events
 // //////////////////////////////////////////////////
 
 // Mainnet/Testnet Link
-DOM.network.testnet.click(initTestnet);
-DOM.network.mainnet.click(initMainnet);
+DOM.network.testnet.click(switchToTestnet);
+DOM.network.mainnet.click(switchToMainnet);
 
 // Menu
 DOM.menuEntry.singleWallet.click(function () {
@@ -58921,6 +59425,7 @@ DOM.options.numberAddresses.change(toggleAddressNumbering);
 // //////////////////////////////////////////////////
 
 function init() {
+
     // set mainnet or testnet
     switch (getURLparameter(GET.network.keyword)) {
         case GET.network.testnet:
@@ -58933,21 +59438,21 @@ function init() {
     // set correct page
     switch (getURLparameter(GET.pages.keyword)) {
         case GET.pages.paperWallet:
-            changePage(pages.paperWallet);
+            initiatePage(pages.paperWallet);
             break;
         case GET.pages.singleWallet:
-            changePage(pages.singleWallet);
+            initiatePage(pages.singleWallet);
         default:
-            changePage(currentPage);
+            initiatePage(currentPage);
             break;
     }
+
+    showAccountsOptions();
 
     // initialize popovers
     for (var x in DOM.popovers) {
         DOM.popovers[x].popover({html: true});
     }
-
-    showAccountsOptions();
 
     password = currentPage.defaultPassword;
 
@@ -58962,7 +59467,7 @@ function init() {
 // Page Management
 // //////////////////////////////////////////////////
 
-function changePage(newPage) {
+function initiatePage(newPage) {
     currentPage = newPage;
 
     setupPageOptions();
@@ -58972,6 +59477,10 @@ function changePage(newPage) {
 
     // reload the page
     showAccountsOptions(true);
+}
+
+function changePage(newPage) {
+    initiatePage(newPage);
     loadWallet();
 }
 
@@ -59006,7 +59515,11 @@ function initMainnet() {
     DOM.menu.removeClass(classes.testnet);
 
     // set correct Bitcoin network and reload the wallet
-    recalculateWallet();
+    setNetwork();
+}
+function switchToMainnet() {
+    initMainnet();
+    loadWallet();
 }
 
 function initTestnet() {
@@ -59022,7 +59535,11 @@ function initTestnet() {
     DOM.menu.addClass(classes.testnet);
 
     // set correct Bitcoin network and reload the wallet
-    recalculateWallet();
+    setNetwork();
+}
+function switchToTestnet() {
+    initTestnet();
+    loadWallet();
 }
 
 
@@ -59114,25 +59631,25 @@ function disableAccounts() {
     DOM.options.accounts.titleAccounts.show();
     DOM.options.accounts.titleAddresses.hide();
 
-    if (isAccountsEmpty()) {
-        initAccounts();
+    if (isAccountsFormEmpty()) {
+        initAccountsForm();
     }else {
-        accounts.splice(1, accounts.length - 1); // remove all entries but the first
+        accountsForm.splice(1, accountsForm.length - 1); // remove all entries but the first
     }
 
     showAccountsOptions();
     $('.account-row.not-template span.title').hide();
     $('.account-row.not-template button.account-insertion').hide();
-    loadWallet();
 }
 
-function initAccounts() {
-    accounts = [];
-    accounts.push(currentPage.addressesPerAccount);
+function initAccountsForm() {
+    accountsForm = [];
+    accountsForm.push(currentPage.addressesPerAccount);
 }
 
 function addAccount(prev) {
-    accounts.splice(prev + 1, 0, currentPage.addressesPerAccount);
+
+    accountsForm.splice(prev + 1, 0, currentPage.addressesPerAccount);
 
     // reload the view
     showAccountsOptions();
@@ -59140,7 +59657,7 @@ function addAccount(prev) {
 
 function removeAccount(position) {
     // remove the element from array
-    accounts.splice(position, 1);
+    accountsForm.splice(position, 1);
 
     // reload the view
     showAccountsOptions();
@@ -59148,36 +59665,35 @@ function removeAccount(position) {
 
 function setAddressesPerAccount(index, amount) {
     if (amount > 0) {
-        accounts[index] = amount;
+        accountsForm[index] = amount;
     }
 }
 
 function showAccountsOptions(reset) {
-
-    if (isAccountsEmpty() || reset) {
-        initAccounts();
+    if (isAccountsFormEmpty() || reset) {
+        initAccountsForm();
     }
 
-    // remove all accounts to add them again
+    // remove all accountsForm to add them again
     $('.account-row.not-template').remove();
 
-    for (var index = accounts.length - 1; index >= 0; index--) {
+    for (var index = accountsForm.length - 1; index >= 0; index--) {
 
         var accountDiv = DOM.options.accounts.accountTemplate.clone();
         accountDiv.prop('id', 'account-row-' + index);
         accountDiv.addClass('not-template');
 
-        accountDiv.find('.title').text('# ' + (index + 1));
+        accountDiv.find('.account-number').text('# ' + (index + 1));
         accountDiv.find('input').prop('id', 'addresses-amount-' + index);
-        accountDiv.find('input').val(accounts[index]);
+        accountDiv.find('input').val(accountsForm[index]);
         accountDiv.find('label').prop('for', 'addresses-amount-' + index);
 
         if (currentPage.showXPUB) {
-            accountDiv.find('.title').show();
+            accountDiv.find('.account-number').show();
             accountDiv.find('button').show();
         }
 
-        if (accounts.length <= 1) {
+        if (accountsForm.length <= 1) {
             accountDiv.find('button.account-remove').prop('disabled', true);
         }
 
@@ -59202,6 +59718,10 @@ function showAccountsOptions(reset) {
     }
 }
 
+function isAccountsFormEmpty() {
+    return typeof accountsForm === 'undefined' || accountsForm.length === 0;
+}
+
 function togglePasswordVisibility() {
     if (DOM.options.encryption.pass.prop('type') === 'text') {
         DOM.options.encryption.pass.prop('type', 'password');
@@ -59222,10 +59742,6 @@ function changePassword() {
     loadWallet(true);
 };
 
-function isAccountsEmpty() {
-    return typeof accounts === 'undefined' || accounts.length === 0;
-}
-
 
 // //////////////////////////////////////////////////
 // Bitcoin Stuff
@@ -59239,26 +59755,27 @@ function setNetwork() {
         case GET.network.testnet:
             switch (addressType) {
                 case GET.addressTypes.nonSegwit:
-                    network = bitcoin.networks.testnet;
+                    network = TESTNET_NONSEGWIT;
                     break;
                 case GET.addressTypes.segwit:
-                    network = bitcoin.networks.testnet.p2wpkhInP2sh;
+                    network = TESTNET_SEGWIT;
                     break;
                 case GET.addressTypes.bech32:
-                    network = bitcoin.networks.testnet.p2wpkh;
+                    network = TESTNET_BECH32;
                     break;
             }
             break;
+        case GET.network.mainnet:
         default:
             switch (addressType) {
                 case GET.addressTypes.nonSegwit:
-                    network = bitcoin.networks.bitcoin;
+                    network = MAINNET_NONSEGWIT;
                     break;
                 case GET.addressTypes.segwit:
-                    network = bitcoin.networks.bitcoin.p2wpkhInP2sh;
+                    network = MAINNET_SEGWIT;
                     break;
                 case GET.addressTypes.bech32:
-                    network = bitcoin.networks.bitcoin.p2wpkh;
+                    network = MAINNET_BECH32;
                     break;
             }
             break;
@@ -59271,58 +59788,68 @@ function recalculateWallet() {
     loadWallet();
 }
 
-// todo this function will be replaced properly
 
-var mnemonic = bitcoin.initiateHDWallet('curve swear maze domain knock frozen ordinary climb love possible brave market', password, true);
+mnemonic = initiateHDWallet('curve swear maze domain knock frozen ordinary climb love possible brave market', password);
 
 function loadWallet(newMnemonic) {
 
     if(newMnemonic){
-        mnemonic = bitcoin.initiateHDWallet('curve swear maze domain knock frozen ordinary climb love possible brave market', password, true);
+        mnemonic = initiateHDWallet('curve swear maze domain knock frozen ordinary climb love possible brave market', password);
     }
 
-    html_output = "<h1>" + mnemonic + "</h1>";
+    if (isAccountsFormEmpty()) {
+        initAccountsForm();
+    }
 
+// todo do this the right way
     var div_tag = document.getElementById('temporary');
+    div_tag.innerHTML = createWalletHTML();
 
-    var x = {
-        dynamic: bitcoin.createP2PKHaddresses(accounts, network, password),
-        // non_segwit_mainnet_encrypted: bitcoin.createP2PKHaddresses([1], bitcoin.networks.bitcoin.p2wpkh, 'MoonLambo'),
-        // non_segwit_testnet: bitcoin.createP2PKHaddresses([2, 3], bitcoin.networks.testnet),
-        // p2sh_p2wpkh_mainnet: bitcoin.createP2PKHaddresses(1, bitcoin.networks.bitcoin.p2wpkhInP2sh),
-        // p2sh_p2wpkh_testnet: bitcoin.createP2PKHaddresses(2, bitcoin.networks.testnet.p2wpkhInP2sh),
-        // bech32_mainnet: bitcoin.createP2PKHaddresses([1], bitcoin.networks.bitcoin.p2wpkh),
-        // bech32_testnet: bitcoin.createP2PKHaddresses([2], bitcoin.networks.testnet.p2wpkh),
-        // bech32_mainnet_multi: bitcoin.createP2PKHaddresses([3, 3], bitcoin.networks.testnet.p2wpkh)
-    }
+    fillWalletHTML();
 
+}
 
-    $.each(x, function (i, dataset) {
-        $.each(dataset, function (accountIndex, addresses) {
-            $.each(addresses.credentials, function (index, data) {
+// todo this function will be replaced properly with templates n' stuff
+function createWalletHTML(){
+    var html_output = "<h1>" + mnemonic + "</h1>";
 
-                var title = i;
-                if (currentPage.numberAddresses) {
-                    title += ' [Address ' + (index + 1) + ']';
-                }
-                html_output += "<h2>" + title + "</h2><table>";
+    foreachCredential(function (accountIndex, addressIndex) {
 
-                $.each(data, function (inner_index, inner_data) {
-                    html_output += "<tr><td><b>" + inner_index + "</b></td><td>" + inner_data + "</td></tr>";
-                });
+        var title = 'lorem ipsum';
 
-                if (currentPage.showXPUB) {
-                    html_output += "<tr><td><b>XPUB</b></td><td>" + addresses.xpub + "</td></tr>";
-                }
-
-
-                html_output += "</table>";
-            });
-        });
+        if (currentPage.numberAddresses) {
+            title += ' [Address ' + (addressIndex + 1) + ']';
+        }
+        html_output += '<h2>' + title + '</h2><table>';
+        html_output += '<tr><td><b>Address</b></td><td id="address-' + accountIndex + '-' + addressIndex + '"> ... wait ... </td></tr>';
+        html_output += '<tr><td><b>Private Key</b></td><td id="privkey-' + accountIndex + '-' + addressIndex + '"> ... wait ... </td></tr>';
+        html_output += "</table>";
     });
 
-    div_tag.innerHTML = html_output;
+    return html_output;
+}
 
+function fillWalletHTML(){
+
+    foreachCredential(function (accountIndex, addressIndex) {
+
+        // todo do this with web workers
+        createCredentials(network, accountIndex, addressIndex, password, function (credentials) {
+            $('td#address-' + accountIndex + '-' + addressIndex).text(credentials.address);
+            $('td#privkey-' + accountIndex + '-' + addressIndex).text(credentials.privateKey);
+        });
+    });
+}
+
+function foreachCredential(callback){
+
+    // loop through accounts
+    for(var accountIndex = 0; accountIndex < accountsForm.length; accountIndex++) {
+        // loop through addresses
+        for (var addressIndex = 0; addressIndex < accountsForm[accountIndex]; addressIndex++) {
+            callback(accountIndex, addressIndex);
+        }
+    }
 }
 
 
@@ -59391,416 +59918,10 @@ function getURLparameter(name, url) {
     return results == null ? null : results[1];
 }
 
-
-// //////////////////////////////////////////////////
-// Unit Tests
-// //////////////////////////////////////////////////
-
-function runUnitTests() {
-    mocha.setup('bdd');
-    tests.bitcoinJStests();
-    mocha.run();
-}
-
 init();
 
-},{"../../test/bitcoinTest":274,"./bitcoin":272}],272:[function(require,module,exports){
-const bitcoinjs = require('./bitcoinjs-lib_patched').bitcoinjs;
-const bip39 = require('bip39');
-const bip38 = require('bip38');
-const wif = require('wif');
 
-var mnemonic;
-var bip32RootKey;
-var useCache;
-var cache;
-
-function initiateHDWallet (loadMnemonic, password, cacheResults) {
-
-    useCache = (cacheResults ? true : false);
-    cache = [];
-
-    if(!loadMnemonic) {
-        // create a new mnemonic and return it
-        mnemonic = bip39.generateMnemonic();
-    }else{
-        // import a given mnemonic
-        if(bip39.validateMnemonic(loadMnemonic)) {
-            mnemonic = loadMnemonic;
-        }else{
-            throw ('given mnemonic [' + loadMnemonic + '] is not a valid 12 word mnemonic');
-        }
-    }
-
-    var seed = bip39.mnemonicToSeed(mnemonic, password);
-    bip32RootKey = bitcoinjs.HDNode.fromSeedBuffer(seed);
-
-    return mnemonic;
-}
-
-// if you want 2 accounts with 3 addresses each:
-// accounts = [3, 3];
-function createP2PKHaddresses (accounts, targetNetwork, password) {
-
-    // by default return one address
-    if(accounts === undefined || accounts.constructor !== Array) {
-        accounts = [1];
-    }
-
-    // set MAINNET P2SH-P2WPKH as standard network
-    targetNetwork = targetNetwork || bitcoinjs.networks.bitcoin.p2wpkhInP2sh;
-
-    var result = [];
-
-    // calculate addresses
-    for(var accIndex = 0; accIndex < accounts.length; accIndex++) {
-        var amount = accounts[accIndex];
-
-        // check path validity
-        var accountPath = getAccountPath(targetNetwork, accIndex);
-        var pathError = findDerivationPathErrors(accountPath, false, true);
-        if(pathError) throw 'Derivation Path Error: ' + pathError;
-
-        var accountResults;
-
-        // read data from cache
-        var cachedData = getCachedResults(accountPath, password);
-        if(cachedData){
-            var cachedAmount = cachedData.credentials.length;
-
-            if(cachedAmount >= amount){
-                // clone the cache object
-                var cacheCopy = {};
-                cacheCopy.xpub = cachedData.xpub;
-                cacheCopy.credentials = JSON.parse(JSON.stringify(cachedData.credentials)); // hack: copy by value instead of reference
-                cacheCopy.credentials.splice(amount); // from the clone, remove the data that is not needed
-
-                result[accIndex] = cacheCopy;
-                continue;
-            }else{
-                var account =  bip32RootKey.derivePath(accountPath);
-                account.keyPair.network = targetNetwork;
-
-                // remove result from cache (to afterwards write the bigger cache)
-                removeCachedResult(accountPath, password);
-
-                // prepend to the cached results so not all the calculations need to be done anymore
-                accountResults = cachedData;
-                var newCredentials = createAccountCredentials(account, targetNetwork, amount, password, cachedAmount);
-                accountResults.credentials = accountResults.credentials.concat(newCredentials);
-            }
-        }else{
-            var account =  bip32RootKey.derivePath(accountPath);
-            account.keyPair.network = targetNetwork;
-
-            accountResults = {};
-            accountResults.credentials = createAccountCredentials(account, targetNetwork, amount, password);
-            accountResults.xpub = account.neutered().toBase58();
-        }
-
-        result[accIndex] = accountResults;
-        cacheResults(accountPath, password, accountResults);
-    }
-
-    return result;
-}
-
-// creates addresses and privKeys on the level of a BIP32 account
-function createAccountCredentials(account, network, amount, password, startIndex){
-
-    var credentials = [];
-
-    for (var index = startIndex || 0; index < amount; index++) {
-
-        // PrivKey / BIP44 | BIP49 | BIP84 / Bitcoin | Testnet / Account / External / First Address
-        //                                                                 ^^^^^^^^^^^^^^^^^^^^^^^^
-        var addressPath = '0/' + index;
-        var pathError = findDerivationPathErrors(addressPath, true, false);
-        if(pathError) throw 'Derivation Path Error: ' + pathError;
-
-        var bip32 = account.derivePath(addressPath);
-        bip32.keyPair.network = network;
-
-        var privateKey = bip32.keyPair.toWIF();
-        if(password){
-            // encrypt the privateKey
-            var decoded = wif.decode(privateKey);
-            privateKey = bip38.encrypt(decoded.privateKey, decoded.compressed, password);
-        }
-
-        switch (network) {
-            case bitcoinjs.networks.bitcoin:
-            case bitcoinjs.networks.testnet:
-
-                credentials.push({privateKey: privateKey, address: bip32.getAddress()});
-                break;
-            case bitcoinjs.networks.bitcoin.p2wpkhInP2sh:
-            case bitcoinjs.networks.testnet.p2wpkhInP2sh:
-
-                var pubKey = bip32.getPublicKeyBuffer();
-                var redeemScript = bitcoinjs.script.witnessPubKeyHash.output.encode(bitcoinjs.crypto.hash160(pubKey));
-                var scriptPubKey = bitcoinjs.script.scriptHash.output.encode(bitcoinjs.crypto.hash160(redeemScript));
-
-                credentials.push({
-                    privateKey: privateKey,
-                    address: bitcoinjs.address.fromOutputScript(scriptPubKey, network)
-                });
-                break;
-            case bitcoinjs.networks.bitcoin.p2wpkh:
-            case bitcoinjs.networks.testnet.p2wpkh:
-
-                var pubKey = bip32.getPublicKeyBuffer();
-                var scriptPubKey = bitcoinjs.script.witnessPubKeyHash.output.encode(bitcoinjs.crypto.hash160(pubKey));
-
-                credentials.push({
-                    privateKey: privateKey,
-                    address: bitcoinjs.address.fromOutputScript(scriptPubKey, network)
-                });
-                break;
-            default:
-                throw ("given network is not a valid network");
-        }
-    }
-
-    return credentials;
-
-}
-
-function getBip44testnetOrMainnet(network){
-
-    if(network === bitcoinjs.networks.testnet ||
-        network === bitcoinjs.networks.testnet.p2wpkhInP2sh ||
-        network === bitcoinjs.networks.testnet.p2wpkh){
-
-        return 1;
-    }
-
-    return 0;
-}
-
-function getAccountPath(network, accountIndex){
-
-    // https://github.com/satoshilabs/slips/blob/master/slip-0044.md
-    var mainnetORtestnet = getBip44testnetOrMainnet(network);
-
-    // get extended public key of each account
-    switch (network) {
-        case bitcoinjs.networks.bitcoin:
-        case bitcoinjs.networks.testnet:
-
-            // PrivKey / BIP44 / Bitcoin | Testnet / Account
-            return "m/44'/" + mainnetORtestnet + "'/" + accountIndex + "'";
-
-        case bitcoinjs.networks.bitcoin.p2wpkhInP2sh:
-        case bitcoinjs.networks.testnet.p2wpkhInP2sh:
-
-            // PrivKey / BIP49 / Bitcoin | Testnet / Account
-            return "m/49'/" + mainnetORtestnet + "'/" + accountIndex + "'";
-
-        case bitcoinjs.networks.bitcoin.p2wpkh:
-        case bitcoinjs.networks.testnet.p2wpkh:
-
-            // PrivKey / BIP84 / Bitcoin | Testnet / Account
-            return "m/84'/" + mainnetORtestnet + "'/" + accountIndex + "'";
-
-        default:
-            throw ("given network is not a valid network");
-    }
-}
-
-// copied from https://github.com/iancoleman/bip39/blob/master/src/js/index.js and adapted
-// PARAMETERS
-// path: the derivation path as a string
-// createXPUB: do you want to create an xpub for the given path?
-// fromMasternode: is the path starting at the masternode level or deeper down the path? (starts with 'm'?)
-function findDerivationPathErrors(path, createXPUB, fromMasternode) {
-
-    if(fromMasternode !== false){
-        fromMasternode = true;
-    }
-
-    // TODO is not perfect but is better than nothing
-    // Inspired by
-    // https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki#test-vectors
-    // and
-    // https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki#extended-keys
-    var maxDepth = 255; // TODO verify this!!
-    var maxIndexValue = Math.pow(2, 31); // TODO verify this!!
-
-    // check first character
-    var invalidFirstChar = path[0].replace(/^[0-9m]/, "");
-    if(invalidFirstChar > 0){
-        return "first charactar must be 'm' or a number, but is " + invalidFirstChar;
-    }
-
-    if (fromMasternode && path[0] != 'm') {
-        return "First character must be 'm'";
-    }else if(!fromMasternode && path[0] == 'm'){
-        return 'The path starts at masternode, but the third param is set to false';
-    }
-
-    if (path.length > 1) {
-        if (path[1] != '/') {
-            return "Separator must be '/'";
-        }
-        var indexes = path.split('/');
-        if (indexes.length > maxDepth) {
-            return 'Derivation depth is ' + indexes.length + ', must be less than '  + maxDepth;
-        }
-        for (var depth = 1; depth<indexes.length; depth++) {
-            var index = indexes[depth];
-            var invalidChars = index.replace(/^[0-9]+'?$/g, "")
-            if (invalidChars.length > 0) {
-                return "Invalid characters " + invalidChars + " found at depth " + depth;
-            }
-            var indexValue = parseInt(index.replace("'", ""));
-            if (isNaN(depth)) {
-                return "Invalid number at depth " + depth;
-            }
-            if (indexValue > maxIndexValue) {
-                return "Value of " + indexValue + " at depth " + depth + " must be less than " + maxIndexValue;
-            }
-        }
-    }
-    // Check root key exists or else derivation path is useless!
-    if (!bip32RootKey) {
-        return "No root key";
-    }
-    // Check no hardened derivation path when using xpub keys
-    var isHardenedPath = path.indexOf("'") > -1;
-    if (isHardenedPath && createXPUB) {
-        return "Hardened derivation path is invalid with xpub key";
-    }
-    return false;
-}
-
-
-// //////////////////////////////////////////////////
-// Result Caching
-// Caching is only done per mnemonic and is resetted
-// on the creation of a new mnemonic.
-// //////////////////////////////////////////////////
-
-function cacheResults(accountPath, password, accountResults){
-    if(useCache) {
-        cache.push({
-                accountPath: accountPath,
-                password: password,
-                xpub: accountResults.xpub,
-                credentials: accountResults.credentials
-            });
-    }
-}
-
-function getCachedResults(accountPath, password){
-    if(useCache) {
-        for (var i = 0; i < cache.length; i++) {
-            if (cache[i].accountPath === accountPath && cache[i].password === password) {
-                return cache[i];
-            }
-        }
-    }
-
-    return false;
-}
-
-function removeCachedResult(accountPath, password){
-    for (var i = 0; i < cache.length; i++) {
-        if (cache[i].accountPath === accountPath && cache[i].password === password) {
-            cache.splice(i, 1);
-        }
-    }
-}
-
-
-
-module.exports = {
-    initiateHDWallet,
-    createP2PKHaddresses,
-    networks: bitcoinjs.networks
-};
-
-},{"./bitcoinjs-lib_patched":273,"bip38":24,"bip39":25,"wif":270}],273:[function(require,module,exports){
-var bitcoinjs = require('bitcoinjs-lib');
-
-// extensions copied from https://github.com/iancoleman/bip39/blob/master/src/js/segwit-parameters.js
-(function() {
-
-// p2wpkh
-
-bitcoinjs.networks.bitcoin.p2wpkh = {
-    baseNetwork: "bitcoin",
-    messagePrefix: '\x18Bitcoin Signed Message:\n',
-    bech32: 'bc',
-    bip32: {
-        public: 0x04b24746,
-        private: 0x04b2430c
-    },
-    pubKeyHash: 0x00,
-    scriptHash: 0x05,
-    wif: 0x80
-};
-
-bitcoinjs.networks.testnet.p2wpkh = {
-    baseNetwork: "testnet",
-    messagePrefix: '\x18Bitcoin Signed Message:\n',
-    bech32: 'tb',
-    bip32: {
-        public: 0x045f1cf6,
-        private: 0x045f18bc
-    },
-    pubKeyHash: 0x6f,
-    scriptHash: 0xc4,
-    wif: 0xef
-};
-
-// p2wpkh in p2sh
-
-bitcoinjs.networks.bitcoin.p2wpkhInP2sh = {
-    baseNetwork: "bitcoin",
-    messagePrefix: '\x18Bitcoin Signed Message:\n',
-    bech32: 'bc',
-    bip32: {
-        public: 0x049d7cb2,
-        private: 0x049d7878
-    },
-    pubKeyHash: 0x00,
-    scriptHash: 0x05,
-    wif: 0x80
-};
-
-bitcoinjs.networks.testnet.p2wpkhInP2sh = {
-    baseNetwork: "testnet",
-    messagePrefix: '\x18Bitcoin Signed Message:\n',
-    bech32: 'tb',
-    bip32: {
-        public: 0x044a5262,
-        private: 0x044a4e28
-    },
-    pubKeyHash: 0x6f,
-    scriptHash: 0xc4,
-    wif: 0xef
-};
-
-bitcoinjs.networks.litecoin.p2wpkhInP2sh = {
-    baseNetwork: "litecoin",
-    messagePrefix: '\x19Litecoin Signed Message:\n',
-    bip32: {
-        public: 0x01b26ef6,
-        private: 0x01b26792
-    },
-    pubKeyHash: 0x30,
-    scriptHash: 0x32,
-    wif: 0xb0
-};
-
-})();
-
-module.exports = {
-    bitcoinjs
-}
-
-},{"bitcoinjs-lib":45}],274:[function(require,module,exports){
+},{"../../test/bitcoinTest":274,"./bitcoin":271}],274:[function(require,module,exports){
 const assert = require('chai').assert;
 const bitcoin = require('../src/js/bitcoin');
 
@@ -59808,411 +59929,411 @@ const testing_mnemonic = 'curve swear maze domain knock frozen ordinary climb lo
 const testing_password = 'MoonLambo';
 
 function bitcoinJStests() {
-    describe('BitcoinJS', function () {
-
-        this.timeout(10000); // all tests may take up to 10 seconds
-        this.slow(3000); // a test is considered slow if it takes more than 3 seconds to completes
-
-        describe('Initiating HD wallet', function () {
-            describe('Unencrypted seed', function () {
-
-                it('Return new 12 word mnemonic', function () {
-                    var mnemonic = bitcoin.initiateHDWallet();
-                    var mnemonic_array = mnemonic.split(' ');
-                    assert.equal(mnemonic_array.length, 12);
-                });
-
-                it('Return given 12 word mnemonic', function () {
-                    var mnemonic = bitcoin.initiateHDWallet(testing_mnemonic);
-                    assert.equal(mnemonic, testing_mnemonic);
-                });
-
-            });
-            describe('Encrypted seed', function () {
-
-                it('Return new 12 word mnemonic', function () {
-                    var mnemonic = bitcoin.initiateHDWallet(false, testing_password);
-                    var mnemonic_array = mnemonic.split(' ');
-                    assert.equal(mnemonic_array.length, 12);
-                });
-
-                it('Return given 12 word mnemonic', function () {
-                    var mnemonic = bitcoin.initiateHDWallet(testing_mnemonic, testing_password);
-                    assert.equal(mnemonic, testing_mnemonic);
-                });
-
-            });
-        });
-
-        // see https://github.com/spesmilo/electrum-docs/blob/0821640adeda072fec1ee4ccfe74a0e47803f4cb/xpub_version_bytes.rst
-        describe('Extended public key', function () {
-            describe('New mnemonic', function () {
-                it('Returns xpub', function () {
-                    bitcoin.initiateHDWallet();
-                    var credentials = bitcoin.createP2PKHaddresses([1], bitcoin.networks.bitcoin);
-                    var xpub = credentials[0]['xpub'];
-
-                    assert.equal(xpub.substring(0, 4), 'xpub');
-                });
-                it('Returns ypub', function () {
-                    bitcoin.initiateHDWallet();
-                    var credentials = bitcoin.createP2PKHaddresses([1], bitcoin.networks.bitcoin.p2wpkhInP2sh);
-                    var ypub = credentials[0]['xpub'];
-
-                    assert.equal(ypub.substring(0, 4), 'ypub');
-                });
-                it('Returns zpub', function () {
-                    bitcoin.initiateHDWallet();
-                    var credentials = bitcoin.createP2PKHaddresses([1], bitcoin.networks.bitcoin.p2wpkh);
-                    var zpub = credentials[0]['xpub'];
-
-                    assert.equal(zpub.substring(0, 4), 'zpub');
-                });
-                it('Returns tpub', function () {
-                    bitcoin.initiateHDWallet();
-                    var credentials = bitcoin.createP2PKHaddresses([1], bitcoin.networks.testnet);
-                    var tpub = credentials[0]['xpub'];
-
-                    assert.equal(tpub.substring(0, 4), 'tpub');
-                });
-                it('Returns upub', function () {
-                    bitcoin.initiateHDWallet();
-                    var credentials = bitcoin.createP2PKHaddresses([1], bitcoin.networks.testnet.p2wpkhInP2sh);
-                    var upub = credentials[0]['xpub'];
-
-                    assert.equal(upub.substring(0, 4), 'upub');
-                });
-                it('Returns vpub', function () {
-                    bitcoin.initiateHDWallet();
-                    var credentials = bitcoin.createP2PKHaddresses([1], bitcoin.networks.testnet.p2wpkh);
-                    var vpub = credentials[0]['xpub'];
-
-                    assert.equal(vpub.substring(0, 4), 'vpub');
-                });
-            });
-            describe('Given mnemonic', function () {
-                it('Returns XPUB [Non-Segwit]', function () {
-                    bitcoin.initiateHDWallet(testing_mnemonic);
-                    var credentials = bitcoin.createP2PKHaddresses([1], bitcoin.networks.bitcoin);
-                    var xpub = credentials[0]['xpub'];
-
-                    var expected = 'xpub6BgB4HXnJs3gV9t9r4LB6ZXmwbawUEZSwFcCHZC3K3yEN4Lmtzg8bBSpriKgHJLS9Jufgym9osUAVHvyMYdQ82zMzp3voYFbgfUYvq9XhCD';
-
-                    assert.equal(xpub, expected);
-                });
-                it('Returns YPUB [P2SH-P2WPKH]', function () {
-                    bitcoin.initiateHDWallet(testing_mnemonic);
-                    var credentials = bitcoin.createP2PKHaddresses([1, 1], bitcoin.networks.bitcoin.p2wpkhInP2sh);
-                    var xpub = credentials[0]['xpub'];
-
-                    var expected = 'ypub6Xvc2hTW5ziP5tApCAFBM9JeyuriZ8SQ3GZfpdneEueDmmhUYgbqtzDub34jqwKAEe9YNwgKD7mBpBfbh1g6Mt5b3xtcczuZXNeu5Q5yJp8';
-
-                    assert.equal(xpub, expected);
-                });
-                it('Returns ZPUB [Bech32, 2nd account]', function () {
-                    bitcoin.initiateHDWallet(testing_mnemonic);
-                    var credentials = bitcoin.createP2PKHaddresses([1, 1], bitcoin.networks.bitcoin.p2wpkh);
-                    var xpub = credentials[1]['xpub'];
-
-                    var expected = 'zpub6s7a2Y5RyxmLZLRMD79crfAeXuwXvChc5MRU5WvipdJHZG84Z1en4LGJCmMVLzYYRprAWShdKgcqPjr3kBuDLPj57j2XA44HaREZ4HMfFHw';
-
-                    assert.equal(xpub, expected);
-                });
-            });
-
-        });
-
-        describe('Retrieve from mnemonic', function () {
-
-            it('Non-Segwit address [mainnet]', function () {
-                // load testing mnemonic
-                bitcoin.initiateHDWallet(testing_mnemonic);
-
-                var credentials = bitcoin.createP2PKHaddresses([1], bitcoin.networks.bitcoin);
-                var address = credentials[0]['credentials'][0]['address'];
-                assert.equal(address, '16C6UYcvPuiY4nHMbdSFAXgB2QEyxjr8Jx');
-            });
-
-            it('Non-Segwit privKey [mainnet]', function () {
-                // load testing mnemonic
-                bitcoin.initiateHDWallet(testing_mnemonic);
-
-                var credentials = bitcoin.createP2PKHaddresses([1], bitcoin.networks.bitcoin);
-                var privateKey = credentials[0]['credentials'][0]['privateKey'];
-                assert.equal(privateKey, 'L2THPE6rBFZBqe1qsXAZvjHwNe1UP3PCePPLsdCv9WxpoeQuXsAd');
-            });
-
-            it('3 non-Segwit addresses [testnet]', function () {
-
-                // load testing mnemonic
-                bitcoin.initiateHDWallet(testing_mnemonic);
-                var amount = 3;
-                var addresses = [];
-                var credentials = bitcoin.createP2PKHaddresses([amount], bitcoin.networks.testnet)
-                for (var x = 0; x < amount; x++) {
-                    addresses[x] = credentials[0]['credentials'][x]['address'];
-                }
-                assert.deepEqual(addresses,
-                    [
-                        'mopKVYnyG1MXViEtsWSrmCRvfdBh87JEDC',
-                        'n3Efkt9APhTRZS37oP7BQvj4ngjZTmZvEh',
-                        'n4MbxG5MjgJ7KhFgb5639vWA2AbvRBbGmw'
-                    ]);
-            });
-
-            it('2 non-Segwit privKeys [testnet]', function () {
-                // load testing mnemonic
-                bitcoin.initiateHDWallet(testing_mnemonic);
-                var amount = 2;
-                var privKeys = [];
-                var credentials = bitcoin.createP2PKHaddresses([amount], bitcoin.networks.testnet)
-                for (var x = 0; x < amount; x++) {
-                    privKeys[x] = credentials[0]['credentials'][x]['privateKey'];
-                }
-                assert.deepEqual(privKeys,
-                    [
-                        'cPbsmCBdoz9FkvoYQxcM7neaZXKhXDQpWcZRUJZPtjTttWRKFvTQ',
-                        'cT9PJkpvFxZZe4CUf8kxZKHuwD6KDwue9qZtyvhPAJuYwLR8oyA6'
-                    ]);
-            });
-
-            it('P2SH-P2WPKH address [mainnet]', function () {
-                // load testing mnemonic
-                bitcoin.initiateHDWallet(testing_mnemonic);
-
-                var credentials = bitcoin.createP2PKHaddresses([1], bitcoin.networks.bitcoin.p2wpkhInP2sh)
-                var address = credentials[0]['credentials'][0]['address'];
-                assert.equal(address, '31uAoP3hMQ2rehKnfEFTMJC4tADveRzx6K');
-            });
-
-            it('P2SH-P2WPKH privKey [mainnet]', function () {
-                // load testing mnemonic
-                bitcoin.initiateHDWallet(testing_mnemonic);
-
-                var credentials = bitcoin.createP2PKHaddresses([1], bitcoin.networks.bitcoin.p2wpkhInP2sh)
-                var privateKey = credentials[0]['credentials'][0]['privateKey'];
-                assert.equal(privateKey, 'KxxQTCfkZgBBQYRBJTJr41avZJdQ1fHb7gc1Q1poGvSBdJtUeaR7');
-            });
-
-            it('P2SH-P2WPKH address [testnet]', function () {
-                // load testing mnemonic
-                bitcoin.initiateHDWallet(testing_mnemonic);
-
-                var credentials = bitcoin.createP2PKHaddresses([1], bitcoin.networks.testnet.p2wpkhInP2sh)
-                var address = credentials[0]['credentials'][0]['address'];
-                assert.equal(address, '2N7oVd4Xq9TfpCWaVHhFNCPQbi4buiLdpyi');
-            });
-
-            it('P2SH-P2WPKH privKey [testnet]', function () {
-                // load testing mnemonic
-                bitcoin.initiateHDWallet(testing_mnemonic);
-
-                var credentials = bitcoin.createP2PKHaddresses([1], bitcoin.networks.testnet.p2wpkhInP2sh)
-                var privateKey = credentials[0]['credentials'][0]['privateKey'];
-                assert.equal(privateKey, 'cRsGmgKfnAueMA2DJzT29dvMx4cLJ4gMbTK8CRahP4orPeD15caX');
-            });
-
-            it('Bech32 address [mainnet]', function () {
-                // load testing mnemonic
-                bitcoin.initiateHDWallet(testing_mnemonic);
-
-                var credentials = bitcoin.createP2PKHaddresses([1], bitcoin.networks.bitcoin.p2wpkh)
-                var address = credentials[0]['credentials'][0]['address'];
-                assert.equal(address, 'bc1qk6rjegtxrvp7ty2tzd4uj88n33vnc3vqn90ps9');
-            });
-
-            it('Bech32 privKey [mainnet]', function () {
-                // load testing mnemonic
-                bitcoin.initiateHDWallet(testing_mnemonic);
-
-                var credentials = bitcoin.createP2PKHaddresses([1], bitcoin.networks.bitcoin.p2wpkh)
-                var privateKey = credentials[0]['credentials'][0]['privateKey'];
-                assert.equal(privateKey, 'Kzkuno5MDgVcs841HW5HWnSFmZ4xBEjzxNN2FnTv6k7cWMkzkvrc');
-            });
-
-            it('Bech32 address [testnet]', function () {
-                // load testing mnemonic
-                bitcoin.initiateHDWallet(testing_mnemonic);
-
-                var credentials = bitcoin.createP2PKHaddresses([1], bitcoin.networks.testnet.p2wpkh)
-                var address = credentials[0]['credentials'][0]['address'];
-                assert.equal(address, 'tb1qc45lcycj4upms5v0hzdnhnyq4s09xe7jnsdhtz');
-            });
-
-            it('Bech32 privKey [testnet]', function () {
-                // load testing mnemonic
-                bitcoin.initiateHDWallet(testing_mnemonic);
-
-                var credentials = bitcoin.createP2PKHaddresses([1], bitcoin.networks.testnet.p2wpkh)
-                var privateKey = credentials[0]['credentials'][0]['privateKey'];
-                assert.equal(privateKey, 'cSoNGp1yv5yJFsUNKJck5TRufjVZ6aCRUu8tQB6X9o8eNa4ZVP1R');
-            });
-
-            it('2 accounts with 3 addresses each', function () {
-                var amountAccounts = 2;
-                var amountAddresses = 3;
-
-                // load testing mnemonic
-                bitcoin.initiateHDWallet(testing_mnemonic);
-
-                var credentials = bitcoin.createP2PKHaddresses([3, 3], bitcoin.networks.testnet.p2wpkh)
-                var addresses = [];
-
-                for (var accounts = 0; accounts < amountAccounts; accounts++) {
-                    for (var x = 0; x < amountAddresses; x++) {
-                        addresses.push(credentials[accounts]['credentials'][x]['address']);
-                    }
-                }
-
-                assert.deepEqual(addresses,
-                    [
-                        'tb1qc45lcycj4upms5v0hzdnhnyq4s09xe7jnsdhtz',
-                        'tb1q2cn8tv0uf3gcl7y3jj4eflddeyk3l3sqm29h2s',
-                        'tb1q47ef5s9eyfcyrn5hnsm0p6cdnrld7mvsfjrccm',
-                        'tb1qhgaflwwuxauaz7d8lp937nh9kkegatc4pjuq2a',
-                        'tb1qgds0hznpnfg33nytttaaea6x54yjk6jg60530q',
-                        'tb1qxkhq30zjdfx6xvw55d2pql638pzx4lm044npug'
-                    ]);
-            });
-
-            it('Password Encrypted Mnemonic', function () {
-                // load testing mnemonic
-                bitcoin.initiateHDWallet(testing_mnemonic, testing_password);
-
-                var credentials = bitcoin.createP2PKHaddresses([1], bitcoin.networks.bitcoin.p2wpkh);
-                var privateKey = credentials[0]['credentials'][0]['privateKey'];
-                assert.equal(privateKey, 'L38Umd9kZNjeo98PFbpzaSfpuyREBc1rzBiyHBqQUXkjrysVyDi5');
-            });
-
-            it('BIP32 Encrypted PrivKey', function () {
-                // load testing mnemonic
-                bitcoin.initiateHDWallet(testing_mnemonic);
-
-                var credentials = bitcoin.createP2PKHaddresses([1], bitcoin.networks.bitcoin.p2wpkh, testing_password);
-                var privateKey = credentials[0]['credentials'][0]['privateKey'];
-                assert.equal(privateKey, '6PYUjuUte84KiL2kFzuCNTven4WkdRFXmeMGGCVzDkpR1AcTBhLn2jMdoo');
-            });
-
-            it('BIP32 and Mnemonic Encryption', function () {
-                // load testing mnemonic
-                bitcoin.initiateHDWallet(testing_mnemonic, testing_password);
-
-                var credentials = bitcoin.createP2PKHaddresses([1], bitcoin.networks.bitcoin.p2wpkh, testing_password);
-                var privateKey = credentials[0]['credentials'][0]['privateKey'];
-                assert.equal(privateKey, '6PYSqLAHxW8CT2sBYVjaZZKJ6yes2itBcvk5WHmsNysTkzM8Z62DZntKYc');
-            });
-        });
-
-        describe('Retrieve from encrypted mnemonic', function () {
-
-            it('P2SH-P2WPKH address [mainnet]', function () {
-                // load testing mnemonic
-                bitcoin.initiateHDWallet(testing_mnemonic, testing_password);
-
-                var credentials = bitcoin.createP2PKHaddresses([1], bitcoin.networks.bitcoin.p2wpkhInP2sh)
-                var address = credentials[0]['credentials'][0]['address'];
-                assert.equal(address, '38799cavJvtfpkK55bsyPGMgQGUfY2EeVW');
-            });
-
-            it('P2SH-P2WPKH privKey [mainnet]', function () {
-                // load testing mnemonic
-                bitcoin.initiateHDWallet(testing_mnemonic, testing_password);
-
-                var credentials = bitcoin.createP2PKHaddresses([1], bitcoin.networks.bitcoin.p2wpkhInP2sh)
-                var privateKey = credentials[0]['credentials'][0]['privateKey'];
-                assert.equal(privateKey, 'KyYUc3DRDc4Qi9F1RZf7bVQVfKxZQAp8Se9KeGenpdT8Favounei');
-            });
-
-            it('Bech32 address [mainnet]', function () {
-                // load testing mnemonic
-                bitcoin.initiateHDWallet(testing_mnemonic, testing_password);
-
-                var credentials = bitcoin.createP2PKHaddresses([1], bitcoin.networks.bitcoin.p2wpkh)
-                var address = credentials[0]['credentials'][0]['address'];
-                assert.equal(address, 'bc1qwvffxlvr7vhg54gtuarm3w4sv9mmsqmtjqq3x4');
-            });
-
-            it('Bech32 privKey [mainnet]', function () {
-                // load testing mnemonic
-                bitcoin.initiateHDWallet(testing_mnemonic, testing_password);
-
-                var credentials = bitcoin.createP2PKHaddresses([1], bitcoin.networks.bitcoin.p2wpkh)
-                var privateKey = credentials[0]['credentials'][0]['privateKey'];
-                assert.equal(privateKey, 'L38Umd9kZNjeo98PFbpzaSfpuyREBc1rzBiyHBqQUXkjrysVyDi5');
-            });
-
-        });
-    });
-    describe('Result Caching', function () {
-
-        // create 4 addresses without the use of caching
-        bitcoin.initiateHDWallet(testing_mnemonic);
-        var credentialsUncached = bitcoin.createP2PKHaddresses([4], bitcoin.networks.bitcoin);
-
-        describe('Credentials', function () {
-            it('Same Amount in Cache', function () {
-                // use caching, create 4 addresses and then read them from cache
-                bitcoin.initiateHDWallet(testing_mnemonic, false, true);
-                bitcoin.createP2PKHaddresses([4], bitcoin.networks.bitcoin);
-                var credentialsCached = bitcoin.createP2PKHaddresses([4], bitcoin.networks.bitcoin);
-
-                assert.deepEqual(credentialsUncached.credentials, credentialsCached.credentials);
-            });
-
-            it('Less Addresses in Cache', function () {
-                // use caching, create 2 addresses and then add 2 more
-                bitcoin.initiateHDWallet(testing_mnemonic, false, true);
-                bitcoin.createP2PKHaddresses([2], bitcoin.networks.bitcoin);
-                var credentialsCached = bitcoin.createP2PKHaddresses([4], bitcoin.networks.bitcoin);
-
-                assert.deepEqual(credentialsUncached.credentials, credentialsCached.credentials);
-            });
-
-            it('More Addresses in Cache', function () {
-                // use caching, create 6 addresses but then read only 4
-                bitcoin.initiateHDWallet(testing_mnemonic, false, true);
-                bitcoin.createP2PKHaddresses([6], bitcoin.networks.bitcoin);
-                var credentialsCached = bitcoin.createP2PKHaddresses([4], bitcoin.networks.bitcoin);
-
-                assert.deepEqual(credentialsUncached.credentials, credentialsCached.credentials);
-            });
-        })
-        describe('XPUB', function () {
-            it('Same Amount in Cache', function () {
-                // use caching, create 4 addresses and then read them from cache
-                bitcoin.initiateHDWallet(testing_mnemonic, false, true);
-                bitcoin.createP2PKHaddresses([4], bitcoin.networks.bitcoin);
-                var credentialsCached = bitcoin.createP2PKHaddresses([4], bitcoin.networks.bitcoin);
-
-                assert.deepEqual(credentialsUncached.xpub, credentialsCached.xpub);
-            });
-
-            it('Less Addresses in Cache', function () {
-                // use caching, create 2 addresses and then add 2 more
-                bitcoin.initiateHDWallet(testing_mnemonic, false, true);
-                bitcoin.createP2PKHaddresses([2], bitcoin.networks.bitcoin);
-                var credentialsCached = bitcoin.createP2PKHaddresses([4], bitcoin.networks.bitcoin);
-
-                assert.deepEqual(credentialsUncached.xpub, credentialsCached.xpub);
-            });
-
-            it('More Addresses in Cache', function () {
-                // use caching, create 6 addresses but then read only 4
-                bitcoin.initiateHDWallet(testing_mnemonic, false, true);
-                bitcoin.createP2PKHaddresses([6], bitcoin.networks.bitcoin);
-                var credentialsCached = bitcoin.createP2PKHaddresses([4], bitcoin.networks.bitcoin);
-
-                assert.deepEqual(credentialsUncached.xpub, credentialsCached.xpub);
-            });
-        });
-    });
+    // describe('BitcoinJS', function () {
+    //
+    //     this.timeout(10000); // all tests may take up to 10 seconds
+    //     this.slow(3000); // a test is considered slow if it takes more than 3 seconds to completes
+    //
+    //     describe('Initiating HD wallet', function () {
+    //         describe('Unencrypted seed', function () {
+    //
+    //             it('Return new 12 word mnemonic', function () {
+    //                 var mnemonic = bitcoin.initiateHDWallet();
+    //                 var mnemonic_array = mnemonic.split(' ');
+    //                 assert.equal(mnemonic_array.length, 12);
+    //             });
+    //
+    //             it('Return given 12 word mnemonic', function () {
+    //                 var mnemonic = bitcoin.initiateHDWallet(testing_mnemonic);
+    //                 assert.equal(mnemonic, testing_mnemonic);
+    //             });
+    //
+    //         });
+    //         describe('Encrypted seed', function () {
+    //
+    //             it('Return new 12 word mnemonic', function () {
+    //                 var mnemonic = bitcoin.initiateHDWallet(false, testing_password);
+    //                 var mnemonic_array = mnemonic.split(' ');
+    //                 assert.equal(mnemonic_array.length, 12);
+    //             });
+    //
+    //             it('Return given 12 word mnemonic', function () {
+    //                 var mnemonic = bitcoin.initiateHDWallet(testing_mnemonic, testing_password);
+    //                 assert.equal(mnemonic, testing_mnemonic);
+    //             });
+    //
+    //         });
+    //     });
+    //
+    //     // see https://github.com/spesmilo/electrum-docs/blob/0821640adeda072fec1ee4ccfe74a0e47803f4cb/xpub_version_bytes.rst
+    //     describe('Extended public key', function () {
+    //         describe('New mnemonic', function () {
+    //             it('Returns xpub', function () {
+    //                 bitcoin.initiateHDWallet();
+    //                 var credentials = bitcoin.createP2PKHaddresses([1], bitcoin.networks.bitcoin);
+    //                 var xpub = credentials[0]['xpub'];
+    //
+    //                 assert.equal(xpub.substring(0, 4), 'xpub');
+    //             });
+    //             it('Returns ypub', function () {
+    //                 bitcoin.initiateHDWallet();
+    //                 var credentials = bitcoin.createP2PKHaddresses([1], bitcoin.networks.bitcoin.p2wpkhInP2sh);
+    //                 var ypub = credentials[0]['xpub'];
+    //
+    //                 assert.equal(ypub.substring(0, 4), 'ypub');
+    //             });
+    //             it('Returns zpub', function () {
+    //                 bitcoin.initiateHDWallet();
+    //                 var credentials = bitcoin.createP2PKHaddresses([1], bitcoin.networks.bitcoin.p2wpkh);
+    //                 var zpub = credentials[0]['xpub'];
+    //
+    //                 assert.equal(zpub.substring(0, 4), 'zpub');
+    //             });
+    //             it('Returns tpub', function () {
+    //                 bitcoin.initiateHDWallet();
+    //                 var credentials = bitcoin.createP2PKHaddresses([1], bitcoin.networks.testnet);
+    //                 var tpub = credentials[0]['xpub'];
+    //
+    //                 assert.equal(tpub.substring(0, 4), 'tpub');
+    //             });
+    //             it('Returns upub', function () {
+    //                 bitcoin.initiateHDWallet();
+    //                 var credentials = bitcoin.createP2PKHaddresses([1], bitcoin.networks.testnet.p2wpkhInP2sh);
+    //                 var upub = credentials[0]['xpub'];
+    //
+    //                 assert.equal(upub.substring(0, 4), 'upub');
+    //             });
+    //             it('Returns vpub', function () {
+    //                 bitcoin.initiateHDWallet();
+    //                 var credentials = bitcoin.createP2PKHaddresses([1], bitcoin.networks.testnet.p2wpkh);
+    //                 var vpub = credentials[0]['xpub'];
+    //
+    //                 assert.equal(vpub.substring(0, 4), 'vpub');
+    //             });
+    //         });
+    //         describe('Given mnemonic', function () {
+    //             it('Returns XPUB [Non-Segwit]', function () {
+    //                 bitcoin.initiateHDWallet(testing_mnemonic);
+    //                 var credentials = bitcoin.createP2PKHaddresses([1], bitcoin.networks.bitcoin);
+    //                 var xpub = credentials[0]['xpub'];
+    //
+    //                 var expected = 'xpub6BgB4HXnJs3gV9t9r4LB6ZXmwbawUEZSwFcCHZC3K3yEN4Lmtzg8bBSpriKgHJLS9Jufgym9osUAVHvyMYdQ82zMzp3voYFbgfUYvq9XhCD';
+    //
+    //                 assert.equal(xpub, expected);
+    //             });
+    //             it('Returns YPUB [P2SH-P2WPKH]', function () {
+    //                 bitcoin.initiateHDWallet(testing_mnemonic);
+    //                 var credentials = bitcoin.createP2PKHaddresses([1, 1], bitcoin.networks.bitcoin.p2wpkhInP2sh);
+    //                 var xpub = credentials[0]['xpub'];
+    //
+    //                 var expected = 'ypub6Xvc2hTW5ziP5tApCAFBM9JeyuriZ8SQ3GZfpdneEueDmmhUYgbqtzDub34jqwKAEe9YNwgKD7mBpBfbh1g6Mt5b3xtcczuZXNeu5Q5yJp8';
+    //
+    //                 assert.equal(xpub, expected);
+    //             });
+    //             it('Returns ZPUB [Bech32, 2nd account]', function () {
+    //                 bitcoin.initiateHDWallet(testing_mnemonic);
+    //                 var credentials = bitcoin.createP2PKHaddresses([1, 1], bitcoin.networks.bitcoin.p2wpkh);
+    //                 var xpub = credentials[1]['xpub'];
+    //
+    //                 var expected = 'zpub6s7a2Y5RyxmLZLRMD79crfAeXuwXvChc5MRU5WvipdJHZG84Z1en4LGJCmMVLzYYRprAWShdKgcqPjr3kBuDLPj57j2XA44HaREZ4HMfFHw';
+    //
+    //                 assert.equal(xpub, expected);
+    //             });
+    //         });
+    //
+    //     });
+    //
+    //     describe('Retrieve from mnemonic', function () {
+    //
+    //         it('Non-Segwit address [mainnet]', function () {
+    //             // load testing mnemonic
+    //             bitcoin.initiateHDWallet(testing_mnemonic);
+    //
+    //             var credentials = bitcoin.createP2PKHaddresses([1], bitcoin.networks.bitcoin);
+    //             var address = credentials[0]['credentials'][0]['address'];
+    //             assert.equal(address, '16C6UYcvPuiY4nHMbdSFAXgB2QEyxjr8Jx');
+    //         });
+    //
+    //         it('Non-Segwit privKey [mainnet]', function () {
+    //             // load testing mnemonic
+    //             bitcoin.initiateHDWallet(testing_mnemonic);
+    //
+    //             var credentials = bitcoin.createP2PKHaddresses([1], bitcoin.networks.bitcoin);
+    //             var privateKey = credentials[0]['credentials'][0]['privateKey'];
+    //             assert.equal(privateKey, 'L2THPE6rBFZBqe1qsXAZvjHwNe1UP3PCePPLsdCv9WxpoeQuXsAd');
+    //         });
+    //
+    //         it('3 non-Segwit addresses [testnet]', function () {
+    //
+    //             // load testing mnemonic
+    //             bitcoin.initiateHDWallet(testing_mnemonic);
+    //             var amount = 3;
+    //             var addresses = [];
+    //             var credentials = bitcoin.createP2PKHaddresses([amount], bitcoin.networks.testnet)
+    //             for (var x = 0; x < amount; x++) {
+    //                 addresses[x] = credentials[0]['credentials'][x]['address'];
+    //             }
+    //             assert.deepEqual(addresses,
+    //                 [
+    //                     'mopKVYnyG1MXViEtsWSrmCRvfdBh87JEDC',
+    //                     'n3Efkt9APhTRZS37oP7BQvj4ngjZTmZvEh',
+    //                     'n4MbxG5MjgJ7KhFgb5639vWA2AbvRBbGmw'
+    //                 ]);
+    //         });
+    //
+    //         it('2 non-Segwit privKeys [testnet]', function () {
+    //             // load testing mnemonic
+    //             bitcoin.initiateHDWallet(testing_mnemonic);
+    //             var amount = 2;
+    //             var privKeys = [];
+    //             var credentials = bitcoin.createP2PKHaddresses([amount], bitcoin.networks.testnet)
+    //             for (var x = 0; x < amount; x++) {
+    //                 privKeys[x] = credentials[0]['credentials'][x]['privateKey'];
+    //             }
+    //             assert.deepEqual(privKeys,
+    //                 [
+    //                     'cPbsmCBdoz9FkvoYQxcM7neaZXKhXDQpWcZRUJZPtjTttWRKFvTQ',
+    //                     'cT9PJkpvFxZZe4CUf8kxZKHuwD6KDwue9qZtyvhPAJuYwLR8oyA6'
+    //                 ]);
+    //         });
+    //
+    //         it('P2SH-P2WPKH address [mainnet]', function () {
+    //             // load testing mnemonic
+    //             bitcoin.initiateHDWallet(testing_mnemonic);
+    //
+    //             var credentials = bitcoin.createP2PKHaddresses([1], bitcoin.networks.bitcoin.p2wpkhInP2sh)
+    //             var address = credentials[0]['credentials'][0]['address'];
+    //             assert.equal(address, '31uAoP3hMQ2rehKnfEFTMJC4tADveRzx6K');
+    //         });
+    //
+    //         it('P2SH-P2WPKH privKey [mainnet]', function () {
+    //             // load testing mnemonic
+    //             bitcoin.initiateHDWallet(testing_mnemonic);
+    //
+    //             var credentials = bitcoin.createP2PKHaddresses([1], bitcoin.networks.bitcoin.p2wpkhInP2sh)
+    //             var privateKey = credentials[0]['credentials'][0]['privateKey'];
+    //             assert.equal(privateKey, 'KxxQTCfkZgBBQYRBJTJr41avZJdQ1fHb7gc1Q1poGvSBdJtUeaR7');
+    //         });
+    //
+    //         it('P2SH-P2WPKH address [testnet]', function () {
+    //             // load testing mnemonic
+    //             bitcoin.initiateHDWallet(testing_mnemonic);
+    //
+    //             var credentials = bitcoin.createP2PKHaddresses([1], bitcoin.networks.testnet.p2wpkhInP2sh)
+    //             var address = credentials[0]['credentials'][0]['address'];
+    //             assert.equal(address, '2N7oVd4Xq9TfpCWaVHhFNCPQbi4buiLdpyi');
+    //         });
+    //
+    //         it('P2SH-P2WPKH privKey [testnet]', function () {
+    //             // load testing mnemonic
+    //             bitcoin.initiateHDWallet(testing_mnemonic);
+    //
+    //             var credentials = bitcoin.createP2PKHaddresses([1], bitcoin.networks.testnet.p2wpkhInP2sh)
+    //             var privateKey = credentials[0]['credentials'][0]['privateKey'];
+    //             assert.equal(privateKey, 'cRsGmgKfnAueMA2DJzT29dvMx4cLJ4gMbTK8CRahP4orPeD15caX');
+    //         });
+    //
+    //         it('Bech32 address [mainnet]', function () {
+    //             // load testing mnemonic
+    //             bitcoin.initiateHDWallet(testing_mnemonic);
+    //
+    //             var credentials = bitcoin.createP2PKHaddresses([1], bitcoin.networks.bitcoin.p2wpkh)
+    //             var address = credentials[0]['credentials'][0]['address'];
+    //             assert.equal(address, 'bc1qk6rjegtxrvp7ty2tzd4uj88n33vnc3vqn90ps9');
+    //         });
+    //
+    //         it('Bech32 privKey [mainnet]', function () {
+    //             // load testing mnemonic
+    //             bitcoin.initiateHDWallet(testing_mnemonic);
+    //
+    //             var credentials = bitcoin.createP2PKHaddresses([1], bitcoin.networks.bitcoin.p2wpkh)
+    //             var privateKey = credentials[0]['credentials'][0]['privateKey'];
+    //             assert.equal(privateKey, 'Kzkuno5MDgVcs841HW5HWnSFmZ4xBEjzxNN2FnTv6k7cWMkzkvrc');
+    //         });
+    //
+    //         it('Bech32 address [testnet]', function () {
+    //             // load testing mnemonic
+    //             bitcoin.initiateHDWallet(testing_mnemonic);
+    //
+    //             var credentials = bitcoin.createP2PKHaddresses([1], bitcoin.networks.testnet.p2wpkh)
+    //             var address = credentials[0]['credentials'][0]['address'];
+    //             assert.equal(address, 'tb1qc45lcycj4upms5v0hzdnhnyq4s09xe7jnsdhtz');
+    //         });
+    //
+    //         it('Bech32 privKey [testnet]', function () {
+    //             // load testing mnemonic
+    //             bitcoin.initiateHDWallet(testing_mnemonic);
+    //
+    //             var credentials = bitcoin.createP2PKHaddresses([1], bitcoin.networks.testnet.p2wpkh)
+    //             var privateKey = credentials[0]['credentials'][0]['privateKey'];
+    //             assert.equal(privateKey, 'cSoNGp1yv5yJFsUNKJck5TRufjVZ6aCRUu8tQB6X9o8eNa4ZVP1R');
+    //         });
+    //
+    //         it('2 accounts with 3 addresses each', function () {
+    //             var amountAccounts = 2;
+    //             var amountAddresses = 3;
+    //
+    //             // load testing mnemonic
+    //             bitcoin.initiateHDWallet(testing_mnemonic);
+    //
+    //             var credentials = bitcoin.createP2PKHaddresses([3, 3], bitcoin.networks.testnet.p2wpkh)
+    //             var addresses = [];
+    //
+    //             for (var accounts = 0; accounts < amountAccounts; accounts++) {
+    //                 for (var x = 0; x < amountAddresses; x++) {
+    //                     addresses.push(credentials[accounts]['credentials'][x]['address']);
+    //                 }
+    //             }
+    //
+    //             assert.deepEqual(addresses,
+    //                 [
+    //                     'tb1qc45lcycj4upms5v0hzdnhnyq4s09xe7jnsdhtz',
+    //                     'tb1q2cn8tv0uf3gcl7y3jj4eflddeyk3l3sqm29h2s',
+    //                     'tb1q47ef5s9eyfcyrn5hnsm0p6cdnrld7mvsfjrccm',
+    //                     'tb1qhgaflwwuxauaz7d8lp937nh9kkegatc4pjuq2a',
+    //                     'tb1qgds0hznpnfg33nytttaaea6x54yjk6jg60530q',
+    //                     'tb1qxkhq30zjdfx6xvw55d2pql638pzx4lm044npug'
+    //                 ]);
+    //         });
+    //
+    //         it('Password Encrypted Mnemonic', function () {
+    //             // load testing mnemonic
+    //             bitcoin.initiateHDWallet(testing_mnemonic, testing_password);
+    //
+    //             var credentials = bitcoin.createP2PKHaddresses([1], bitcoin.networks.bitcoin.p2wpkh);
+    //             var privateKey = credentials[0]['credentials'][0]['privateKey'];
+    //             assert.equal(privateKey, 'L38Umd9kZNjeo98PFbpzaSfpuyREBc1rzBiyHBqQUXkjrysVyDi5');
+    //         });
+    //
+    //         it('BIP32 Encrypted PrivKey', function () {
+    //             // load testing mnemonic
+    //             bitcoin.initiateHDWallet(testing_mnemonic);
+    //
+    //             var credentials = bitcoin.createP2PKHaddresses([1], bitcoin.networks.bitcoin.p2wpkh, testing_password);
+    //             var privateKey = credentials[0]['credentials'][0]['privateKey'];
+    //             assert.equal(privateKey, '6PYUjuUte84KiL2kFzuCNTven4WkdRFXmeMGGCVzDkpR1AcTBhLn2jMdoo');
+    //         });
+    //
+    //         it('BIP32 and Mnemonic Encryption', function () {
+    //             // load testing mnemonic
+    //             bitcoin.initiateHDWallet(testing_mnemonic, testing_password);
+    //
+    //             var credentials = bitcoin.createP2PKHaddresses([1], bitcoin.networks.bitcoin.p2wpkh, testing_password);
+    //             var privateKey = credentials[0]['credentials'][0]['privateKey'];
+    //             assert.equal(privateKey, '6PYSqLAHxW8CT2sBYVjaZZKJ6yes2itBcvk5WHmsNysTkzM8Z62DZntKYc');
+    //         });
+    //     });
+    //
+    //     describe('Retrieve from encrypted mnemonic', function () {
+    //
+    //         it('P2SH-P2WPKH address [mainnet]', function () {
+    //             // load testing mnemonic
+    //             bitcoin.initiateHDWallet(testing_mnemonic, testing_password);
+    //
+    //             var credentials = bitcoin.createP2PKHaddresses([1], bitcoin.networks.bitcoin.p2wpkhInP2sh)
+    //             var address = credentials[0]['credentials'][0]['address'];
+    //             assert.equal(address, '38799cavJvtfpkK55bsyPGMgQGUfY2EeVW');
+    //         });
+    //
+    //         it('P2SH-P2WPKH privKey [mainnet]', function () {
+    //             // load testing mnemonic
+    //             bitcoin.initiateHDWallet(testing_mnemonic, testing_password);
+    //
+    //             var credentials = bitcoin.createP2PKHaddresses([1], bitcoin.networks.bitcoin.p2wpkhInP2sh)
+    //             var privateKey = credentials[0]['credentials'][0]['privateKey'];
+    //             assert.equal(privateKey, 'KyYUc3DRDc4Qi9F1RZf7bVQVfKxZQAp8Se9KeGenpdT8Favounei');
+    //         });
+    //
+    //         it('Bech32 address [mainnet]', function () {
+    //             // load testing mnemonic
+    //             bitcoin.initiateHDWallet(testing_mnemonic, testing_password);
+    //
+    //             var credentials = bitcoin.createP2PKHaddresses([1], bitcoin.networks.bitcoin.p2wpkh)
+    //             var address = credentials[0]['credentials'][0]['address'];
+    //             assert.equal(address, 'bc1qwvffxlvr7vhg54gtuarm3w4sv9mmsqmtjqq3x4');
+    //         });
+    //
+    //         it('Bech32 privKey [mainnet]', function () {
+    //             // load testing mnemonic
+    //             bitcoin.initiateHDWallet(testing_mnemonic, testing_password);
+    //
+    //             var credentials = bitcoin.createP2PKHaddresses([1], bitcoin.networks.bitcoin.p2wpkh)
+    //             var privateKey = credentials[0]['credentials'][0]['privateKey'];
+    //             assert.equal(privateKey, 'L38Umd9kZNjeo98PFbpzaSfpuyREBc1rzBiyHBqQUXkjrysVyDi5');
+    //         });
+    //
+    //     });
+    // });
+    // describe('Result Caching', function () {
+    //
+    //     // create 4 addresses without the use of caching
+    //     bitcoin.initiateHDWallet(testing_mnemonic);
+    //     var credentialsUncached = bitcoin.createP2PKHaddresses([4], bitcoin.networks.bitcoin);
+    //
+    //     describe('Credentials', function () {
+    //         it('Same Amount in Cache', function () {
+    //             // use caching, create 4 addresses and then read them from cache
+    //             bitcoin.initiateHDWallet(testing_mnemonic, false, true);
+    //             bitcoin.createP2PKHaddresses([4], bitcoin.networks.bitcoin);
+    //             var credentialsCached = bitcoin.createP2PKHaddresses([4], bitcoin.networks.bitcoin);
+    //
+    //             assert.deepEqual(credentialsUncached.credentials, credentialsCached.credentials);
+    //         });
+    //
+    //         it('Less Addresses in Cache', function () {
+    //             // use caching, create 2 addresses and then add 2 more
+    //             bitcoin.initiateHDWallet(testing_mnemonic, false, true);
+    //             bitcoin.createP2PKHaddresses([2], bitcoin.networks.bitcoin);
+    //             var credentialsCached = bitcoin.createP2PKHaddresses([4], bitcoin.networks.bitcoin);
+    //
+    //             assert.deepEqual(credentialsUncached.credentials, credentialsCached.credentials);
+    //         });
+    //
+    //         it('More Addresses in Cache', function () {
+    //             // use caching, create 6 addresses but then read only 4
+    //             bitcoin.initiateHDWallet(testing_mnemonic, false, true);
+    //             bitcoin.createP2PKHaddresses([6], bitcoin.networks.bitcoin);
+    //             var credentialsCached = bitcoin.createP2PKHaddresses([4], bitcoin.networks.bitcoin);
+    //
+    //             assert.deepEqual(credentialsUncached.credentials, credentialsCached.credentials);
+    //         });
+    //     })
+    //     describe('XPUB', function () {
+    //         it('Same Amount in Cache', function () {
+    //             // use caching, create 4 addresses and then read them from cache
+    //             bitcoin.initiateHDWallet(testing_mnemonic, false, true);
+    //             bitcoin.createP2PKHaddresses([4], bitcoin.networks.bitcoin);
+    //             var credentialsCached = bitcoin.createP2PKHaddresses([4], bitcoin.networks.bitcoin);
+    //
+    //             assert.deepEqual(credentialsUncached.xpub, credentialsCached.xpub);
+    //         });
+    //
+    //         it('Less Addresses in Cache', function () {
+    //             // use caching, create 2 addresses and then add 2 more
+    //             bitcoin.initiateHDWallet(testing_mnemonic, false, true);
+    //             bitcoin.createP2PKHaddresses([2], bitcoin.networks.bitcoin);
+    //             var credentialsCached = bitcoin.createP2PKHaddresses([4], bitcoin.networks.bitcoin);
+    //
+    //             assert.deepEqual(credentialsUncached.xpub, credentialsCached.xpub);
+    //         });
+    //
+    //         it('More Addresses in Cache', function () {
+    //             // use caching, create 6 addresses but then read only 4
+    //             bitcoin.initiateHDWallet(testing_mnemonic, false, true);
+    //             bitcoin.createP2PKHaddresses([6], bitcoin.networks.bitcoin);
+    //             var credentialsCached = bitcoin.createP2PKHaddresses([4], bitcoin.networks.bitcoin);
+    //
+    //             assert.deepEqual(credentialsUncached.xpub, credentialsCached.xpub);
+    //         });
+    //     });
+    // });
 
     }
 
 module.exports = {
     bitcoinJStests
 }
-},{"../src/js/bitcoin":272,"chai":110}]},{},[271])(271)
+},{"../src/js/bitcoin":271,"chai":110}]},{},[273])(273)
 });
 
 //# sourceMappingURL=../maps/bundle.js.map

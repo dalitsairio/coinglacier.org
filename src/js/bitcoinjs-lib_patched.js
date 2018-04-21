@@ -3,9 +3,15 @@ var bitcoinjs = require('bitcoinjs-lib');
 // extensions copied from https://github.com/iancoleman/bip39/blob/master/src/js/segwit-parameters.js
 (function() {
 
+// add id's to existing networks
+bitcoinjs.networks.bitcoin.id = 0;
+bitcoinjs.networks.testnet.id = 10;
+
+
 // p2wpkh
 
 bitcoinjs.networks.bitcoin.p2wpkh = {
+    id: 2,
     baseNetwork: "bitcoin",
     messagePrefix: '\x18Bitcoin Signed Message:\n',
     bech32: 'bc',
@@ -19,6 +25,7 @@ bitcoinjs.networks.bitcoin.p2wpkh = {
 };
 
 bitcoinjs.networks.testnet.p2wpkh = {
+    id: 12,
     baseNetwork: "testnet",
     messagePrefix: '\x18Bitcoin Signed Message:\n',
     bech32: 'tb',
@@ -34,6 +41,7 @@ bitcoinjs.networks.testnet.p2wpkh = {
 // p2wpkh in p2sh
 
 bitcoinjs.networks.bitcoin.p2wpkhInP2sh = {
+    id: 1,
     baseNetwork: "bitcoin",
     messagePrefix: '\x18Bitcoin Signed Message:\n',
     bech32: 'bc',
@@ -47,6 +55,7 @@ bitcoinjs.networks.bitcoin.p2wpkhInP2sh = {
 };
 
 bitcoinjs.networks.testnet.p2wpkhInP2sh = {
+    id: 11,
     baseNetwork: "testnet",
     messagePrefix: '\x18Bitcoin Signed Message:\n',
     bech32: 'tb',

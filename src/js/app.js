@@ -1,21 +1,22 @@
 // //////////////////////////////////////////////////
-// requires
-// //////////////////////////////////////////////////
-
-const tests = require('../../test/bitcoinTest');
-const bitcoin = require('./bitcoin');
-
-
-// //////////////////////////////////////////////////
 // Constants and Variables
 // //////////////////////////////////////////////////
 
 // bitcoin network
-// contains not only network information, but also address type specific information
 var network;
-var accounts;
 var currentPage;
 var password;
+var accountsForm;
+var mnemonic;
+
+
+// identical to the id's set in bitcoinjs-lib_patched.js
+const MAINNET_NONSEGWIT = 0;
+const MAINNET_SEGWIT = 1;
+const MAINNET_BECH32 = 2;
+const TESTNET_NONSEGWIT = 10;
+const TESTNET_SEGWIT = 11;
+const TESTNET_BECH32 = 12;
 
 // GET parameters
 var GET = {};
@@ -28,6 +29,7 @@ GET.pages.paperWallet = 'paper-wallet';
 GET.network = {};
 GET.network.keyword = 'network';
 GET.network.testnet = 'testnet';
+GET.network.mainnet = 'mainnet';
 // GET address types
 GET.addressTypes = {};
 GET.addressTypes.keyword = 'addressType';
@@ -123,14 +125,13 @@ const defaultAddressType = {
 };
 currentPage = pages.singleWallet;
 
-
 // //////////////////////////////////////////////////
 // Events
 // //////////////////////////////////////////////////
 
 // Mainnet/Testnet Link
-DOM.network.testnet.click(initTestnet);
-DOM.network.mainnet.click(initMainnet);
+DOM.network.testnet.click(switchToTestnet);
+DOM.network.mainnet.click(switchToMainnet);
 
 // Menu
 DOM.menuEntry.singleWallet.click(function () {
@@ -159,6 +160,7 @@ DOM.options.numberAddresses.change(toggleAddressNumbering);
 // //////////////////////////////////////////////////
 
 function init() {
+
     // set mainnet or testnet
     switch (getURLparameter(GET.network.keyword)) {
         case GET.network.testnet:
@@ -171,21 +173,21 @@ function init() {
     // set correct page
     switch (getURLparameter(GET.pages.keyword)) {
         case GET.pages.paperWallet:
-            changePage(pages.paperWallet);
+            initiatePage(pages.paperWallet);
             break;
         case GET.pages.singleWallet:
-            changePage(pages.singleWallet);
+            initiatePage(pages.singleWallet);
         default:
-            changePage(currentPage);
+            initiatePage(currentPage);
             break;
     }
+
+    showAccountsOptions();
 
     // initialize popovers
     for (var x in DOM.popovers) {
         DOM.popovers[x].popover({html: true});
     }
-
-    showAccountsOptions();
 
     password = currentPage.defaultPassword;
 
@@ -200,7 +202,7 @@ function init() {
 // Page Management
 // //////////////////////////////////////////////////
 
-function changePage(newPage) {
+function initiatePage(newPage) {
     currentPage = newPage;
 
     setupPageOptions();
@@ -210,6 +212,10 @@ function changePage(newPage) {
 
     // reload the page
     showAccountsOptions(true);
+}
+
+function changePage(newPage) {
+    initiatePage(newPage);
     loadWallet();
 }
 
@@ -244,7 +250,11 @@ function initMainnet() {
     DOM.menu.removeClass(classes.testnet);
 
     // set correct Bitcoin network and reload the wallet
-    recalculateWallet();
+    setNetwork();
+}
+function switchToMainnet() {
+    initMainnet();
+    loadWallet();
 }
 
 function initTestnet() {
@@ -260,7 +270,11 @@ function initTestnet() {
     DOM.menu.addClass(classes.testnet);
 
     // set correct Bitcoin network and reload the wallet
-    recalculateWallet();
+    setNetwork();
+}
+function switchToTestnet() {
+    initTestnet();
+    loadWallet();
 }
 
 
@@ -352,25 +366,25 @@ function disableAccounts() {
     DOM.options.accounts.titleAccounts.show();
     DOM.options.accounts.titleAddresses.hide();
 
-    if (isAccountsEmpty()) {
-        initAccounts();
+    if (isAccountsFormEmpty()) {
+        initAccountsForm();
     }else {
-        accounts.splice(1, accounts.length - 1); // remove all entries but the first
+        accountsForm.splice(1, accountsForm.length - 1); // remove all entries but the first
     }
 
     showAccountsOptions();
     $('.account-row.not-template span.title').hide();
     $('.account-row.not-template button.account-insertion').hide();
-    loadWallet();
 }
 
-function initAccounts() {
-    accounts = [];
-    accounts.push(currentPage.addressesPerAccount);
+function initAccountsForm() {
+    accountsForm = [];
+    accountsForm.push(currentPage.addressesPerAccount);
 }
 
 function addAccount(prev) {
-    accounts.splice(prev + 1, 0, currentPage.addressesPerAccount);
+
+    accountsForm.splice(prev + 1, 0, currentPage.addressesPerAccount);
 
     // reload the view
     showAccountsOptions();
@@ -378,7 +392,7 @@ function addAccount(prev) {
 
 function removeAccount(position) {
     // remove the element from array
-    accounts.splice(position, 1);
+    accountsForm.splice(position, 1);
 
     // reload the view
     showAccountsOptions();
@@ -386,36 +400,35 @@ function removeAccount(position) {
 
 function setAddressesPerAccount(index, amount) {
     if (amount > 0) {
-        accounts[index] = amount;
+        accountsForm[index] = amount;
     }
 }
 
 function showAccountsOptions(reset) {
-
-    if (isAccountsEmpty() || reset) {
-        initAccounts();
+    if (isAccountsFormEmpty() || reset) {
+        initAccountsForm();
     }
 
-    // remove all accounts to add them again
+    // remove all accountsForm to add them again
     $('.account-row.not-template').remove();
 
-    for (var index = accounts.length - 1; index >= 0; index--) {
+    for (var index = accountsForm.length - 1; index >= 0; index--) {
 
         var accountDiv = DOM.options.accounts.accountTemplate.clone();
         accountDiv.prop('id', 'account-row-' + index);
         accountDiv.addClass('not-template');
 
-        accountDiv.find('.title').text('# ' + (index + 1));
+        accountDiv.find('.account-number').text('# ' + (index + 1));
         accountDiv.find('input').prop('id', 'addresses-amount-' + index);
-        accountDiv.find('input').val(accounts[index]);
+        accountDiv.find('input').val(accountsForm[index]);
         accountDiv.find('label').prop('for', 'addresses-amount-' + index);
 
         if (currentPage.showXPUB) {
-            accountDiv.find('.title').show();
+            accountDiv.find('.account-number').show();
             accountDiv.find('button').show();
         }
 
-        if (accounts.length <= 1) {
+        if (accountsForm.length <= 1) {
             accountDiv.find('button.account-remove').prop('disabled', true);
         }
 
@@ -440,6 +453,10 @@ function showAccountsOptions(reset) {
     }
 }
 
+function isAccountsFormEmpty() {
+    return typeof accountsForm === 'undefined' || accountsForm.length === 0;
+}
+
 function togglePasswordVisibility() {
     if (DOM.options.encryption.pass.prop('type') === 'text') {
         DOM.options.encryption.pass.prop('type', 'password');
@@ -460,10 +477,6 @@ function changePassword() {
     loadWallet(true);
 };
 
-function isAccountsEmpty() {
-    return typeof accounts === 'undefined' || accounts.length === 0;
-}
-
 
 // //////////////////////////////////////////////////
 // Bitcoin Stuff
@@ -477,26 +490,27 @@ function setNetwork() {
         case GET.network.testnet:
             switch (addressType) {
                 case GET.addressTypes.nonSegwit:
-                    network = bitcoin.networks.testnet;
+                    network = TESTNET_NONSEGWIT;
                     break;
                 case GET.addressTypes.segwit:
-                    network = bitcoin.networks.testnet.p2wpkhInP2sh;
+                    network = TESTNET_SEGWIT;
                     break;
                 case GET.addressTypes.bech32:
-                    network = bitcoin.networks.testnet.p2wpkh;
+                    network = TESTNET_BECH32;
                     break;
             }
             break;
+        case GET.network.mainnet:
         default:
             switch (addressType) {
                 case GET.addressTypes.nonSegwit:
-                    network = bitcoin.networks.bitcoin;
+                    network = MAINNET_NONSEGWIT;
                     break;
                 case GET.addressTypes.segwit:
-                    network = bitcoin.networks.bitcoin.p2wpkhInP2sh;
+                    network = MAINNET_SEGWIT;
                     break;
                 case GET.addressTypes.bech32:
-                    network = bitcoin.networks.bitcoin.p2wpkh;
+                    network = MAINNET_BECH32;
                     break;
             }
             break;
@@ -509,58 +523,68 @@ function recalculateWallet() {
     loadWallet();
 }
 
-// todo this function will be replaced properly
 
-var mnemonic = bitcoin.initiateHDWallet('curve swear maze domain knock frozen ordinary climb love possible brave market', password, true);
+mnemonic = initiateHDWallet('curve swear maze domain knock frozen ordinary climb love possible brave market', password);
 
 function loadWallet(newMnemonic) {
 
     if(newMnemonic){
-        mnemonic = bitcoin.initiateHDWallet('curve swear maze domain knock frozen ordinary climb love possible brave market', password, true);
+        mnemonic = initiateHDWallet('curve swear maze domain knock frozen ordinary climb love possible brave market', password);
     }
 
-    html_output = "<h1>" + mnemonic + "</h1>";
+    if (isAccountsFormEmpty()) {
+        initAccountsForm();
+    }
 
+// todo do this the right way
     var div_tag = document.getElementById('temporary');
+    div_tag.innerHTML = createWalletHTML();
 
-    var x = {
-        dynamic: bitcoin.createP2PKHaddresses(accounts, network, password),
-        // non_segwit_mainnet_encrypted: bitcoin.createP2PKHaddresses([1], bitcoin.networks.bitcoin.p2wpkh, 'MoonLambo'),
-        // non_segwit_testnet: bitcoin.createP2PKHaddresses([2, 3], bitcoin.networks.testnet),
-        // p2sh_p2wpkh_mainnet: bitcoin.createP2PKHaddresses(1, bitcoin.networks.bitcoin.p2wpkhInP2sh),
-        // p2sh_p2wpkh_testnet: bitcoin.createP2PKHaddresses(2, bitcoin.networks.testnet.p2wpkhInP2sh),
-        // bech32_mainnet: bitcoin.createP2PKHaddresses([1], bitcoin.networks.bitcoin.p2wpkh),
-        // bech32_testnet: bitcoin.createP2PKHaddresses([2], bitcoin.networks.testnet.p2wpkh),
-        // bech32_mainnet_multi: bitcoin.createP2PKHaddresses([3, 3], bitcoin.networks.testnet.p2wpkh)
-    }
+    fillWalletHTML();
 
+}
 
-    $.each(x, function (i, dataset) {
-        $.each(dataset, function (accountIndex, addresses) {
-            $.each(addresses.credentials, function (index, data) {
+// todo this function will be replaced properly with templates n' stuff
+function createWalletHTML(){
+    var html_output = "<h1>" + mnemonic + "</h1>";
 
-                var title = i;
-                if (currentPage.numberAddresses) {
-                    title += ' [Address ' + (index + 1) + ']';
-                }
-                html_output += "<h2>" + title + "</h2><table>";
+    foreachCredential(function (accountIndex, addressIndex) {
 
-                $.each(data, function (inner_index, inner_data) {
-                    html_output += "<tr><td><b>" + inner_index + "</b></td><td>" + inner_data + "</td></tr>";
-                });
+        var title = 'lorem ipsum';
 
-                if (currentPage.showXPUB) {
-                    html_output += "<tr><td><b>XPUB</b></td><td>" + addresses.xpub + "</td></tr>";
-                }
-
-
-                html_output += "</table>";
-            });
-        });
+        if (currentPage.numberAddresses) {
+            title += ' [Address ' + (addressIndex + 1) + ']';
+        }
+        html_output += '<h2>' + title + '</h2><table>';
+        html_output += '<tr><td><b>Address</b></td><td id="address-' + accountIndex + '-' + addressIndex + '"> ... wait ... </td></tr>';
+        html_output += '<tr><td><b>Private Key</b></td><td id="privkey-' + accountIndex + '-' + addressIndex + '"> ... wait ... </td></tr>';
+        html_output += "</table>";
     });
 
-    div_tag.innerHTML = html_output;
+    return html_output;
+}
 
+function fillWalletHTML(){
+
+    foreachCredential(function (accountIndex, addressIndex) {
+
+        // todo do this with web workers
+        createCredentials(network, accountIndex, addressIndex, password, function (credentials) {
+            $('td#address-' + accountIndex + '-' + addressIndex).text(credentials.address);
+            $('td#privkey-' + accountIndex + '-' + addressIndex).text(credentials.privateKey);
+        });
+    });
+}
+
+function foreachCredential(callback){
+
+    // loop through accounts
+    for(var accountIndex = 0; accountIndex < accountsForm.length; accountIndex++) {
+        // loop through addresses
+        for (var addressIndex = 0; addressIndex < accountsForm[accountIndex]; addressIndex++) {
+            callback(accountIndex, addressIndex);
+        }
+    }
 }
 
 
@@ -627,17 +651,6 @@ function getURLparameter(name, url) {
     var regex = new RegExp(regexS);
     var results = regex.exec(url);
     return results == null ? null : results[1];
-}
-
-
-// //////////////////////////////////////////////////
-// Unit Tests
-// //////////////////////////////////////////////////
-
-function runUnitTests() {
-    mocha.setup('bdd');
-    tests.bitcoinJStests();
-    mocha.run();
 }
 
 init();

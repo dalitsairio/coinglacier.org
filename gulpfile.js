@@ -19,10 +19,12 @@ const hashsum = require('gulp-hashsum');
 const clean = require('gulp-clean');
 const bump = require('gulp-bump');
 const sass = require('gulp-sass');
+var concat = require('gulp-concat');
 
 const domain = 'coinglacier.org';
 const mainFile = domain + '.html'; // 'coinglacier.org.html'
 const temporaryFolder = 'temporary';
+const concatFile = 'temporary_concat.js';
 const hashsumFilename = 'mainFileSha256';
 const packageFile = 'package.json';
 
@@ -30,9 +32,15 @@ const packageFile = 'package.json';
 // JavaScript Task
 // //////////////////////////////////////////////////
 
-gulp.task('javascript', function () {
+gulp.task('create-bundle', function () {
+
+    gulp.src(['src/js/bitcoin_loader.js', 'src/js/app.js'], { sourcemaps: true })
+        .pipe(concat(concatFile))
+        .pipe(sourcemaps.write())
+        .pipe(gulp.dest('./src/js'));
+
     var b = browserify({
-        entries: ['src/js/app.js'],
+        entries: ['./src/js/' + concatFile],
         debug: true,
         standalone: 'bundle'
     });
@@ -47,6 +55,13 @@ gulp.task('javascript', function () {
         .pipe(reload({stream:true}));
 });
 
+gulp.task('remove-concat-javascript', function () {
+    return gulp.src('./src/js/' + concatFile, {read:false})
+        .pipe(clean());
+});
+
+// gulp.task('javascript', gulp.series('create-bundle'));
+gulp.task('javascript', gulp.series('create-bundle', 'remove-concat-javascript'));
 
 // //////////////////////////////////////////////////
 // Compass / Sass Task
@@ -118,8 +133,7 @@ gulp.task('html', function () {
 // //////////////////////////////////////////////////
 
 gulp.task('watch', function () {
-    gulp.watch(['src/js/**/*.js', '!src/js/**/bundle.js', 'test/**/*.js'], gulp.parallel('javascript'));
-    // gulp.watch(['src/js/**/*.js', '!src/js/**/bundle.js', 'test/**/*.js'], gulp.parallel('javascript', 'tests'));
+    gulp.watch(['src/js/**/*.js', '!src/js/**/bundle.js', '!src/js/**/' + concatFile, 'test/**/*.js'], gulp.parallel('javascript'));
 });
 
 gulp.task('watch-ui', function () {
