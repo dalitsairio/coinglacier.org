@@ -40,7 +40,9 @@ function createAccount(networkID, index) {
 
     var result = {};
     result.account = account;
-    result.xpub = account.neutered().toBase58();
+
+    // todo: this creates the cyclic object value problem
+    // result.xpub = account.neutered().toBase58();
     result.credentials = [];
 
     return result;

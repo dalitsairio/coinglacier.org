@@ -1,18 +1,17 @@
+var bitcoin = require('./bitcoin');
 
-var i = 0;
+onmessage = function(e) {
 
-function timedCount() {
-    i = i + 1;
-    postMessage(i);
-    setTimeout("timedCount()",500);
+    var input = JSON.parse(e.data);
+
+    var mnemonic = input.mnemonic;
+    var networkID = input.networkID;
+    var accountIndex = input.accountIndex;
+    var addressIndex = input.addressIndex;
+    var password = input.password;
+
+    bitcoin.initiateHDWallet(mnemonic, password);
+    var account = bitcoin.createAccount(networkID, accountIndex).account;
+
+    self.postMessage(JSON.stringify(bitcoin.createCredentials(account, addressIndex, password)));
 }
-
-timedCount();
-
-const tests = require('../../test/bitcoinTest');
-
-
-
-mocha.setup('bdd');
-tests.bitcoinJStests();
-mocha.run();

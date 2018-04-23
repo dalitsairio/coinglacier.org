@@ -568,8 +568,7 @@ function fillWalletHTML(){
 
     foreachCredential(function (accountIndex, addressIndex) {
 
-        // todo do this with web workers
-        createCredentials(network, accountIndex, addressIndex, password, function (credentials) {
+        asyncCreateCredentials(network, accountIndex, addressIndex, password, function (credentials) {
             $('td#address-' + accountIndex + '-' + addressIndex).text(credentials.address);
             $('td#privkey-' + accountIndex + '-' + addressIndex).text(credentials.privateKey);
         });

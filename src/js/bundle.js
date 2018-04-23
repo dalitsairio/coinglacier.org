@@ -58837,7 +58837,9 @@ function createAccount(networkID, index) {
 
     var result = {};
     result.account = account;
-    result.xpub = account.neutered().toBase58();
+
+    // todo: this creates the cyclic object value problem
+    // result.xpub = account.neutered().toBase58();
     result.credentials = [];
 
     return result;
@@ -59141,16 +59143,49 @@ const bitcoin = require('./bitcoin');
 // Constants and Variables
 // //////////////////////////////////////////////////
 
-var amountOfWebWorkers;
-var wpool;
+// set amount of workers to the amount of cpu cores, or to 8 if the former does not work
+const amountOfWorkers = navigator.hardwareConcurrency || 8;
+const WORK_IN_PROGRESS = 1;
+
+var workerState = {};
+workerState.available = 0;
+workerState.busy = 1;
+
 var cache;
+var mnemonic;
+var workerpool;
 
 
-// //////////////////////////////////////////////////
-// Global Options
-// //////////////////////////////////////////////////
+function initiateWorkerpool(){
+    workerpool = [];
 
-amountOfWebWorkers = 8;
+    // var code = '';
+    // var blob = new Blob([code], {type: 'application/javascript'});
+
+    for(var x = 0; x < amountOfWorkers; x++){
+        // workerpool.push({state: workerState.available, worker: new Worker(URL.createObjectURL(blob))});
+        workerpool.push({state: workerState.available, worker: new Worker('js/worker_bundled.js')});
+    }
+
+};
+
+function getAvailableWorkerIndex(callback){
+
+    // check every hundert milliseconds for a free worker
+    var checkingInterval = setInterval(function () {
+        for(var index = 0; index < workerpool.length; index++){
+            if(workerpool[index].state === workerState.available){
+                // return index;
+                clearInterval(checkingInterval);
+                callback(index);
+                return;
+            }
+        }
+    }, 100);
+}
+
+initiateWorkerpool()
+
 
 // //////////////////////////////////////////////////
 // functions
@@ -59158,100 +59193,80 @@ amountOfWebWorkers = 8;
 
 function initiateHDWallet(mnemonic, password) {
 
-    wpool = new WorkerPool('js/xy.js', amountOfWebWorkers);
     // always reset the cache on new wallets
     cache = [];
+    mnemonic = bitcoin.initiateHDWallet(mnemonic, password);
 
     return bitcoin.initiateHDWallet(mnemonic, password);
 }
 
-function createAccount (networkID, index) {
+function createAccount (networkID, index, callback) {
+
+    if(typeof mnemonic === 'undefined'){
+        throw 'run initiateHDWallet before calling createAccount()';
+    }
 
     index = index || 0;
     cache[networkID] = cache[networkID] || []; // initialize array if that didn't happen before
 
-    if(typeof cache[networkID][index] === 'undefined') {
-        cache[networkID][index] = bitcoin.createAccount(networkID, index);
-    }
+    JSON.stringify(bitcoin.createAccount(networkID, index));
 
-    return cache[networkID][index];
+    if (typeof cache[networkID][index] === 'undefined') {
+            cache[networkID][index] = bitcoin.createAccount(networkID, index)
+    }
+    callback(cache[networkID][index]);
 }
 
-function createCredentials(networkID, accountIndex, addressIndex, password, callback){
+function asyncCreateCredentials(networkID, accountIndex, addressIndex, password, callback){
 
-    var account = createAccount(networkID, accountIndex, addressIndex, password).account;
-
-    // initiate cache array for all credentials under the given password
-    cache[networkID][accountIndex].credentials[password] = cache[networkID][accountIndex].credentials[password] || [];
-
-    if(!cache[networkID][accountIndex].credentials[password][addressIndex]) {
-        cache[networkID][accountIndex].credentials[password][addressIndex] = bitcoin.createCredentials(account, addressIndex, password);
+    if(typeof mnemonic === 'undefined'){
+        throw 'run initiateHDWallet before calling asyncCreateCredentials()';
     }
 
-    callback(cache[networkID][accountIndex].credentials[password][addressIndex]);
-}
+    createAccount (networkID, accountIndex, function () {
 
-// copy from https://github.com/gonzalo123/workerpool/blob/master/www/js/workerpool.js
+        // initiate cache array for all credentials under the given password
+        cache[networkID][accountIndex].credentials[password] = cache[networkID][accountIndex].credentials[password] || [];
+        var currentCache = cache[networkID][accountIndex].credentials[password][addressIndex];
 
-var WorkerPool;
-
-WorkerPool = (function () {
-    var pool = {};
-    var poolIds = [];
-
-    function WorkerPool(worker, numberOfWorkers) {
-        this.worker = worker;
-        this.numberOfWorkers = numberOfWorkers;
-
-        for (var i = 0; i < this.numberOfWorkers; i++) {
-            poolIds.push(i);
-            var myWorker = new Worker(worker);
-
-            +function (i) {
-                myWorker.addEventListener('message', function (e) {
-                    var data = e.data;
-                    console.log("Worker #" + i + " finished. status: " + data.status);
-                    pool[i].status = true;
-                    poolIds.push(i);
-                });
-            }(i);
-
-            pool[i] = {status: true, worker: myWorker};
-        }
-
-        this.getFreeWorkerId = function (callback) {
-            if (poolIds.length > 0) {
-                return callback(poolIds.pop());
-            } else {
-                var that = this;
-                setTimeout(function () {
-                    that.getFreeWorkerId(callback);
-                }, 100);
+        // return result from cache if available
+        if(currentCache) {
+            // if cache is set to WORK_IN_PROGRESS, do nothing.
+            // The result will be displayed as soon as the calculation is done.
+            if(currentCache !== WORK_IN_PROGRESS){
+                callback(currentCache);
             }
-        }
-    }
 
-    WorkerPool.prototype.postMessage = function (data) {
-        this.getFreeWorkerId(function (workerId) {
-            pool[workerId].status = false;
-            var worker = pool[workerId].worker;
-            console.log("postMessage with worker #" + workerId);
-            worker.postMessage(data);
+            return;
+        }
+
+
+        // calculate the credentials using web workers
+
+        cache[networkID][accountIndex].credentials[password][addressIndex] = WORK_IN_PROGRESS;
+
+        getAvailableWorkerIndex(function (workerID) {
+
+            workerpool[workerID].state = workerState.busy;
+            var worker = workerpool[workerID].worker
+
+            worker.onmessage = function (e) {
+                cache[networkID][accountIndex].credentials[password][addressIndex] = JSON.parse(e.data);
+                workerpool[workerID].state = workerState.available;
+                callback(cache[networkID][accountIndex].credentials[password][addressIndex]);
+            };
+
+            worker.postMessage(JSON.stringify({
+                mnemonic: mnemonic,
+                networkID: networkID,
+                accountIndex: accountIndex,
+                addressIndex: addressIndex,
+                password: password
+            }));
         });
-    };
-
-    WorkerPool.prototype.registerOnMessage = function (callback) {
-        for (var i = 0; i < this.numberOfWorkers; i++) {
-            pool[i].worker.addEventListener('message', callback);
-        }
-    };
-
-    WorkerPool.prototype.getFreeIds = function () {
-        return poolIds;
-    };
-
-    return WorkerPool;
-})();
+    });
+    
+}
 
 
 // //////////////////////////////////////////////////
@@ -59833,8 +59848,7 @@ function fillWalletHTML(){
 
     foreachCredential(function (accountIndex, addressIndex) {
 
-        // todo do this with web workers
-        createCredentials(network, accountIndex, addressIndex, password, function (credentials) {
+        asyncCreateCredentials(network, accountIndex, addressIndex, password, function (credentials) {
             $('td#address-' + accountIndex + '-' + addressIndex).text(credentials.address);
             $('td#privkey-' + accountIndex + '-' + addressIndex).text(credentials.privateKey);
         });

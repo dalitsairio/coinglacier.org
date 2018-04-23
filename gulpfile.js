@@ -63,6 +63,28 @@ gulp.task('remove-concat-javascript', function () {
 // gulp.task('javascript', gulp.series('create-bundle'));
 gulp.task('javascript', gulp.series('create-bundle', 'remove-concat-javascript'));
 
+
+// //////////////////////////////////////////////////
+// create web worker
+// //////////////////////////////////////////////////
+
+gulp.task('create-worker', function () {
+
+    var b = browserify({
+        entries: ['./src/js/worker.js']
+    });
+
+    return b.bundle()
+        .pipe(plumber())
+        .pipe(source('worker_bundled.js'))
+        .pipe(buffer())
+        .pipe(sourcemaps.init({loadMaps: true}))
+        .pipe(sourcemaps.write('../maps/'))
+        .pipe(gulp.dest('./src/js'))
+        .pipe(reload({stream:true}));
+});
+
+
 // //////////////////////////////////////////////////
 // Compass / Sass Task
 // //////////////////////////////////////////////////
@@ -133,7 +155,18 @@ gulp.task('html', function () {
 // //////////////////////////////////////////////////
 
 gulp.task('watch', function () {
-    gulp.watch(['src/js/**/*.js', '!src/js/**/bundle.js', '!src/js/**/' + concatFile, 'test/**/*.js'], gulp.parallel('javascript'));
+    gulp.watch([
+        'src/js/**/*.js',
+        '!src/js/**/bundle.js',
+        '!src/js/**/' + concatFile,
+        '!src/js/**/worker.js',
+        '!src/js/**/worker_bundled.js',
+        'test/**/*.js'
+    ], gulp.parallel('javascript'));
+});
+
+gulp.task('watch-worker', function () {
+    gulp.watch(['src/js/**/worker.js'], gulp.parallel('create-worker'));
 });
 
 gulp.task('watch-ui', function () {
@@ -155,7 +188,7 @@ gulp.task('tests', function () {
 // Default Task
 // //////////////////////////////////////////////////
 
-gulp.task('default', gulp.parallel('tests', 'javascript', 'sass', 'browser-sync', 'watch', 'watch-ui', 'move-dependencies'));
+gulp.task('default', gulp.parallel('tests', 'javascript', 'create-worker', 'sass', 'browser-sync', 'watch', 'watch-ui', 'watch-worker', 'move-dependencies'));
 
 
 // //////////////////////////////////////////////////
