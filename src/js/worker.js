@@ -1,17 +1,16 @@
-var bitcoin = require('./bitcoin');
+var bip38 = require('bip38');
+var wif = require('wif');
+
 
 onmessage = function(e) {
 
     var input = JSON.parse(e.data);
 
-    var mnemonic = input.mnemonic;
-    var networkID = input.networkID;
-    var accountIndex = input.accountIndex;
-    var addressIndex = input.addressIndex;
+    var privateKey = input.privateKey;
     var password = input.password;
 
-    bitcoin.initiateHDWallet(mnemonic, password);
-    var account = bitcoin.createAccount(networkID, accountIndex).account;
+    var decoded = wif.decode(privateKey);
+    var encryptedPrivKey = bip38.encrypt(decoded.privateKey, decoded.compressed, password);
 
-    self.postMessage(JSON.stringify(bitcoin.createCredentials(account, addressIndex, password)));
+    self.postMessage(encryptedPrivKey);
 }

@@ -34,12 +34,11 @@ var workerpool;
 function initiateWorkerpool(){
     workerpool = [];
 
-    // var code = '';
-    // var blob = new Blob([code], {type: 'application/javascript'});
+    var workerCode = 'WORKER_CODE_PLACEHOLDER'; // is replaced with actual JS code by gulp task
+    var blob = new Blob([workerCode], {type: 'application/javascript'});
 
     for(var x = 0; x < amountOfWorkers; x++){
-        // workerpool.push({state: workerState.available, worker: new Worker(URL.createObjectURL(blob))});
-        workerpool.push({state: workerState.available, worker: new Worker('js/worker_bundled.js')});
+        workerpool.push({state: workerState.available, worker: new Worker(URL.createObjectURL(blob))});
     }
 
 };
@@ -84,8 +83,6 @@ function createAccount (networkID, index, callback) {
     index = index || 0;
     cache[networkID] = cache[networkID] || []; // initialize array if that didn't happen before
 
-    JSON.stringify(bitcoin.createAccount(networkID, index));
-
     if (typeof cache[networkID][index] === 'undefined') {
             cache[networkID][index] = bitcoin.createAccount(networkID, index)
     }
@@ -100,45 +97,58 @@ function asyncCreateCredentials(networkID, accountIndex, addressIndex, password,
 
     createAccount (networkID, accountIndex, function () {
 
-        // initiate cache array for all credentials under the given password
-        cache[networkID][accountIndex].credentials[password] = cache[networkID][accountIndex].credentials[password] || [];
-        var currentCache = cache[networkID][accountIndex].credentials[password][addressIndex];
+        setTimeout(function () {
 
-        // return result from cache if available
-        if(currentCache) {
-            // if cache is set to WORK_IN_PROGRESS, do nothing.
-            // The result will be displayed as soon as the calculation is done.
-            if(currentCache !== WORK_IN_PROGRESS){
-                callback(currentCache);
+            // initiate cache array for all credentials under the given password
+            cache[networkID][accountIndex].credentials[password] = cache[networkID][accountIndex].credentials[password] || [];
+            var currentCache = cache[networkID][accountIndex].credentials[password][addressIndex];
+
+            // return result from cache if available
+            if(currentCache) {
+                // if cache is set to WORK_IN_PROGRESS, do nothing.
+                // The result will be displayed as soon as the calculation is done.
+                if(currentCache !== WORK_IN_PROGRESS){
+                    callback(currentCache);
+                }
+
+                return;
             }
 
-            return;
-        }
 
+            // calculate the credentials using web workers
+            cache[networkID][accountIndex].credentials[password][addressIndex] = WORK_IN_PROGRESS;
 
-        // calculate the credentials using web workers
+            var credentials = bitcoin.createCredentials(cache[networkID][accountIndex].external, addressIndex);
 
-        cache[networkID][accountIndex].credentials[password][addressIndex] = WORK_IN_PROGRESS;
+            if(!password){
+                cache[networkID][accountIndex].credentials[password][addressIndex] = credentials;
+                callback(credentials);
+            }else{
 
-        getAvailableWorkerIndex(function (workerID) {
+                // asynchronous BIP38 encryption with web workers
 
-            workerpool[workerID].state = workerState.busy;
-            var worker = workerpool[workerID].worker
+                getAvailableWorkerIndex(function (workerID) {
 
-            worker.onmessage = function (e) {
-                cache[networkID][accountIndex].credentials[password][addressIndex] = JSON.parse(e.data);
-                workerpool[workerID].state = workerState.available;
-                callback(cache[networkID][accountIndex].credentials[password][addressIndex]);
-            };
+                    workerpool[workerID].state = workerState.busy;
+                    var worker = workerpool[workerID].worker;
 
-            worker.postMessage(JSON.stringify({
-                mnemonic: mnemonic,
-                networkID: networkID,
-                accountIndex: accountIndex,
-                addressIndex: addressIndex,
-                password: password
-            }));
-        });
+                    worker.onmessage = function (e) {
+
+                        cache[networkID][accountIndex].credentials[password][addressIndex] = credentials;
+                        cache[networkID][accountIndex].credentials[password][addressIndex].privateKey = e.data;
+                        workerpool[workerID].state = workerState.available;
+
+                        callback(cache[networkID][accountIndex].credentials[password][addressIndex]);
+                    };
+
+                    worker.postMessage(JSON.stringify({
+                        privateKey: credentials.privateKey,
+                        password: password
+                    }));
+                });
+            }
+
+        }, 0);
     });
     
 }

@@ -1,7 +1,5 @@
 const bitcoinjs = require('./bitcoinjs-lib_patched').bitcoinjs;
 const bip39 = require('bip39');
-const bip38 = require('bip38');
-const wif = require('wif');
 
 var mnemonic;
 var bip32RootKey;
@@ -41,33 +39,34 @@ function createAccount(networkID, index) {
     var result = {};
     result.account = account;
 
-    // todo: this creates the cyclic object value problem
-    // result.xpub = account.neutered().toBase58();
+    result.xpub = account.neutered().toBase58();
     result.credentials = [];
+
+    // calculate one level more downwards the tree, so time can be saved when creating multiple addresses later on
+    // Masternode / BIP44 | BIP49 | BIP84 / Bitcoin | Testnet / Account / External / First Address
+    //                                                                   ^^^^^^^^^
+    var externalPath = '0';
+    var pathError = findDerivationPathErrors(externalPath, false, false);
+    if (pathError) throw 'Derivation Path Error: ' + pathError;
+    result.external = account.derivePath(externalPath);
 
     return result;
 }
 
 
 // creates addresses and privKeys on the level of a BIP32 account
-function createCredentials(account, addressIndex, password) {
+function createCredentials(bip44external, addressIndex) {
 
     var credentials;
 
     // Masternode / BIP44 | BIP49 | BIP84 / Bitcoin | Testnet / Account / External / First Address
-    //                                                                    ^^^^^^^^^^^^^^^^^^^^^^^^
-    var addressPath = '0/' + addressIndex;
+    //                                                                              ^^^^^^^^^^^^^^^
+    var addressPath = addressIndex + '';
     var pathError = findDerivationPathErrors(addressPath, true, false);
     if (pathError) throw 'Derivation Path Error: ' + pathError;
-
-    var bip32 = account.derivePath(addressPath);
+    var bip32 = bip44external.derivePath(addressPath);
 
     var privateKey = bip32.keyPair.toWIF();
-    if (password) {
-        // encrypt the privateKey
-        var decoded = wif.decode(privateKey);
-        privateKey = bip38.encrypt(decoded.privateKey, decoded.compressed, password);
-    }
 
     switch (bip32.keyPair.network) {
         case bitcoinjs.networks.bitcoin:
@@ -194,7 +193,7 @@ function findDerivationPathErrors(path, createXPUB, fromMasternode) {
         return 'The path starts at masternode, but the third param is set to false';
     }
 
-    if (path.length > 1) {
+    if (fromMasternode && path.length > 1) {
         if (path[1] != '/') {
             return "Separator must be '/'";
         }

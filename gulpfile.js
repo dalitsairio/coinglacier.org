@@ -20,11 +20,14 @@ const clean = require('gulp-clean');
 const bump = require('gulp-bump');
 const sass = require('gulp-sass');
 var concat = require('gulp-concat');
+var uglify = require('gulp-uglify');
+var replace = require('gulp-replace');
 
 const domain = 'coinglacier.org';
 const mainFile = domain + '.html'; // 'coinglacier.org.html'
 const temporaryFolder = 'temporary';
 const concatFile = 'temporary_concat.js';
+const workerBundleFile = 'worker_bundled.js';
 const hashsumFilename = 'mainFileSha256';
 const packageFile = 'package.json';
 
@@ -51,17 +54,34 @@ gulp.task('create-bundle', function () {
         .pipe(buffer())
         .pipe(sourcemaps.init({loadMaps: true}))
         .pipe(sourcemaps.write('../maps/'))
-        .pipe(gulp.dest('./src/js'))
-        .pipe(reload({stream:true}));
+        .pipe(gulp.dest('./src/js'));
+
 });
 
-gulp.task('remove-concat-javascript', function () {
-    return gulp.src('./src/js/' + concatFile, {read:false})
+gulp.task('prepare-worker-code', function () {
+    return gulp.src(['src/js/' + workerBundleFile])
+        .pipe(replace('\\', '\\\\')) // escape the backslashes (replace \ by \\)
+        .pipe(replace('\'', '\\\'')) // escape the quotes (replace ' by \')
+        .pipe(replace(/(\r\n\t|\n|\r\t)/gm, '')) // remove new lines
+        .pipe(gulp.dest('./src/js'))
+});
+
+gulp.task('inject-worker-code', function () {
+    var workerFileContent = fs.readFileSync('src/js/' + workerBundleFile, 'utf8');
+
+    return gulp.src(['src/js/bundle.js'])
+        .pipe(replace('is replaced with actual JS code by gulp task', 'code injected by gulp task'))
+        .pipe(replace('WORKER_CODE_PLACEHOLDER', workerFileContent))
+        .pipe(gulp.dest('./src/js'))
+        .pipe(reload({stream: true}))
+});
+
+gulp.task('remove-temporary-files', function () {
+    return gulp.src(['./src/js/' + concatFile, 'src/js/' + workerBundleFile], {read:false})
         .pipe(clean());
 });
 
-// gulp.task('javascript', gulp.series('create-bundle'));
-gulp.task('javascript', gulp.series('create-bundle', 'remove-concat-javascript'));
+gulp.task('javascript', gulp.series('create-bundle', 'prepare-worker-code', 'inject-worker-code', 'remove-temporary-files'));
 
 
 // //////////////////////////////////////////////////
@@ -76,13 +96,16 @@ gulp.task('create-worker', function () {
 
     return b.bundle()
         .pipe(plumber())
-        .pipe(source('worker_bundled.js'))
+        .pipe(source(workerBundleFile))
         .pipe(buffer())
         .pipe(sourcemaps.init({loadMaps: true}))
-        .pipe(sourcemaps.write('../maps/'))
+        .pipe(uglify())
+        .pipe(sourcemaps.write( ))
         .pipe(gulp.dest('./src/js'))
         .pipe(reload({stream:true}));
 });
+
+gulp.task('update-worker', gulp.series('create-worker', 'javascript'));
 
 
 // //////////////////////////////////////////////////
@@ -160,13 +183,13 @@ gulp.task('watch', function () {
         '!src/js/**/bundle.js',
         '!src/js/**/' + concatFile,
         '!src/js/**/worker.js',
-        '!src/js/**/worker_bundled.js',
+        '!src/js/**/' + workerBundleFile,
         'test/**/*.js'
     ], gulp.parallel('javascript'));
 });
 
 gulp.task('watch-worker', function () {
-    gulp.watch(['src/js/**/worker.js'], gulp.parallel('create-worker'));
+    gulp.watch(['src/js/**/worker.js'], gulp.parallel('update-worker'));
 });
 
 gulp.task('watch-ui', function () {
@@ -188,7 +211,7 @@ gulp.task('tests', function () {
 // Default Task
 // //////////////////////////////////////////////////
 
-gulp.task('default', gulp.parallel('tests', 'javascript', 'create-worker', 'sass', 'browser-sync', 'watch', 'watch-ui', 'watch-worker', 'move-dependencies'));
+gulp.task('default', gulp.parallel('tests', 'update-worker', 'sass', 'browser-sync', 'watch', 'watch-ui', 'watch-worker', 'move-dependencies'));
 
 
 // //////////////////////////////////////////////////
