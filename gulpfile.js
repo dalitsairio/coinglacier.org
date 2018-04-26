@@ -101,8 +101,7 @@ gulp.task('create-worker', function () {
         .pipe(sourcemaps.init({loadMaps: true}))
         .pipe(uglify())
         .pipe(sourcemaps.write( ))
-        .pipe(gulp.dest('./src/js'))
-        .pipe(reload({stream:true}));
+        .pipe(gulp.dest('./src/js'));
 });
 
 gulp.task('javascript', gulp.series('create-worker', 'create-main'));
@@ -180,10 +179,10 @@ gulp.task('html', function () {
 gulp.task('watch', function () {
     gulp.watch([
         'src/js/**/*.js',
-        '!src/js/**/bundle.js',
-        '!src/js/**/' + concatFile,
-        '!src/js/**/encryptionWorker.js',
-        '!src/js/**/' + encWorkerBundleFile,
+        '!src/js/bundle.js',
+        '!src/js/' + concatFile,
+        '!src/js/encryptionWorker.js',
+        '!src/js/' + encWorkerBundleFile,
         'test/**/*.js'
     ], gulp.parallel('javascript'));
 });
