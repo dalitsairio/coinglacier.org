@@ -3,4 +3,4 @@
 node_modules
 temporary
 src/js/temporary_concat.js
-src/js/worker_bundled.js
+src/js/encryptionWorker_bundled.min.js

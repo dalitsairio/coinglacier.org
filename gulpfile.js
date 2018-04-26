@@ -81,7 +81,7 @@ gulp.task('remove-temporary-files', function () {
         .pipe(clean());
 });
 
-gulp.task('javascript', gulp.series('create-bundle', 'prepare-worker-code', 'inject-worker-code', 'remove-temporary-files'));
+gulp.task('create-main', gulp.series('create-bundle', 'prepare-worker-code', 'inject-worker-code', 'remove-temporary-files'));
 
 
 // //////////////////////////////////////////////////
@@ -105,7 +105,7 @@ gulp.task('create-worker', function () {
         .pipe(reload({stream:true}));
 });
 
-gulp.task('update-worker', gulp.series('create-worker', 'javascript'));
+gulp.task('javascript', gulp.series('create-worker', 'create-main'));
 
 
 // //////////////////////////////////////////////////
@@ -189,7 +189,7 @@ gulp.task('watch', function () {
 });
 
 gulp.task('watch-worker', function () {
-    gulp.watch(['src/js/**/encryptionWorker.js'], gulp.parallel('update-worker'));
+    gulp.watch(['src/js/**/encryptionWorker.js'], gulp.parallel('javascript'));
 });
 
 gulp.task('watch-ui', function () {
@@ -211,7 +211,7 @@ gulp.task('tests', function () {
 // Default Task
 // //////////////////////////////////////////////////
 
-gulp.task('default', gulp.parallel('tests', 'update-worker', 'sass', 'browser-sync', 'watch', 'watch-ui', 'watch-worker', 'move-dependencies'));
+gulp.task('default', gulp.parallel('tests', 'javascript', 'sass', 'browser-sync', 'watch', 'watch-ui', 'watch-worker', 'move-dependencies'));
 
 
 // //////////////////////////////////////////////////
