@@ -232,5 +232,6 @@ function findDerivationPathErrors(path, createXPUB, fromMasternode) {
 module.exports = {
     initiateHDWallet,
     createAccount,
-    createCredentials
+    createCredentials,
+    networks: bitcoinjs.networks
 };

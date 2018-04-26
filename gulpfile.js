@@ -27,7 +27,7 @@ const domain = 'coinglacier.org';
 const mainFile = domain + '.html'; // 'coinglacier.org.html'
 const temporaryFolder = 'temporary';
 const concatFile = 'temporary_concat.js';
-const workerBundleFile = 'worker_bundled.js';
+const encWorkerBundleFile = 'encryptionWorker_bundled.min.js';
 const hashsumFilename = 'mainFileSha256';
 const packageFile = 'package.json';
 
@@ -59,7 +59,7 @@ gulp.task('create-bundle', function () {
 });
 
 gulp.task('prepare-worker-code', function () {
-    return gulp.src(['src/js/' + workerBundleFile])
+    return gulp.src(['src/js/' + encWorkerBundleFile])
         .pipe(replace('\\', '\\\\')) // escape the backslashes (replace \ by \\)
         .pipe(replace('\'', '\\\'')) // escape the quotes (replace ' by \')
         .pipe(replace(/(\r\n\t|\n|\r\t)/gm, '')) // remove new lines
@@ -67,7 +67,7 @@ gulp.task('prepare-worker-code', function () {
 });
 
 gulp.task('inject-worker-code', function () {
-    var workerFileContent = fs.readFileSync('src/js/' + workerBundleFile, 'utf8');
+    var workerFileContent = fs.readFileSync('src/js/' + encWorkerBundleFile, 'utf8');
 
     return gulp.src(['src/js/bundle.js'])
         .pipe(replace('is replaced with actual JS code by gulp task', 'code injected by gulp task'))
@@ -77,7 +77,7 @@ gulp.task('inject-worker-code', function () {
 });
 
 gulp.task('remove-temporary-files', function () {
-    return gulp.src(['./src/js/' + concatFile, 'src/js/' + workerBundleFile], {read:false})
+    return gulp.src(['./src/js/' + concatFile, 'src/js/' + encWorkerBundleFile], {read:false})
         .pipe(clean());
 });
 
@@ -91,12 +91,12 @@ gulp.task('javascript', gulp.series('create-bundle', 'prepare-worker-code', 'inj
 gulp.task('create-worker', function () {
 
     var b = browserify({
-        entries: ['./src/js/worker.js']
+        entries: ['./src/js/encryptionWorker.js']
     });
 
     return b.bundle()
         .pipe(plumber())
-        .pipe(source(workerBundleFile))
+        .pipe(source(encWorkerBundleFile))
         .pipe(buffer())
         .pipe(sourcemaps.init({loadMaps: true}))
         .pipe(uglify())
@@ -182,14 +182,14 @@ gulp.task('watch', function () {
         'src/js/**/*.js',
         '!src/js/**/bundle.js',
         '!src/js/**/' + concatFile,
-        '!src/js/**/worker.js',
-        '!src/js/**/' + workerBundleFile,
+        '!src/js/**/encryptionWorker.js',
+        '!src/js/**/' + encWorkerBundleFile,
         'test/**/*.js'
     ], gulp.parallel('javascript'));
 });
 
 gulp.task('watch-worker', function () {
-    gulp.watch(['src/js/**/worker.js'], gulp.parallel('update-worker'));
+    gulp.watch(['src/js/**/encryptionWorker.js'], gulp.parallel('update-worker'));
 });
 
 gulp.task('watch-ui', function () {
