@@ -8,14 +8,6 @@ function encryptPrivKey(privKey, password) {
     return bip38.encrypt(decoded.privateKey, decoded.compressed, password);
 }
 
-//
-// var bip38 = require('bip38');
-// var wif = require('wif');
-//
-// function encryptPrivKey() {
-//     // do nothing
-// }
-
 module.exports = {
     encryptPrivKey: encryptPrivKey
 };
