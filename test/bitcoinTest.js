@@ -303,16 +303,6 @@ function bitcoinJStests() {
                 var encryptedPrivKey = bip38.encryptPrivKey(credentials.privateKey, testing_password);
 
                 assert.equal(encryptedPrivKey, '6PYSqLAHxW8CT2sBYVjaZZKJ6yes2itBcvk5WHmsNysTkzM8Z62DZntKYc');
-
-
-
-
-                // // load testing mnemonic
-                // bitcoin.initiateHDWallet(testing_mnemonic, testing_password);
-                //
-                // var credentials = bitcoin.createP2PKHaddresses([1], bitcoin.networks.bitcoin.p2wpkh, testing_password);
-                // var privateKey = credentials[0]['credentials'][0]['privateKey'];
-                // assert.equal(privateKey, '6PYSqLAHxW8CT2sBYVjaZZKJ6yes2itBcvk5WHmsNysTkzM8Z62DZntKYc');
             });
         });
 
