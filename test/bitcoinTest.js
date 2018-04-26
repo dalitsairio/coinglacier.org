@@ -16,7 +16,6 @@ const testing_password = 'MoonLambo';
 function bitcoinJStests() {
     describe('BitcoinJS', function () {
 
-        // this.timeout(20000); // all tests may take up to 20 seconds
         this.timeout(20000); // all tests may take up to 20 seconds
         this.slow(3000); // a test is considered slow if it takes more than 3 seconds to completes
 
