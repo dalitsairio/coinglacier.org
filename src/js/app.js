@@ -8,6 +8,7 @@ var currentPage;
 var password;
 var accountsForm;
 var mnemonic;
+var showXPUB;
 
 
 // identical to the id's set in bitcoinjs-lib_patched.js
@@ -100,6 +101,7 @@ pages.singleWallet.menuEntryDOM = DOM.menuEntry.singleWallet;
 pages.singleWallet.getParam = GET.pages.singleWallet;
 // set default values
 pages.singleWallet.addressesPerAccount = 1;
+pages.singleWallet.allowAccounts = false;
 pages.singleWallet.showXPUB = false;
 pages.singleWallet.numberAddresses = false;
 pages.singleWallet.defaultPassword = '';
@@ -110,6 +112,7 @@ pages.paperWallet.menuEntryDOM = DOM.menuEntry.paperWallet;
 pages.paperWallet.getParam = GET.pages.paperWallet;
 // set default values
 pages.paperWallet.addressesPerAccount = 3;
+pages.paperWallet.allowAccounts = true;
 pages.paperWallet.showXPUB = false;
 pages.paperWallet.numberAddresses = true;
 pages.paperWallet.defaultPassword = '';
@@ -190,6 +193,7 @@ function init() {
     }
 
     password = currentPage.defaultPassword;
+    showXPUB = currentPage.showXPUB;
 
     loadWallet();
 
@@ -326,8 +330,10 @@ function optionShowXPUBchanged() {
     currentPage.showXPUB = DOM.options.showXPUB.prop('checked');
     if (currentPage.showXPUB) {
         enableAccounts();
+        showXPUB = true;
     } else {
         disableAccounts();
+        showXPUB = false;
     }
     loadWallet();
 }
@@ -540,6 +546,12 @@ function loadWallet(newMnemonic) {
     var div_tag = document.getElementById('temporary');
     div_tag.innerHTML = createWalletHTML();
 
+    if(currentPage.allowAccounts && showXPUB){
+        $('h3.xpub').show();
+    }else{
+        $('h3.xpub').hide();
+    }
+
     fillWalletHTML();
 
 }
@@ -555,10 +567,12 @@ function createWalletHTML(){
         if (currentPage.numberAddresses) {
             title += ' [Address ' + (addressIndex + 1) + ']';
         }
-        html_output += '<h2>' + title + '</h2><table>';
+        html_output += '<h3>' + title + '</h3><table>';
         html_output += '<tr><td><b>Address</b></td><td id="address-' + accountIndex + '-' + addressIndex + '"> ... wait ... </td></tr>';
         html_output += '<tr><td><b>Private Key</b></td><td id="privkey-' + accountIndex + '-' + addressIndex + '"> ... wait ... </td></tr>';
         html_output += "</table>";
+    }, function (accountIndex) {
+        html_output += '<h3 id="xpub-' + accountIndex + '" class="xpub" style="display: none;"> ... wait ... </h3>'
     });
 
     return html_output;
@@ -572,13 +586,17 @@ function fillWalletHTML(){
             $('td#address-' + accountIndex + '-' + addressIndex).text(credentials.address);
             $('td#privkey-' + accountIndex + '-' + addressIndex).text(credentials.privateKey);
         });
+    }, function (accountIndex) {
+        createAccount (network, accountIndex, function (account) {
+            $('h3#xpub-' + accountIndex).text('XPUB: ' + account.xpub);
+        });
     });
 }
 
-function foreachCredential(callback){
-
+function foreachCredential(callback, callbackPerAccount){
     // loop through accounts
     for(var accountIndex = 0; accountIndex < accountsForm.length; accountIndex++) {
+        callbackPerAccount(accountIndex);
         // loop through addresses
         for (var addressIndex = 0; addressIndex < accountsForm[accountIndex]; addressIndex++) {
             callback(accountIndex, addressIndex);
