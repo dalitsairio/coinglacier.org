@@ -158,8 +158,13 @@ function asyncCreateCredentials(networkID, accountIndex, addressIndex, password,
 // Unit Tests
 // //////////////////////////////////////////////////
 
-function runUnitTests() {
+function runUnitTests(runSlowTests) {
     mocha.setup('bdd');
     tests.bitcoinJStests();
+
+    if(runSlowTests) {
+        tests.bip38Tests();
+    }
+
     mocha.run();
 }

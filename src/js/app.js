@@ -37,6 +37,10 @@ GET.addressTypes.keyword = 'addressType';
 GET.addressTypes.nonSegwit = 'non-segwit';
 GET.addressTypes.segwit = 'segwit';
 GET.addressTypes.bech32 = 'bech32';
+// run also the slow unit tests?
+GET.allUnitTests = {};
+GET.allUnitTests.keyword = 'run-all-tests';
+GET.allUnitTests.yes = 'true';
 
 // CSS classes
 var classes = {};
@@ -198,7 +202,8 @@ function init() {
     loadWallet();
 
     // run unit tests
-    runUnitTests();
+    var runAllTests = getURLparameter(GET.allUnitTests.keyword) == GET.allUnitTests.yes;
+    runUnitTests(runAllTests);
 }
 
 

@@ -59752,9 +59752,14 @@ function asyncCreateCredentials(networkID, accountIndex, addressIndex, password,
 // Unit Tests
 // //////////////////////////////////////////////////
 
-function runUnitTests() {
+function runUnitTests(runSlowTests) {
     mocha.setup('bdd');
     tests.bitcoinJStests();
+
+    if(runSlowTests) {
+        tests.bip38Tests();
+    }
+
     mocha.run();
 }
 // //////////////////////////////////////////////////
@@ -59796,6 +59801,10 @@ GET.addressTypes.keyword = 'addressType';
 GET.addressTypes.nonSegwit = 'non-segwit';
 GET.addressTypes.segwit = 'segwit';
 GET.addressTypes.bech32 = 'bech32';
+// run also the slow unit tests?
+GET.allUnitTests = {};
+GET.allUnitTests.keyword = 'run-all-tests';
+GET.allUnitTests.yes = 'true';
 
 // CSS classes
 var classes = {};
@@ -59957,7 +59966,8 @@ function init() {
     loadWallet();
 
     // run unit tests
-    runUnitTests();
+    var runAllTests = getURLparameter(GET.allUnitTests.keyword) == GET.allUnitTests.yes;
+    runUnitTests(runAllTests);
 }
 
 
@@ -60437,7 +60447,6 @@ const assert = require('chai').assert;
 const bitcoin = require('../src/js/bitcoin');
 const bip38 = require('../src/js/bip38encryption');
 
-
 const MAINNET_NONSEGWIT = bitcoin.networks.bitcoin.id; // 0
 const MAINNET_SEGWIT = bitcoin.networks.bitcoin.p2wpkhInP2sh.id; // 1
 const MAINNET_BECH32 = bitcoin.networks.bitcoin.p2wpkh.id; // 2
@@ -60449,9 +60458,9 @@ const testing_mnemonic = 'curve swear maze domain knock frozen ordinary climb lo
 const testing_password = 'MoonLambo';
 
 function bitcoinJStests() {
-    describe('BitcoinJS', function () {
+    describe('BitcoinJS tests', function () {
 
-        this.timeout(20000); // all tests may take up to 20 seconds
+        this.timeout(10000); // all tests may take up to 20 seconds
         this.slow(3000); // a test is considered slow if it takes more than 3 seconds to completes
 
         describe('Initiating HD wallet', function () {
@@ -60719,36 +60728,6 @@ function bitcoinJStests() {
 
                 assert.equal(credentials.privateKey, 'L38Umd9kZNjeo98PFbpzaSfpuyREBc1rzBiyHBqQUXkjrysVyDi5');
             });
-
-            it('BIP38 Encrypted PrivKey', function () {
-                // load testing mnemonic
-                bitcoin.initiateHDWallet(testing_mnemonic);
-                var account = bitcoin.createAccount(MAINNET_BECH32, 0);
-                var credentials = bitcoin.createCredentials(account.external, 0);
-                var encryptedPrivKey = bip38.encryptPrivKey(credentials.privateKey, testing_password);
-
-                assert.equal(encryptedPrivKey, '6PYUjuUte84KiL2kFzuCNTven4WkdRFXmeMGGCVzDkpR1AcTBhLn2jMdoo');
-            });
-
-            it('BIP38 and Mnemonic Encryption', function () {
-                // load testing mnemonic
-                bitcoin.initiateHDWallet(testing_mnemonic, testing_password);
-                var account = bitcoin.createAccount(MAINNET_BECH32, 0);
-                var credentials = bitcoin.createCredentials(account.external, 0);
-                var encryptedPrivKey = bip38.encryptPrivKey(credentials.privateKey, testing_password);
-
-                assert.equal(encryptedPrivKey, '6PYSqLAHxW8CT2sBYVjaZZKJ6yes2itBcvk5WHmsNysTkzM8Z62DZntKYc');
-
-
-
-
-                // // load testing mnemonic
-                // bitcoin.initiateHDWallet(testing_mnemonic, testing_password);
-                //
-                // var credentials = bitcoin.createP2PKHaddresses([1], bitcoin.networks.bitcoin.p2wpkh, testing_password);
-                // var privateKey = credentials[0]['credentials'][0]['privateKey'];
-                // assert.equal(privateKey, '6PYSqLAHxW8CT2sBYVjaZZKJ6yes2itBcvk5WHmsNysTkzM8Z62DZntKYc');
-            });
         });
 
         describe('Retrieve from encrypted mnemonic', function () {
@@ -60792,8 +60771,38 @@ function bitcoinJStests() {
     });
 }
 
+function bip38Tests() {
+    describe('BIP38 tests', function () {
+
+    this.timeout(50000); // all tests may take up to 20 seconds
+    this.slow(20000); // a test is considered slow if it takes more than 3 seconds to completes
+
+
+        it('Encrypted PrivKey', function () {
+            // load testing mnemonic
+            bitcoin.initiateHDWallet(testing_mnemonic);
+            var account = bitcoin.createAccount(MAINNET_BECH32, 0);
+            var credentials = bitcoin.createCredentials(account.external, 0);
+            var encryptedPrivKey = bip38.encryptPrivKey(credentials.privateKey, testing_password);
+
+            assert.equal(encryptedPrivKey, '6PYUjuUte84KiL2kFzuCNTven4WkdRFXmeMGGCVzDkpR1AcTBhLn2jMdoo');
+        });
+
+        it('Encrpyted Privkey and Mnemonic', function () {
+            // load testing mnemonic
+            bitcoin.initiateHDWallet(testing_mnemonic, testing_password);
+            var account = bitcoin.createAccount(MAINNET_BECH32, 0);
+            var credentials = bitcoin.createCredentials(account.external, 0);
+            var encryptedPrivKey = bip38.encryptPrivKey(credentials.privateKey, testing_password);
+
+            assert.equal(encryptedPrivKey, '6PYSqLAHxW8CT2sBYVjaZZKJ6yes2itBcvk5WHmsNysTkzM8Z62DZntKYc');;
+        });
+    });
+}
+
 module.exports = {
-    bitcoinJStests
+    bitcoinJStests: bitcoinJStests,
+    bip38Tests: bip38Tests
 }
 },{"../src/js/bip38encryption":273,"../src/js/bitcoin":274,"chai":111}]},{},[276])(276)
 });
