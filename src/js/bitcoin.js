@@ -1,27 +1,96 @@
 const bitcoinjs = require('./bitcoinjs-lib_patched').bitcoinjs;
 const bip39 = require('bip39');
+const mEntropy = require('more-entropy');
+var randomBytes = require('randombytes');
+
+const bip39_bitSize = 128; // = 12 words  // https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki#generating-the-mnemonic
+const bip39_byteSize = bip39_bitSize / 8;
 
 var mnemonic;
 var bip32RootKey;
 
-function initiateHDWallet(loadMnemonic, password) {
+var moreEntropyGen = new mEntropy.Generator({
+    'loop_delay':        2, // how many milliseconds to pause between each operation loop. A lower value will generate entropy faster, but will also be harder on the CPU
+    'work_min':           1 ,// milliseconds per loop; a higher value blocks the CPU more, so 1 is recommended
+    'auto_stop_bits':  8192, // the generator prepares entropy for you before you request it; if it reaches this much unclaimed entropy it will stop working
+    'max_bits_per_delta': 8, // a safety cap on how much entropy it can claim per value; 4 (default) is very conservative. a larger value will allow faster entropy generation
+});
+
+// cross-site scripting prevention: remove the generator from window, as it is not needed there.
+// https://github.com/keybase/more-entropy/blob/v0.0.4/lib/generator.js#L173
+if (typeof window !== "undefined" && window !== null) {
+    window.Generator = null;
+}
+
+function getEntropy(useImprovedEntropy, cb){
+    if(useImprovedEntropy){
+        // if(useImprovedEntropy){
+        improveEntropy(bip39_byteSize)
+            .then(function (improvedEntropy) {
+                cb(improvedEntropy);
+            });
+    }else{
+        cb(randomBytes(bip39_byteSize));
+    }
+}
+
+// takes randomBytes() and more-entropy and returns an XOR of both entropies
+async function improveEntropy(amountInBytes){
+
+    return new Promise(function (resolve, reject) {
+        // get an array of integers with at least the given amount of bits of combined entropy:
+        moreEntropyGen.generate(amountInBytes * 8, function (vals) {
+
+            // stuff entropy into a Uint8Array
+            var valsUint8 = new Uint8Array(vals);
+
+            // get randomBytes (uses crypto.getRandomValues)
+            var randBytes = randomBytes(amountInBytes);
+
+            // merge
+            var mergeArray = new Uint8Array(amountInBytes);
+            for (var i = 0; i < amountInBytes; i++) {
+                mergeArray[i] = randBytes[i] ^ valsUint8[i];
+            }
+
+            var mergedEntropy = Buffer.from(mergeArray);
+
+            resolve(mergedEntropy);
+        });
+
+    });
+}
+
+function initiateHDWallet(loadMnemonic, password, useImprovedEntropy, cb) {
+
+    function afterGettingMnemonic(mnemonic, password) {
+        var seed = bip39.mnemonicToSeed(mnemonic, password);
+        bip32RootKey = bitcoinjs.HDNode.fromSeedBuffer(seed);
+
+        cb(mnemonic);
+    }
 
     if (!loadMnemonic) {
-        // create a new mnemonic and return it
-        mnemonic = bip39.generateMnemonic();
+
+        getEntropy(useImprovedEntropy, function (entropy) {
+
+            // create a new mnemonic and return it
+            mnemonic = bip39.entropyToMnemonic(entropy);
+
+            afterGettingMnemonic(mnemonic, password);
+        });
+
+
     } else {
         // import a given mnemonic
         if (bip39.validateMnemonic(loadMnemonic)) {
             mnemonic = loadMnemonic;
+
+            afterGettingMnemonic(mnemonic, password);
         } else {
             throw ('given mnemonic [' + loadMnemonic + '] is not a valid 12 word mnemonic');
         }
     }
-
-    var seed = bip39.mnemonicToSeed(mnemonic, password);
-    bip32RootKey = bitcoinjs.HDNode.fromSeedBuffer(seed);
-
-    return mnemonic;
 }
 
 function createAccount(networkID, index) {

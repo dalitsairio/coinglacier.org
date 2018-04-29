@@ -199,7 +199,9 @@ function init() {
     password = currentPage.defaultPassword;
     showXPUB = currentPage.showXPUB;
 
-    loadWallet();
+    initiateWallet(function () {
+        loadWallet();
+    });
 
     // run unit tests
     var runAllTests = getURLparameter(GET.allUnitTests.keyword) == GET.allUnitTests.yes;
@@ -485,7 +487,9 @@ function toggleAddressNumbering() {
 
 function changePassword() {
     password = DOM.options.encryption.pass.val();
-    loadWallet(true);
+    initiateWallet(function () {
+        loadWallet();
+    });
 };
 
 
@@ -534,14 +538,14 @@ function recalculateWallet() {
     loadWallet();
 }
 
+function initiateWallet(cb){
+    initiateHDWallet('curve swear maze domain knock frozen ordinary climb love possible brave market', password, true, function (result) {
+        mnemonic = result;
+        cb();
+    });
+}
 
-mnemonic = initiateHDWallet('curve swear maze domain knock frozen ordinary climb love possible brave market', password);
-
-function loadWallet(newMnemonic) {
-
-    if(newMnemonic){
-        mnemonic = initiateHDWallet('curve swear maze domain knock frozen ordinary climb love possible brave market', password);
-    }
+function loadWallet() {
 
     if (isAccountsFormEmpty()) {
         initAccountsForm();

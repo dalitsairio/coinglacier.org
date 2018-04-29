@@ -65,19 +65,21 @@ initiateWorkerpool()
 // functions
 // //////////////////////////////////////////////////
 
-function initiateHDWallet(mnemonic, password) {
+function initiateHDWallet(loadMnemonic, password, useImprovedEntropy, cb) {
 
     // always reset the cache on new wallets
     cache = [];
-    mnemonic = bitcoin.initiateHDWallet(mnemonic, password);
 
-    return bitcoin.initiateHDWallet(mnemonic, password);
+    bitcoin.initiateHDWallet(mnemonic, password, useImprovedEntropy, function (result) {
+        mnemonic = result;
+        cb(mnemonic);
+    });
 }
 
 function createAccount (networkID, index, callback) {
 
     if(typeof mnemonic === 'undefined'){
-        throw 'run initiateHDWallet before calling createAccount()';
+        throw 'you must run initiateHDWallet before calling createAccount()';
     }
 
     index = index || 0;
@@ -92,7 +94,7 @@ function createAccount (networkID, index, callback) {
 function asyncCreateCredentials(networkID, accountIndex, addressIndex, password, callback){
 
     if(typeof mnemonic === 'undefined'){
-        throw 'run initiateHDWallet before calling asyncCreateCredentials()';
+        throw 'you must run initiateHDWallet before calling asyncCreateCredentials()';
     }
 
     createAccount (networkID, accountIndex, function () {

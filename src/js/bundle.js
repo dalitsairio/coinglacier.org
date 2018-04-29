@@ -72,7 +72,7 @@ Entity.prototype.encode = function encode(data, enc, /* internal */ reporter) {
   return this._getEncoder(enc).encode(data, reporter);
 };
 
-},{"../asn1":1,"inherits":203,"vm":271}],3:[function(require,module,exports){
+},{"../asn1":1,"inherits":207,"vm":277}],3:[function(require,module,exports){
 var inherits = require('inherits');
 var Reporter = require('../base').Reporter;
 var Buffer = require('buffer').Buffer;
@@ -190,7 +190,7 @@ EncoderBuffer.prototype.join = function join(out, offset) {
   return out;
 };
 
-},{"../base":4,"buffer":110,"inherits":203}],4:[function(require,module,exports){
+},{"../base":4,"buffer":110,"inherits":207}],4:[function(require,module,exports){
 var base = exports;
 
 base.Reporter = require('./reporter').Reporter;
@@ -834,7 +834,7 @@ Node.prototype._isPrintstr = function isPrintstr(str) {
   return /^[A-Za-z0-9 '\(\)\+,\-\.\/:=\?]*$/.test(str);
 };
 
-},{"../base":4,"minimalistic-assert":209}],6:[function(require,module,exports){
+},{"../base":4,"minimalistic-assert":213}],6:[function(require,module,exports){
 var inherits = require('inherits');
 
 function Reporter(options) {
@@ -957,7 +957,7 @@ ReporterError.prototype.rethrow = function rethrow(msg) {
   return this;
 };
 
-},{"inherits":203}],7:[function(require,module,exports){
+},{"inherits":207}],7:[function(require,module,exports){
 var constants = require('../constants');
 
 exports.tagClass = {
@@ -1348,7 +1348,7 @@ function derDecodeLen(buf, primitive, fail) {
   return len;
 }
 
-},{"../../asn1":1,"inherits":203}],10:[function(require,module,exports){
+},{"../../asn1":1,"inherits":207}],10:[function(require,module,exports){
 var decoders = exports;
 
 decoders.der = require('./der');
@@ -1405,7 +1405,7 @@ PEMDecoder.prototype.decode = function decode(data, options) {
   return DERDecoder.prototype.decode.call(this, input, options);
 };
 
-},{"./der":9,"buffer":110,"inherits":203}],12:[function(require,module,exports){
+},{"./der":9,"buffer":110,"inherits":207}],12:[function(require,module,exports){
 var inherits = require('inherits');
 var Buffer = require('buffer').Buffer;
 
@@ -1702,7 +1702,7 @@ function encodeTag(tag, primitive, cls, reporter) {
   return res;
 }
 
-},{"../../asn1":1,"buffer":110,"inherits":203}],13:[function(require,module,exports){
+},{"../../asn1":1,"buffer":110,"inherits":207}],13:[function(require,module,exports){
 var encoders = exports;
 
 encoders.der = require('./der');
@@ -1731,7 +1731,7 @@ PEMEncoder.prototype.encode = function encode(data, options) {
   return out.join('\n');
 };
 
-},{"./der":12,"inherits":203}],15:[function(require,module,exports){
+},{"./der":12,"inherits":207}],15:[function(require,module,exports){
 (function (global){
 'use strict';
 
@@ -2226,7 +2226,7 @@ var objectKeys = Object.keys || function (obj) {
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{"util/":269}],16:[function(require,module,exports){
+},{"util/":275}],16:[function(require,module,exports){
 /*!
  * assertion-error
  * Copyright(c) 2013 Jake Luer <jake@qualiancy.com>
@@ -2438,7 +2438,7 @@ module.exports = function base (ALPHABET) {
   }
 }
 
-},{"safe-buffer":248}],18:[function(require,module,exports){
+},{"safe-buffer":254}],18:[function(require,module,exports){
 'use strict'
 
 exports.byteLength = byteLength
@@ -4721,7 +4721,7 @@ module.exports = {
   verify: verify
 }
 
-},{"assert":15,"bigi":22,"browserify-aes":79,"bs58check":107,"buffer-xor/inplace":109,"create-hash":147,"ecurve":166,"safe-buffer":248,"scryptsy":249}],25:[function(require,module,exports){
+},{"assert":15,"bigi":22,"browserify-aes":79,"bs58check":107,"buffer-xor/inplace":109,"create-hash":147,"ecurve":166,"safe-buffer":254,"scryptsy":255}],25:[function(require,module,exports){
 var Buffer = require('safe-buffer').Buffer
 var createHash = require('create-hash')
 var pbkdf2 = require('pbkdf2').pbkdf2Sync
@@ -4876,7 +4876,7 @@ module.exports = {
   }
 }
 
-},{"./wordlists/chinese_simplified.json":26,"./wordlists/chinese_traditional.json":27,"./wordlists/english.json":28,"./wordlists/french.json":29,"./wordlists/italian.json":30,"./wordlists/japanese.json":31,"./wordlists/korean.json":32,"./wordlists/spanish.json":33,"create-hash":147,"pbkdf2":217,"randombytes":231,"safe-buffer":248,"unorm":265}],26:[function(require,module,exports){
+},{"./wordlists/chinese_simplified.json":26,"./wordlists/chinese_traditional.json":27,"./wordlists/english.json":28,"./wordlists/french.json":29,"./wordlists/italian.json":30,"./wordlists/japanese.json":31,"./wordlists/korean.json":32,"./wordlists/spanish.json":33,"create-hash":147,"pbkdf2":223,"randombytes":237,"safe-buffer":254,"unorm":271}],26:[function(require,module,exports){
 module.exports=[
   "的",
   "一",
@@ -21407,7 +21407,7 @@ module.exports = {
   encode: encode
 }
 
-},{"safe-buffer":248}],35:[function(require,module,exports){
+},{"safe-buffer":254}],35:[function(require,module,exports){
 module.exports={
   "OP_FALSE": 0,
   "OP_0": 0,
@@ -21652,7 +21652,7 @@ module.exports = {
   toOutputScript: toOutputScript
 }
 
-},{"./networks":46,"./script":47,"./templates":49,"./types":73,"bech32":19,"bs58check":107,"safe-buffer":248,"typeforce":263}],38:[function(require,module,exports){
+},{"./networks":46,"./script":47,"./templates":49,"./types":73,"bech32":19,"bs58check":107,"safe-buffer":254,"typeforce":269}],38:[function(require,module,exports){
 var Buffer = require('safe-buffer').Buffer
 var bcrypto = require('./crypto')
 var fastMerkleRoot = require('merkle-lib/fastRoot')
@@ -21831,7 +21831,7 @@ Block.prototype.checkProofOfWork = function () {
 
 module.exports = Block
 
-},{"./crypto":40,"./transaction":71,"./types":73,"merkle-lib/fastRoot":207,"safe-buffer":248,"typeforce":263,"varuint-bitcoin":270}],39:[function(require,module,exports){
+},{"./crypto":40,"./transaction":71,"./types":73,"merkle-lib/fastRoot":211,"safe-buffer":254,"typeforce":269,"varuint-bitcoin":276}],39:[function(require,module,exports){
 var pushdata = require('pushdata-bitcoin')
 var varuint = require('varuint-bitcoin')
 
@@ -21889,7 +21889,7 @@ module.exports = {
   writeVarInt: writeVarInt
 }
 
-},{"pushdata-bitcoin":230,"varuint-bitcoin":270}],40:[function(require,module,exports){
+},{"pushdata-bitcoin":236,"varuint-bitcoin":276}],40:[function(require,module,exports){
 var createHash = require('create-hash')
 
 function ripemd160 (buffer) {
@@ -22083,7 +22083,7 @@ module.exports = {
   __curve: secp256k1
 }
 
-},{"./ecsignature":43,"./types":73,"bigi":22,"create-hmac":150,"ecurve":166,"safe-buffer":248,"typeforce":263}],42:[function(require,module,exports){
+},{"./ecsignature":43,"./types":73,"bigi":22,"create-hmac":150,"ecurve":166,"safe-buffer":254,"typeforce":269}],42:[function(require,module,exports){
 var baddress = require('./address')
 var bcrypto = require('./crypto')
 var ecdsa = require('./ecdsa')
@@ -22216,7 +22216,7 @@ ECPair.prototype.verify = function (hash, signature) {
 
 module.exports = ECPair
 
-},{"./address":37,"./crypto":40,"./ecdsa":41,"./networks":46,"./types":73,"bigi":22,"ecurve":166,"randombytes":231,"typeforce":263,"wif":272}],43:[function(require,module,exports){
+},{"./address":37,"./crypto":40,"./ecdsa":41,"./networks":46,"./types":73,"bigi":22,"ecurve":166,"randombytes":237,"typeforce":269,"wif":278}],43:[function(require,module,exports){
 (function (Buffer){
 var bip66 = require('bip66')
 var typeforce = require('typeforce')
@@ -22318,7 +22318,7 @@ module.exports = ECSignature
 
 }).call(this,require("buffer").Buffer)
 
-},{"./types":73,"bigi":22,"bip66":34,"buffer":110,"typeforce":263}],44:[function(require,module,exports){
+},{"./types":73,"bigi":22,"bip66":34,"buffer":110,"typeforce":269}],44:[function(require,module,exports){
 var Buffer = require('safe-buffer').Buffer
 var base58check = require('bs58check')
 var bcrypto = require('./crypto')
@@ -22636,7 +22636,7 @@ HDNode.prototype.derivePath = function (path) {
 
 module.exports = HDNode
 
-},{"./crypto":40,"./ecpair":42,"./networks":46,"./types":73,"bigi":22,"bs58check":107,"create-hmac":150,"ecurve":166,"safe-buffer":248,"typeforce":263}],45:[function(require,module,exports){
+},{"./crypto":40,"./ecpair":42,"./networks":46,"./types":73,"bigi":22,"bs58check":107,"create-hmac":150,"ecurve":166,"safe-buffer":254,"typeforce":269}],45:[function(require,module,exports){
 var script = require('./script')
 
 var templates = require('./templates')
@@ -22916,7 +22916,7 @@ module.exports = {
   isDefinedHashType: isDefinedHashType
 }
 
-},{"./script_number":48,"./types":73,"bip66":34,"bitcoin-ops":35,"bitcoin-ops/map":36,"pushdata-bitcoin":230,"safe-buffer":248,"typeforce":263}],48:[function(require,module,exports){
+},{"./script_number":48,"./types":73,"bip66":34,"bitcoin-ops":35,"bitcoin-ops/map":36,"pushdata-bitcoin":236,"safe-buffer":254,"typeforce":269}],48:[function(require,module,exports){
 var Buffer = require('safe-buffer').Buffer
 
 function decode (buffer, maxLength, minimal) {
@@ -22986,7 +22986,7 @@ module.exports = {
   encode: encode
 }
 
-},{"safe-buffer":248}],49:[function(require,module,exports){
+},{"safe-buffer":254}],49:[function(require,module,exports){
 var decompile = require('../script').decompile
 var multisig = require('./multisig')
 var nullData = require('./nulldata')
@@ -23142,7 +23142,7 @@ module.exports = {
   encodeStack: encodeStack
 }
 
-},{"../../script":47,"./output":52,"bitcoin-ops":35,"safe-buffer":248,"typeforce":263}],52:[function(require,module,exports){
+},{"../../script":47,"./output":52,"bitcoin-ops":35,"safe-buffer":254,"typeforce":269}],52:[function(require,module,exports){
 // m [pubKeys ...] n OP_CHECKMULTISIG
 
 var bscript = require('../../script')
@@ -23208,7 +23208,7 @@ module.exports = {
   encode: encode
 }
 
-},{"../../script":47,"../../types":73,"bitcoin-ops":35,"typeforce":263}],53:[function(require,module,exports){
+},{"../../script":47,"../../types":73,"bitcoin-ops":35,"typeforce":269}],53:[function(require,module,exports){
 // OP_RETURN {data}
 
 var bscript = require('../script')
@@ -23244,7 +23244,7 @@ module.exports = {
   }
 }
 
-},{"../script":47,"../types":73,"bitcoin-ops":35,"typeforce":263}],54:[function(require,module,exports){
+},{"../script":47,"../types":73,"bitcoin-ops":35,"typeforce":269}],54:[function(require,module,exports){
 arguments[4][50][0].apply(exports,arguments)
 },{"./input":55,"./output":56,"dup":50}],55:[function(require,module,exports){
 // {signature}
@@ -23288,7 +23288,7 @@ module.exports = {
   encodeStack: encodeStack
 }
 
-},{"../../script":47,"typeforce":263}],56:[function(require,module,exports){
+},{"../../script":47,"typeforce":269}],56:[function(require,module,exports){
 // {pubKey} OP_CHECKSIG
 
 var bscript = require('../../script')
@@ -23323,7 +23323,7 @@ module.exports = {
   encode: encode
 }
 
-},{"../../script":47,"bitcoin-ops":35,"typeforce":263}],57:[function(require,module,exports){
+},{"../../script":47,"bitcoin-ops":35,"typeforce":269}],57:[function(require,module,exports){
 arguments[4][50][0].apply(exports,arguments)
 },{"./input":58,"./output":59,"dup":50}],58:[function(require,module,exports){
 // {signature} {pubKey}
@@ -23379,7 +23379,7 @@ module.exports = {
   encodeStack: encodeStack
 }
 
-},{"../../script":47,"typeforce":263}],59:[function(require,module,exports){
+},{"../../script":47,"typeforce":269}],59:[function(require,module,exports){
 // OP_DUP OP_HASH160 {pubKeyHash} OP_EQUALVERIFY OP_CHECKSIG
 
 var bscript = require('../../script')
@@ -23423,7 +23423,7 @@ module.exports = {
   encode: encode
 }
 
-},{"../../script":47,"../../types":73,"bitcoin-ops":35,"typeforce":263}],60:[function(require,module,exports){
+},{"../../script":47,"../../types":73,"bitcoin-ops":35,"typeforce":269}],60:[function(require,module,exports){
 arguments[4][50][0].apply(exports,arguments)
 },{"./input":61,"./output":62,"dup":50}],61:[function(require,module,exports){
 // <scriptSig> {serialized scriptPubKey script}
@@ -23512,7 +23512,7 @@ module.exports = {
   encodeStack: encodeStack
 }
 
-},{"../../script":47,"../multisig/":50,"../pubkey/":54,"../pubkeyhash/":57,"../witnesspubkeyhash/output":67,"../witnessscripthash/output":70,"safe-buffer":248,"typeforce":263}],62:[function(require,module,exports){
+},{"../../script":47,"../multisig/":50,"../pubkey/":54,"../pubkeyhash/":57,"../witnesspubkeyhash/output":67,"../witnessscripthash/output":70,"safe-buffer":254,"typeforce":269}],62:[function(require,module,exports){
 // OP_HASH160 {scriptHash} OP_EQUAL
 
 var bscript = require('../../script')
@@ -23548,7 +23548,7 @@ module.exports = {
   encode: encode
 }
 
-},{"../../script":47,"../../types":73,"bitcoin-ops":35,"typeforce":263}],63:[function(require,module,exports){
+},{"../../script":47,"../../types":73,"bitcoin-ops":35,"typeforce":269}],63:[function(require,module,exports){
 module.exports = {
   output: require('./output')
 }
@@ -23597,7 +23597,7 @@ module.exports = {
   encode: encode
 }
 
-},{"../../script":47,"../../types":73,"bitcoin-ops":35,"safe-buffer":248,"typeforce":263}],65:[function(require,module,exports){
+},{"../../script":47,"../../types":73,"bitcoin-ops":35,"safe-buffer":254,"typeforce":269}],65:[function(require,module,exports){
 arguments[4][50][0].apply(exports,arguments)
 },{"./input":66,"./output":67,"dup":50}],66:[function(require,module,exports){
 // {signature} {pubKey}
@@ -23646,7 +23646,7 @@ module.exports = {
   encodeStack: encodeStack
 }
 
-},{"../../script":47,"typeforce":263}],67:[function(require,module,exports){
+},{"../../script":47,"typeforce":269}],67:[function(require,module,exports){
 // OP_0 {pubKeyHash}
 
 var bscript = require('../../script')
@@ -23681,7 +23681,7 @@ module.exports = {
   encode: encode
 }
 
-},{"../../script":47,"../../types":73,"bitcoin-ops":35,"typeforce":263}],68:[function(require,module,exports){
+},{"../../script":47,"../../types":73,"bitcoin-ops":35,"typeforce":269}],68:[function(require,module,exports){
 arguments[4][50][0].apply(exports,arguments)
 },{"./input":69,"./output":70,"dup":50}],69:[function(require,module,exports){
 (function (Buffer){
@@ -23752,7 +23752,7 @@ module.exports = {
 
 }).call(this,{"isBuffer":require("../../../../is-buffer/index.js")})
 
-},{"../../../../is-buffer/index.js":204,"../../script":47,"../../types":73,"../multisig/":50,"../pubkey/":54,"../pubkeyhash/":57,"typeforce":263}],70:[function(require,module,exports){
+},{"../../../../is-buffer/index.js":208,"../../script":47,"../../types":73,"../multisig/":50,"../pubkey/":54,"../pubkeyhash/":57,"typeforce":269}],70:[function(require,module,exports){
 // OP_0 {scriptHash}
 
 var bscript = require('../../script')
@@ -23787,7 +23787,7 @@ module.exports = {
   encode: encode
 }
 
-},{"../../script":47,"../../types":73,"bitcoin-ops":35,"typeforce":263}],71:[function(require,module,exports){
+},{"../../script":47,"../../types":73,"bitcoin-ops":35,"typeforce":269}],71:[function(require,module,exports){
 var Buffer = require('safe-buffer').Buffer
 var bcrypto = require('./crypto')
 var bscript = require('./script')
@@ -24281,7 +24281,7 @@ Transaction.prototype.setWitness = function (index, witness) {
 
 module.exports = Transaction
 
-},{"./bufferutils":39,"./crypto":40,"./script":47,"./types":73,"bitcoin-ops":35,"safe-buffer":248,"typeforce":263,"varuint-bitcoin":270}],72:[function(require,module,exports){
+},{"./bufferutils":39,"./crypto":40,"./script":47,"./types":73,"bitcoin-ops":35,"safe-buffer":254,"typeforce":269,"varuint-bitcoin":276}],72:[function(require,module,exports){
 var Buffer = require('safe-buffer').Buffer
 var baddress = require('./address')
 var bcrypto = require('./crypto')
@@ -25060,7 +25060,7 @@ TransactionBuilder.prototype.__overMaximumFees = function (bytes) {
 
 module.exports = TransactionBuilder
 
-},{"./address":37,"./crypto":40,"./ecpair":42,"./ecsignature":43,"./networks":46,"./script":47,"./templates":49,"./transaction":71,"./types":73,"bitcoin-ops":35,"safe-buffer":248,"typeforce":263}],73:[function(require,module,exports){
+},{"./address":37,"./crypto":40,"./ecpair":42,"./ecsignature":43,"./networks":46,"./script":47,"./templates":49,"./transaction":71,"./types":73,"bitcoin-ops":35,"safe-buffer":254,"typeforce":269}],73:[function(require,module,exports){
 var typeforce = require('typeforce')
 
 var UINT31_MAX = Math.pow(2, 31) - 1
@@ -25115,7 +25115,7 @@ for (var typeName in typeforce) {
 
 module.exports = types
 
-},{"typeforce":263}],74:[function(require,module,exports){
+},{"typeforce":269}],74:[function(require,module,exports){
 (function (module, exports) {
   'use strict';
 
@@ -28843,7 +28843,7 @@ AES.prototype.scrub = function () {
 
 module.exports.AES = AES
 
-},{"safe-buffer":248}],78:[function(require,module,exports){
+},{"safe-buffer":254}],78:[function(require,module,exports){
 var aes = require('./aes')
 var Buffer = require('safe-buffer').Buffer
 var Transform = require('cipher-base')
@@ -28962,7 +28962,7 @@ StreamCipher.prototype.setAAD = function setAAD (buf) {
 
 module.exports = StreamCipher
 
-},{"./aes":77,"./ghash":82,"./incr32":83,"buffer-xor":108,"cipher-base":144,"inherits":203,"safe-buffer":248}],79:[function(require,module,exports){
+},{"./aes":77,"./ghash":82,"./incr32":83,"buffer-xor":108,"cipher-base":144,"inherits":207,"safe-buffer":254}],79:[function(require,module,exports){
 var ciphers = require('./encrypter')
 var deciphers = require('./decrypter')
 var modes = require('./modes/list.json')
@@ -29100,7 +29100,7 @@ function createDecipher (suite, password) {
 exports.createDecipher = createDecipher
 exports.createDecipheriv = createDecipheriv
 
-},{"./aes":77,"./authCipher":78,"./modes":90,"./streamCipher":93,"cipher-base":144,"evp_bytestokey":186,"inherits":203,"safe-buffer":248}],81:[function(require,module,exports){
+},{"./aes":77,"./authCipher":78,"./modes":90,"./streamCipher":93,"cipher-base":144,"evp_bytestokey":186,"inherits":207,"safe-buffer":254}],81:[function(require,module,exports){
 var MODES = require('./modes')
 var AuthCipher = require('./authCipher')
 var Buffer = require('safe-buffer').Buffer
@@ -29216,7 +29216,7 @@ function createCipher (suite, password) {
 exports.createCipheriv = createCipheriv
 exports.createCipher = createCipher
 
-},{"./aes":77,"./authCipher":78,"./modes":90,"./streamCipher":93,"cipher-base":144,"evp_bytestokey":186,"inherits":203,"safe-buffer":248}],82:[function(require,module,exports){
+},{"./aes":77,"./authCipher":78,"./modes":90,"./streamCipher":93,"cipher-base":144,"evp_bytestokey":186,"inherits":207,"safe-buffer":254}],82:[function(require,module,exports){
 var Buffer = require('safe-buffer').Buffer
 var ZEROES = Buffer.alloc(16, 0)
 
@@ -29307,7 +29307,7 @@ GHASH.prototype.final = function (abl, bl) {
 
 module.exports = GHASH
 
-},{"safe-buffer":248}],83:[function(require,module,exports){
+},{"safe-buffer":254}],83:[function(require,module,exports){
 function incr32 (iv) {
   var len = iv.length
   var item
@@ -29378,7 +29378,7 @@ exports.encrypt = function (self, data, decrypt) {
   return out
 }
 
-},{"buffer-xor":108,"safe-buffer":248}],86:[function(require,module,exports){
+},{"buffer-xor":108,"safe-buffer":254}],86:[function(require,module,exports){
 var Buffer = require('safe-buffer').Buffer
 
 function encryptByte (self, byteParam, decrypt) {
@@ -29422,7 +29422,7 @@ exports.encrypt = function (self, chunk, decrypt) {
   return out
 }
 
-},{"safe-buffer":248}],87:[function(require,module,exports){
+},{"safe-buffer":254}],87:[function(require,module,exports){
 var Buffer = require('safe-buffer').Buffer
 
 function encryptByte (self, byteParam, decrypt) {
@@ -29449,7 +29449,7 @@ exports.encrypt = function (self, chunk, decrypt) {
   return out
 }
 
-},{"safe-buffer":248}],88:[function(require,module,exports){
+},{"safe-buffer":254}],88:[function(require,module,exports){
 var xor = require('buffer-xor')
 var Buffer = require('safe-buffer').Buffer
 var incr32 = require('../incr32')
@@ -29481,7 +29481,7 @@ exports.encrypt = function (self, chunk) {
   return xor(chunk, pad)
 }
 
-},{"../incr32":83,"buffer-xor":108,"safe-buffer":248}],89:[function(require,module,exports){
+},{"../incr32":83,"buffer-xor":108,"safe-buffer":254}],89:[function(require,module,exports){
 exports.encrypt = function (self, block) {
   return self._cipher.encryptBlock(block)
 }
@@ -29753,7 +29753,7 @@ StreamCipher.prototype._final = function () {
 
 module.exports = StreamCipher
 
-},{"./aes":77,"cipher-base":144,"inherits":203,"safe-buffer":248}],94:[function(require,module,exports){
+},{"./aes":77,"cipher-base":144,"inherits":207,"safe-buffer":254}],94:[function(require,module,exports){
 var DES = require('browserify-des')
 var aes = require('browserify-aes/browser')
 var aesModes = require('browserify-aes/modes')
@@ -29870,7 +29870,7 @@ DES.prototype._final = function () {
 
 }).call(this,require("buffer").Buffer)
 
-},{"buffer":110,"cipher-base":144,"des.js":154,"inherits":203}],96:[function(require,module,exports){
+},{"buffer":110,"cipher-base":144,"des.js":154,"inherits":207}],96:[function(require,module,exports){
 exports['des-ecb'] = {
   key: 8,
   iv: 0
@@ -29941,7 +29941,7 @@ function getr(priv) {
 
 }).call(this,require("buffer").Buffer)
 
-},{"bn.js":74,"buffer":110,"randombytes":231}],98:[function(require,module,exports){
+},{"bn.js":74,"buffer":110,"randombytes":237}],98:[function(require,module,exports){
 module.exports = require('./browser/algorithms.json')
 
 },{"./browser/algorithms.json":99}],99:[function(require,module,exports){
@@ -30204,7 +30204,7 @@ module.exports = {
 
 }).call(this,require("buffer").Buffer)
 
-},{"./algorithms.json":99,"./sign":102,"./verify":103,"buffer":110,"create-hash":147,"inherits":203,"stream":258}],102:[function(require,module,exports){
+},{"./algorithms.json":99,"./sign":102,"./verify":103,"buffer":110,"create-hash":147,"inherits":207,"stream":264}],102:[function(require,module,exports){
 (function (Buffer){
 // much of this based on https://github.com/indutny/self-signed/blob/gh-pages/lib/rsa.js
 var createHmac = require('create-hmac')
@@ -30354,7 +30354,7 @@ module.exports.makeKey = makeKey
 
 }).call(this,require("buffer").Buffer)
 
-},{"./curves.json":100,"bn.js":74,"browserify-rsa":97,"buffer":110,"create-hmac":150,"elliptic":169,"parse-asn1":215}],103:[function(require,module,exports){
+},{"./curves.json":100,"bn.js":74,"browserify-rsa":97,"buffer":110,"create-hmac":150,"elliptic":169,"parse-asn1":221}],103:[function(require,module,exports){
 (function (Buffer){
 // much of this based on https://github.com/indutny/self-signed/blob/gh-pages/lib/rsa.js
 var BN = require('bn.js')
@@ -30442,7 +30442,7 @@ module.exports = verify
 
 }).call(this,require("buffer").Buffer)
 
-},{"./curves.json":100,"bn.js":74,"buffer":110,"elliptic":169,"parse-asn1":215}],104:[function(require,module,exports){
+},{"./curves.json":100,"bn.js":74,"buffer":110,"elliptic":169,"parse-asn1":221}],104:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -30739,7 +30739,7 @@ function simpleWrite(buf) {
 function simpleEnd(buf) {
   return buf && buf.length ? this.write(buf) : '';
 }
-},{"safe-buffer":248}],105:[function(require,module,exports){
+},{"safe-buffer":254}],105:[function(require,module,exports){
 var basex = require('base-x')
 var ALPHABET = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
 
@@ -30797,7 +30797,7 @@ module.exports = function (checksumFn) {
   }
 }
 
-},{"bs58":105,"safe-buffer":248}],107:[function(require,module,exports){
+},{"bs58":105,"safe-buffer":254}],107:[function(require,module,exports){
 'use strict'
 
 var createHash = require('create-hash')
@@ -32575,7 +32575,7 @@ function numberIsNaN (obj) {
   return obj !== obj // eslint-disable-line no-self-compare
 }
 
-},{"base64-js":18,"ieee754":202}],111:[function(require,module,exports){
+},{"base64-js":18,"ieee754":206}],111:[function(require,module,exports){
 module.exports = require('./lib/chai');
 
 },{"./lib/chai":112}],112:[function(require,module,exports){
@@ -40456,7 +40456,7 @@ module.exports = function expectTypes(obj, types) {
   }
 };
 
-},{"./flag":125,"assertion-error":16,"type-detect":260}],125:[function(require,module,exports){
+},{"./flag":125,"assertion-error":16,"type-detect":266}],125:[function(require,module,exports){
 /*!
  * Chai - flag utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -40866,7 +40866,7 @@ exports.isProxyEnabled = require('./isProxyEnabled');
 
 exports.isNaN = require('./isNaN');
 
-},{"./addChainableMethod":119,"./addLengthGuard":120,"./addMethod":121,"./addProperty":122,"./compareByInspect":123,"./expectTypes":124,"./flag":125,"./getActual":126,"./getMessage":128,"./getOwnEnumerableProperties":129,"./getOwnEnumerablePropertySymbols":130,"./inspect":133,"./isNaN":134,"./isProxyEnabled":135,"./objDisplay":136,"./overwriteChainableMethod":137,"./overwriteMethod":138,"./overwriteProperty":139,"./proxify":140,"./test":141,"./transferFlags":142,"check-error":143,"deep-eql":153,"get-func-name":187,"pathval":216,"type-detect":260}],133:[function(require,module,exports){
+},{"./addChainableMethod":119,"./addLengthGuard":120,"./addMethod":121,"./addProperty":122,"./compareByInspect":123,"./expectTypes":124,"./flag":125,"./getActual":126,"./getMessage":128,"./getOwnEnumerableProperties":129,"./getOwnEnumerablePropertySymbols":130,"./inspect":133,"./isNaN":134,"./isProxyEnabled":135,"./objDisplay":136,"./overwriteChainableMethod":137,"./overwriteMethod":138,"./overwriteProperty":139,"./proxify":140,"./test":141,"./transferFlags":142,"check-error":143,"deep-eql":153,"get-func-name":187,"pathval":222,"type-detect":266}],133:[function(require,module,exports){
 // This is (almost) directly from Node.js utils
 // https://github.com/joyent/node/blob/f8c335d0caf47f16d31413f89aa28eda3878e3aa/lib/util.js
 
@@ -42095,7 +42095,7 @@ CipherBase.prototype._toString = function (value, enc, fin) {
 
 module.exports = CipherBase
 
-},{"inherits":203,"safe-buffer":248,"stream":258,"string_decoder":104}],145:[function(require,module,exports){
+},{"inherits":207,"safe-buffer":254,"stream":264,"string_decoder":104}],145:[function(require,module,exports){
 (function (Buffer){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -42207,7 +42207,7 @@ function objectToString(o) {
 
 }).call(this,{"isBuffer":require("../../is-buffer/index.js")})
 
-},{"../../is-buffer/index.js":204}],146:[function(require,module,exports){
+},{"../../is-buffer/index.js":208}],146:[function(require,module,exports){
 (function (Buffer){
 var elliptic = require('elliptic');
 var BN = require('bn.js');
@@ -42391,7 +42391,7 @@ module.exports = function createHash (alg) {
 
 }).call(this,require("buffer").Buffer)
 
-},{"./md5":149,"buffer":110,"cipher-base":144,"inherits":203,"ripemd160":247,"sha.js":251}],148:[function(require,module,exports){
+},{"./md5":149,"buffer":110,"cipher-base":144,"inherits":207,"ripemd160":253,"sha.js":257}],148:[function(require,module,exports){
 (function (Buffer){
 'use strict'
 var intSize = 4
@@ -42643,7 +42643,7 @@ module.exports = function createHmac (alg, key) {
   return new Hmac(alg, key)
 }
 
-},{"./legacy":151,"cipher-base":144,"create-hash/md5":149,"inherits":203,"ripemd160":247,"safe-buffer":248,"sha.js":251}],151:[function(require,module,exports){
+},{"./legacy":151,"cipher-base":144,"create-hash/md5":149,"inherits":207,"ripemd160":253,"safe-buffer":254,"sha.js":257}],151:[function(require,module,exports){
 'use strict'
 var inherits = require('inherits')
 var Buffer = require('safe-buffer').Buffer
@@ -42691,7 +42691,7 @@ Hmac.prototype._final = function () {
 }
 module.exports = Hmac
 
-},{"cipher-base":144,"inherits":203,"safe-buffer":248}],152:[function(require,module,exports){
+},{"cipher-base":144,"inherits":207,"safe-buffer":254}],152:[function(require,module,exports){
 'use strict'
 
 exports.randomBytes = exports.rng = exports.pseudoRandomBytes = exports.prng = require('randombytes')
@@ -42790,7 +42790,7 @@ exports.constants = {
   'POINT_CONVERSION_HYBRID': 6
 }
 
-},{"browserify-cipher":94,"browserify-sign":101,"browserify-sign/algos":98,"create-ecdh":146,"create-hash":147,"create-hmac":150,"diffie-hellman":160,"pbkdf2":217,"public-encrypt":224,"randombytes":231,"randomfill":232}],153:[function(require,module,exports){
+},{"browserify-cipher":94,"browserify-sign":101,"browserify-sign/algos":98,"create-ecdh":146,"create-hash":147,"create-hmac":150,"diffie-hellman":160,"pbkdf2":223,"public-encrypt":230,"randombytes":237,"randomfill":238}],153:[function(require,module,exports){
 'use strict';
 /* globals Symbol: false, Uint8Array: false, WeakMap: false */
 /*!
@@ -43247,7 +43247,7 @@ function isPrimitive(value) {
   return value === null || typeof value !== 'object';
 }
 
-},{"type-detect":260}],154:[function(require,module,exports){
+},{"type-detect":266}],154:[function(require,module,exports){
 'use strict';
 
 exports.utils = require('./des/utils');
@@ -43323,7 +43323,7 @@ proto._update = function _update(inp, inOff, out, outOff) {
   }
 };
 
-},{"inherits":203,"minimalistic-assert":209}],156:[function(require,module,exports){
+},{"inherits":207,"minimalistic-assert":213}],156:[function(require,module,exports){
 'use strict';
 
 var assert = require('minimalistic-assert');
@@ -43466,7 +43466,7 @@ Cipher.prototype._finalDecrypt = function _finalDecrypt() {
   return this._unpad(out);
 };
 
-},{"minimalistic-assert":209}],157:[function(require,module,exports){
+},{"minimalistic-assert":213}],157:[function(require,module,exports){
 'use strict';
 
 var assert = require('minimalistic-assert');
@@ -43611,7 +43611,7 @@ DES.prototype._decrypt = function _decrypt(state, lStart, rStart, out, off) {
   utils.rip(l, r, out, off);
 };
 
-},{"../des":154,"inherits":203,"minimalistic-assert":209}],158:[function(require,module,exports){
+},{"../des":154,"inherits":207,"minimalistic-assert":213}],158:[function(require,module,exports){
 'use strict';
 
 var assert = require('minimalistic-assert');
@@ -43668,7 +43668,7 @@ EDE.prototype._update = function _update(inp, inOff, out, outOff) {
 EDE.prototype._pad = DES.prototype._pad;
 EDE.prototype._unpad = DES.prototype._unpad;
 
-},{"../des":154,"inherits":203,"minimalistic-assert":209}],159:[function(require,module,exports){
+},{"../des":154,"inherits":207,"minimalistic-assert":213}],159:[function(require,module,exports){
 'use strict';
 
 exports.readUInt32BE = function readUInt32BE(bytes, off) {
@@ -44142,7 +44142,7 @@ function formatReturnValue(bn, enc) {
 
 }).call(this,require("buffer").Buffer)
 
-},{"./generatePrime":162,"bn.js":74,"buffer":110,"miller-rabin":208,"randombytes":231}],162:[function(require,module,exports){
+},{"./generatePrime":162,"bn.js":74,"buffer":110,"miller-rabin":212,"randombytes":237}],162:[function(require,module,exports){
 var randomBytes = require('randombytes');
 module.exports = findPrime;
 findPrime.simpleSieve = simpleSieve;
@@ -44249,7 +44249,7 @@ function findPrime(bits, gen) {
 
 }
 
-},{"bn.js":74,"miller-rabin":208,"randombytes":231}],163:[function(require,module,exports){
+},{"bn.js":74,"miller-rabin":212,"randombytes":237}],163:[function(require,module,exports){
 module.exports={
     "modp1": {
         "gen": "02",
@@ -44711,7 +44711,7 @@ Point.prototype.toString = function () {
 
 module.exports = Point
 
-},{"assert":15,"bigi":22,"safe-buffer":248}],169:[function(require,module,exports){
+},{"assert":15,"bigi":22,"safe-buffer":254}],169:[function(require,module,exports){
 'use strict';
 
 var elliptic = exports;
@@ -45538,7 +45538,7 @@ Point.prototype.eqXToP = function eqXToP(x) {
 Point.prototype.toP = Point.prototype.normalize;
 Point.prototype.mixedAdd = Point.prototype.add;
 
-},{"../../elliptic":169,"../curve":172,"bn.js":74,"inherits":203}],172:[function(require,module,exports){
+},{"../../elliptic":169,"../curve":172,"bn.js":74,"inherits":207}],172:[function(require,module,exports){
 'use strict';
 
 var curve = exports;
@@ -45730,7 +45730,7 @@ Point.prototype.getX = function getX() {
   return this.x.fromRed();
 };
 
-},{"../../elliptic":169,"../curve":172,"bn.js":74,"inherits":203}],174:[function(require,module,exports){
+},{"../../elliptic":169,"../curve":172,"bn.js":74,"inherits":207}],174:[function(require,module,exports){
 'use strict';
 
 var curve = require('../curve');
@@ -46670,7 +46670,7 @@ JPoint.prototype.isInfinity = function isInfinity() {
   return this.z.cmpn(0) === 0;
 };
 
-},{"../../elliptic":169,"../curve":172,"bn.js":74,"inherits":203}],175:[function(require,module,exports){
+},{"../../elliptic":169,"../curve":172,"bn.js":74,"inherits":207}],175:[function(require,module,exports){
 'use strict';
 
 var curves = exports;
@@ -48567,7 +48567,7 @@ function intFromLE(bytes) {
 utils.intFromLE = intFromLE;
 
 
-},{"bn.js":74,"minimalistic-assert":209,"minimalistic-crypto-utils":210}],184:[function(require,module,exports){
+},{"bn.js":74,"minimalistic-assert":213,"minimalistic-crypto-utils":214}],184:[function(require,module,exports){
 module.exports={
   "_args": [
     [
@@ -49251,7 +49251,7 @@ function EVP_BytesToKey (password, salt, keyBits, ivLen) {
 
 module.exports = EVP_BytesToKey
 
-},{"md5.js":205,"safe-buffer":248}],187:[function(require,module,exports){
+},{"md5.js":209,"safe-buffer":254}],187:[function(require,module,exports){
 'use strict';
 
 /* !
@@ -49385,7 +49385,7 @@ module.exports = HashBase
 
 }).call(this,require("buffer").Buffer)
 
-},{"buffer":110,"inherits":203,"stream":258}],189:[function(require,module,exports){
+},{"buffer":110,"inherits":207,"stream":264}],189:[function(require,module,exports){
 var hash = exports;
 
 hash.utils = require('./hash/utils');
@@ -49496,7 +49496,7 @@ BlockHash.prototype._pad = function pad() {
   return res;
 };
 
-},{"./utils":200,"minimalistic-assert":209}],191:[function(require,module,exports){
+},{"./utils":200,"minimalistic-assert":213}],191:[function(require,module,exports){
 'use strict';
 
 var utils = require('./utils');
@@ -49545,7 +49545,7 @@ Hmac.prototype.digest = function digest(enc) {
   return this.outer.digest(enc);
 };
 
-},{"./utils":200,"minimalistic-assert":209}],192:[function(require,module,exports){
+},{"./utils":200,"minimalistic-assert":213}],192:[function(require,module,exports){
 'use strict';
 
 var utils = require('./utils');
@@ -49917,7 +49917,7 @@ SHA256.prototype._digest = function digest(enc) {
     return utils.split32(this.h, 'big');
 };
 
-},{"../common":190,"../utils":200,"./common":199,"minimalistic-assert":209}],197:[function(require,module,exports){
+},{"../common":190,"../utils":200,"./common":199,"minimalistic-assert":213}],197:[function(require,module,exports){
 'use strict';
 
 var utils = require('../utils');
@@ -50286,7 +50286,7 @@ function g1_512_lo(xh, xl) {
   return r;
 }
 
-},{"../common":190,"../utils":200,"minimalistic-assert":209}],199:[function(require,module,exports){
+},{"../common":190,"../utils":200,"minimalistic-assert":213}],199:[function(require,module,exports){
 'use strict';
 
 var utils = require('../utils');
@@ -50592,7 +50592,7 @@ function shr64_lo(ah, al, num) {
 }
 exports.shr64_lo = shr64_lo;
 
-},{"inherits":203,"minimalistic-assert":209}],201:[function(require,module,exports){
+},{"inherits":207,"minimalistic-assert":213}],201:[function(require,module,exports){
 'use strict';
 
 var hash = require('hash.js');
@@ -50707,7 +50707,585 @@ HmacDRBG.prototype.generate = function generate(len, enc, add, addEnc) {
   return utils.encode(res, enc);
 };
 
-},{"hash.js":189,"minimalistic-assert":209,"minimalistic-crypto-utils":210}],202:[function(require,module,exports){
+},{"hash.js":189,"minimalistic-assert":213,"minimalistic-crypto-utils":214}],202:[function(require,module,exports){
+// Generated by IcedCoffeeScript 108.0.8
+(function() {
+  module.exports = {
+    k: "__iced_k",
+    k_noop: "__iced_k_noop",
+    param: "__iced_p_",
+    ns: "iced",
+    runtime: "runtime",
+    Deferrals: "Deferrals",
+    deferrals: "__iced_deferrals",
+    fulfill: "_fulfill",
+    b_while: "_break",
+    t_while: "_while",
+    c_while: "_continue",
+    n_while: "_next",
+    n_arg: "__iced_next_arg",
+    defer_method: "defer",
+    slot: "__slot",
+    assign_fn: "assign_fn",
+    autocb: "autocb",
+    retslot: "ret",
+    trace: "__iced_trace",
+    passed_deferral: "__iced_passed_deferral",
+    findDeferral: "findDeferral",
+    lineno: "lineno",
+    parent: "parent",
+    filename: "filename",
+    funcname: "funcname",
+    catchExceptions: 'catchExceptions',
+    runtime_modes: ["node", "inline", "window", "none", "browserify", "interp"],
+    trampoline: "trampoline",
+    context: "context",
+    defer_arg: "__iced_defer_"
+  };
+
+}).call(this);
+
+},{}],203:[function(require,module,exports){
+// Generated by IcedCoffeeScript 108.0.8
+(function() {
+  var C, Pipeliner, iced, __iced_k, __iced_k_noop, _iand, _ior, _timeout,
+    __slice = [].slice;
+
+  __iced_k = __iced_k_noop = function() {};
+
+  C = require('./const');
+
+  exports.iced = iced = require('./runtime');
+
+  _timeout = function(cb, t, res, tmp) {
+    var arr, rv, which, ___iced_passed_deferral, __iced_deferrals, __iced_k;
+    __iced_k = __iced_k_noop;
+    ___iced_passed_deferral = iced.findDeferral(arguments);
+    rv = new iced.Rendezvous;
+    tmp[0] = rv.id(true).defer({
+      assign_fn: (function(_this) {
+        return function() {
+          return function() {
+            return arr = __slice.call(arguments, 0);
+          };
+        };
+      })(this)(),
+      lineno: 20,
+      context: __iced_deferrals
+    });
+    setTimeout(rv.id(false).defer({
+      lineno: 21,
+      context: __iced_deferrals
+    }), t);
+    (function(_this) {
+      return (function(__iced_k) {
+        __iced_deferrals = new iced.Deferrals(__iced_k, {
+          parent: ___iced_passed_deferral,
+          filename: "/Users/max/src/iced/iced-runtime/src/library.iced"
+        });
+        rv.wait(__iced_deferrals.defer({
+          assign_fn: (function() {
+            return function() {
+              return which = arguments[0];
+            };
+          })(),
+          lineno: 22
+        }));
+        __iced_deferrals._fulfill();
+      });
+    })(this)((function(_this) {
+      return function() {
+        if (res) {
+          res[0] = which;
+        }
+        return cb.apply(null, arr);
+      };
+    })(this));
+  };
+
+  exports.timeout = function(cb, t, res) {
+    var tmp;
+    tmp = [];
+    _timeout(cb, t, res, tmp);
+    return tmp[0];
+  };
+
+  _iand = function(cb, res, tmp) {
+    var ok, ___iced_passed_deferral, __iced_deferrals, __iced_k;
+    __iced_k = __iced_k_noop;
+    ___iced_passed_deferral = iced.findDeferral(arguments);
+    (function(_this) {
+      return (function(__iced_k) {
+        __iced_deferrals = new iced.Deferrals(__iced_k, {
+          parent: ___iced_passed_deferral,
+          filename: "/Users/max/src/iced/iced-runtime/src/library.iced"
+        });
+        tmp[0] = __iced_deferrals.defer({
+          assign_fn: (function() {
+            return function() {
+              return ok = arguments[0];
+            };
+          })(),
+          lineno: 39
+        });
+        __iced_deferrals._fulfill();
+      });
+    })(this)((function(_this) {
+      return function() {
+        if (!ok) {
+          res[0] = false;
+        }
+        return cb();
+      };
+    })(this));
+  };
+
+  exports.iand = function(cb, res) {
+    var tmp;
+    tmp = [];
+    _iand(cb, res, tmp);
+    return tmp[0];
+  };
+
+  _ior = function(cb, res, tmp) {
+    var ok, ___iced_passed_deferral, __iced_deferrals, __iced_k;
+    __iced_k = __iced_k_noop;
+    ___iced_passed_deferral = iced.findDeferral(arguments);
+    (function(_this) {
+      return (function(__iced_k) {
+        __iced_deferrals = new iced.Deferrals(__iced_k, {
+          parent: ___iced_passed_deferral,
+          filename: "/Users/max/src/iced/iced-runtime/src/library.iced"
+        });
+        tmp[0] = __iced_deferrals.defer({
+          assign_fn: (function() {
+            return function() {
+              return ok = arguments[0];
+            };
+          })(),
+          lineno: 58
+        });
+        __iced_deferrals._fulfill();
+      });
+    })(this)((function(_this) {
+      return function() {
+        if (ok) {
+          res[0] = true;
+        }
+        return cb();
+      };
+    })(this));
+  };
+
+  exports.ior = function(cb, res) {
+    var tmp;
+    tmp = [];
+    _ior(cb, res, tmp);
+    return tmp[0];
+  };
+
+  exports.Pipeliner = Pipeliner = (function() {
+    function Pipeliner(window, delay) {
+      this.window = window || 1;
+      this.delay = delay || 0;
+      this.queue = [];
+      this.n_out = 0;
+      this.cb = null;
+      this[C.deferrals] = this;
+      this["defer"] = this._defer;
+    }
+
+    Pipeliner.prototype.waitInQueue = function(cb) {
+      var ___iced_passed_deferral, __iced_deferrals, __iced_k;
+      __iced_k = __iced_k_noop;
+      ___iced_passed_deferral = iced.findDeferral(arguments);
+      (function(_this) {
+        return (function(__iced_k) {
+          var _while;
+          _while = function(__iced_k) {
+            var _break, _continue, _next;
+            _break = __iced_k;
+            _continue = function() {
+              return iced.trampoline(function() {
+                return _while(__iced_k);
+              });
+            };
+            _next = _continue;
+            if (!(_this.n_out >= _this.window)) {
+              return _break();
+            } else {
+              (function(__iced_k) {
+                __iced_deferrals = new iced.Deferrals(__iced_k, {
+                  parent: ___iced_passed_deferral,
+                  filename: "/Users/max/src/iced/iced-runtime/src/library.iced",
+                  funcname: "Pipeliner.waitInQueue"
+                });
+                _this.cb = __iced_deferrals.defer({
+                  lineno: 100
+                });
+                __iced_deferrals._fulfill();
+              })(_next);
+            }
+          };
+          _while(__iced_k);
+        });
+      })(this)((function(_this) {
+        return function() {
+          _this.n_out++;
+          (function(__iced_k) {
+            if (_this.delay) {
+              (function(__iced_k) {
+                __iced_deferrals = new iced.Deferrals(__iced_k, {
+                  parent: ___iced_passed_deferral,
+                  filename: "/Users/max/src/iced/iced-runtime/src/library.iced",
+                  funcname: "Pipeliner.waitInQueue"
+                });
+                setTimeout(__iced_deferrals.defer({
+                  lineno: 108
+                }), _this.delay);
+                __iced_deferrals._fulfill();
+              })(__iced_k);
+            } else {
+              return __iced_k();
+            }
+          })(function() {
+            return cb();
+          });
+        };
+      })(this));
+    };
+
+    Pipeliner.prototype.__defer = function(out, deferArgs) {
+      var tmp, voidCb, ___iced_passed_deferral, __iced_deferrals, __iced_k;
+      __iced_k = __iced_k_noop;
+      ___iced_passed_deferral = iced.findDeferral(arguments);
+      (function(_this) {
+        return (function(__iced_k) {
+          __iced_deferrals = new iced.Deferrals(__iced_k, {
+            parent: ___iced_passed_deferral,
+            filename: "/Users/max/src/iced/iced-runtime/src/library.iced",
+            funcname: "Pipeliner.__defer"
+          });
+          voidCb = __iced_deferrals.defer({
+            lineno: 122
+          });
+          out[0] = function() {
+            var args, _ref;
+            args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+            if ((_ref = deferArgs.assign_fn) != null) {
+              _ref.apply(null, args);
+            }
+            return voidCb();
+          };
+          __iced_deferrals._fulfill();
+        });
+      })(this)((function(_this) {
+        return function() {
+          _this.n_out--;
+          if (_this.cb) {
+            tmp = _this.cb;
+            _this.cb = null;
+            return tmp();
+          }
+        };
+      })(this));
+    };
+
+    Pipeliner.prototype._defer = function(deferArgs) {
+      var tmp;
+      tmp = [];
+      this.__defer(tmp, deferArgs);
+      return tmp[0];
+    };
+
+    Pipeliner.prototype.flush = function(autocb) {
+      var ___iced_passed_deferral, __iced_k, _while;
+      __iced_k = autocb;
+      ___iced_passed_deferral = iced.findDeferral(arguments);
+      _while = (function(_this) {
+        var __iced_deferrals;
+        return function(__iced_k) {
+          var _break, _continue, _next;
+          _break = __iced_k;
+          _continue = function() {
+            return iced.trampoline(function() {
+              return _while(__iced_k);
+            });
+          };
+          _next = _continue;
+          if (!_this.n_out) {
+            return _break();
+          } else {
+            (function(__iced_k) {
+              __iced_deferrals = new iced.Deferrals(__iced_k, {
+                parent: ___iced_passed_deferral,
+                filename: "/Users/max/src/iced/iced-runtime/src/library.iced",
+                funcname: "Pipeliner.flush"
+              });
+              _this.cb = __iced_deferrals.defer({
+                lineno: 151
+              });
+              __iced_deferrals._fulfill();
+            })(_next);
+          }
+        };
+      })(this);
+      _while(__iced_k);
+    };
+
+    return Pipeliner;
+
+  })();
+
+}).call(this);
+
+},{"./const":202,"./runtime":205}],204:[function(require,module,exports){
+// Generated by IcedCoffeeScript 108.0.8
+(function() {
+  var k, mod, mods, v, _i, _len;
+
+  exports["const"] = require('./const');
+
+  mods = [require('./runtime'), require('./library')];
+
+  for (_i = 0, _len = mods.length; _i < _len; _i++) {
+    mod = mods[_i];
+    for (k in mod) {
+      v = mod[k];
+      exports[k] = v;
+    }
+  }
+
+}).call(this);
+
+},{"./const":202,"./library":203,"./runtime":205}],205:[function(require,module,exports){
+(function (process){
+// Generated by IcedCoffeeScript 108.0.8
+(function() {
+  var C, Deferrals, Rendezvous, exceptionHandler, findDeferral, make_defer_return, stackWalk, tick_counter, trampoline, warn, __active_trace, __c, _trace_to_string,
+    __slice = [].slice;
+
+  C = require('./const');
+
+  make_defer_return = function(obj, defer_args, id, trace_template, multi) {
+    var k, ret, trace, v;
+    trace = {};
+    for (k in trace_template) {
+      v = trace_template[k];
+      trace[k] = v;
+    }
+    trace[C.lineno] = defer_args != null ? defer_args[C.lineno] : void 0;
+    ret = function() {
+      var inner_args, o, _ref;
+      inner_args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+      if (defer_args != null) {
+        if ((_ref = defer_args.assign_fn) != null) {
+          _ref.apply(null, inner_args);
+        }
+      }
+      if (obj) {
+        o = obj;
+        if (!multi) {
+          obj = null;
+        }
+        return o._fulfill(id, trace);
+      } else {
+        return warn("overused deferral at " + (_trace_to_string(trace)));
+      }
+    };
+    ret[C.trace] = trace;
+    return ret;
+  };
+
+  __c = 0;
+
+  tick_counter = function(mod) {
+    __c++;
+    if ((__c % mod) === 0) {
+      __c = 0;
+      return true;
+    } else {
+      return false;
+    }
+  };
+
+  __active_trace = null;
+
+  _trace_to_string = function(tr) {
+    var fn;
+    fn = tr[C.funcname] || "<anonymous>";
+    return "" + fn + " (" + tr[C.filename] + ":" + (tr[C.lineno] + 1) + ")";
+  };
+
+  warn = function(m) {
+    return typeof console !== "undefined" && console !== null ? console.error("ICED warning: " + m) : void 0;
+  };
+
+  exports.trampoline = trampoline = function(fn) {
+    if (!tick_counter(500)) {
+      return fn();
+    } else if ((typeof process !== "undefined" && process !== null ? process.nextTick : void 0) != null) {
+      return process.nextTick(fn);
+    } else {
+      return setTimeout(fn);
+    }
+  };
+
+  exports.Deferrals = Deferrals = (function() {
+    function Deferrals(k, trace) {
+      this.trace = trace;
+      this.continuation = k;
+      this.count = 1;
+      this.ret = null;
+    }
+
+    Deferrals.prototype._call = function(trace) {
+      var c;
+      if (this.continuation) {
+        __active_trace = trace;
+        c = this.continuation;
+        this.continuation = null;
+        return c(this.ret);
+      } else {
+        return warn("Entered dead await at " + (_trace_to_string(trace)));
+      }
+    };
+
+    Deferrals.prototype._fulfill = function(id, trace) {
+      if (--this.count > 0) {
+
+      } else {
+        return trampoline(((function(_this) {
+          return function() {
+            return _this._call(trace);
+          };
+        })(this)));
+      }
+    };
+
+    Deferrals.prototype.defer = function(args) {
+      var self;
+      this.count++;
+      self = this;
+      return make_defer_return(self, args, null, this.trace);
+    };
+
+    return Deferrals;
+
+  })();
+
+  exports.findDeferral = findDeferral = function(args) {
+    var a, _i, _len;
+    for (_i = 0, _len = args.length; _i < _len; _i++) {
+      a = args[_i];
+      if (a != null ? a[C.trace] : void 0) {
+        return a;
+      }
+    }
+    return null;
+  };
+
+  exports.Rendezvous = Rendezvous = (function() {
+    var RvId;
+
+    function Rendezvous() {
+      this.completed = [];
+      this.waiters = [];
+      this.defer_id = 0;
+    }
+
+    RvId = (function() {
+      function RvId(rv, id, multi) {
+        this.rv = rv;
+        this.id = id;
+        this.multi = multi;
+      }
+
+      RvId.prototype.defer = function(defer_args) {
+        return this.rv._defer_with_id(this.id, defer_args, this.multi);
+      };
+
+      return RvId;
+
+    })();
+
+    Rendezvous.prototype.wait = function(cb) {
+      var x;
+      if (this.completed.length) {
+        x = this.completed.shift();
+        return cb(x);
+      } else {
+        return this.waiters.push(cb);
+      }
+    };
+
+    Rendezvous.prototype.defer = function(defer_args) {
+      var id;
+      id = this.defer_id++;
+      return this._defer_with_id(id, defer_args);
+    };
+
+    Rendezvous.prototype.id = function(i, multi) {
+      multi = !!multi;
+      return new RvId(this, i, multi);
+    };
+
+    Rendezvous.prototype._fulfill = function(id, trace) {
+      var cb;
+      if (this.waiters.length) {
+        cb = this.waiters.shift();
+        return cb(id);
+      } else {
+        return this.completed.push(id);
+      }
+    };
+
+    Rendezvous.prototype._defer_with_id = function(id, defer_args, multi) {
+      this.count++;
+      return make_defer_return(this, defer_args, id, {}, multi);
+    };
+
+    return Rendezvous;
+
+  })();
+
+  exports.stackWalk = stackWalk = function(cb) {
+    var line, ret, tr, _ref;
+    ret = [];
+    tr = cb ? cb[C.trace] : __active_trace;
+    while (tr) {
+      line = "   at " + (_trace_to_string(tr));
+      ret.push(line);
+      tr = tr != null ? (_ref = tr[C.parent]) != null ? _ref[C.trace] : void 0 : void 0;
+    }
+    return ret;
+  };
+
+  exports.exceptionHandler = exceptionHandler = function(err, logger) {
+    var stack;
+    if (!logger) {
+      logger = console.error;
+    }
+    logger(err.stack);
+    stack = stackWalk();
+    if (stack.length) {
+      logger("Iced 'stack' trace (w/ real line numbers):");
+      return logger(stack.join("\n"));
+    }
+  };
+
+  exports.catchExceptions = function(logger) {
+    return typeof process !== "undefined" && process !== null ? process.on('uncaughtException', function(err) {
+      exceptionHandler(err, logger);
+      return process.exit(1);
+    }) : void 0;
+  };
+
+}).call(this);
+
+}).call(this,require('_process'))
+
+},{"./const":202,"_process":229}],206:[function(require,module,exports){
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
   var e, m
   var eLen = (nBytes * 8) - mLen - 1
@@ -50793,7 +51371,7 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
   buffer[offset + i - d] |= s * 128
 }
 
-},{}],203:[function(require,module,exports){
+},{}],207:[function(require,module,exports){
 if (typeof Object.create === 'function') {
   // implementation from standard node.js 'util' module
   module.exports = function inherits(ctor, superCtor) {
@@ -50818,7 +51396,7 @@ if (typeof Object.create === 'function') {
   }
 }
 
-},{}],204:[function(require,module,exports){
+},{}],208:[function(require,module,exports){
 /*!
  * Determine if an object is a Buffer
  *
@@ -50841,7 +51419,7 @@ function isSlowBuffer (obj) {
   return typeof obj.readFloatLE === 'function' && typeof obj.slice === 'function' && isBuffer(obj.slice(0, 0))
 }
 
-},{}],205:[function(require,module,exports){
+},{}],209:[function(require,module,exports){
 (function (Buffer){
 'use strict'
 var inherits = require('inherits')
@@ -50991,7 +51569,7 @@ module.exports = MD5
 
 }).call(this,require("buffer").Buffer)
 
-},{"buffer":110,"hash-base":206,"inherits":203}],206:[function(require,module,exports){
+},{"buffer":110,"hash-base":210,"inherits":207}],210:[function(require,module,exports){
 'use strict'
 var Buffer = require('safe-buffer').Buffer
 var Transform = require('stream').Transform
@@ -51088,7 +51666,7 @@ HashBase.prototype._digest = function () {
 
 module.exports = HashBase
 
-},{"inherits":203,"safe-buffer":248,"stream":258}],207:[function(require,module,exports){
+},{"inherits":207,"safe-buffer":254,"stream":264}],211:[function(require,module,exports){
 (function (Buffer){
 // constant-space merkle root calculation algorithm
 module.exports = function fastRoot (values, digestFn) {
@@ -51117,7 +51695,7 @@ module.exports = function fastRoot (values, digestFn) {
 
 }).call(this,require("buffer").Buffer)
 
-},{"buffer":110}],208:[function(require,module,exports){
+},{"buffer":110}],212:[function(require,module,exports){
 var bn = require('bn.js');
 var brorand = require('brorand');
 
@@ -51234,7 +51812,7 @@ MillerRabin.prototype.getDivisor = function getDivisor(n, k) {
   return false;
 };
 
-},{"bn.js":74,"brorand":75}],209:[function(require,module,exports){
+},{"bn.js":74,"brorand":75}],213:[function(require,module,exports){
 module.exports = assert;
 
 function assert(val, msg) {
@@ -51247,7 +51825,7 @@ assert.equal = function assertEqual(l, r, msg) {
     throw new Error(msg || ('Assertion failed: ' + l + ' != ' + r));
 };
 
-},{}],210:[function(require,module,exports){
+},{}],214:[function(require,module,exports){
 'use strict';
 
 var utils = exports;
@@ -51307,7 +51885,232 @@ utils.encode = function encode(arr, enc) {
     return arr;
 };
 
-},{}],211:[function(require,module,exports){
+},{}],215:[function(require,module,exports){
+// Generated by IcedCoffeeScript 1.7.1-f
+(function() {
+  var Generator, iced, __iced_k, __iced_k_noop;
+
+  iced = require('iced-runtime');
+  __iced_k = __iced_k_noop = function() {};
+
+  Generator = Generator = (function() {
+    function Generator(opts) {
+      opts = opts || {};
+      this.lazy_loop_delay = opts.lazy_loop_delay || 30;
+      this.loop_delay = opts.loop_delay || 5;
+      this.work_min = opts.work_min || 1;
+      this.auto_stop_bits = opts.auto_stop_bits || 4096;
+      this.max_bits_per_delta = opts.max_bits_per_delta || 4;
+      this.auto_stop = opts.auto_stop ? opts.auto_stop : true;
+      this.entropies = [];
+      this.running = true;
+      this.is_generating = false;
+      this.timer_race_loop();
+    }
+
+    Generator.prototype.generate = function(bits_wanted, cb) {
+      var e, harvested_bits, res, ___iced_passed_deferral, __iced_deferrals, __iced_k;
+      __iced_k = __iced_k_noop;
+      ___iced_passed_deferral = iced.findDeferral(arguments);
+      this.is_generating = true;
+      if (!this.running) {
+        this.resume();
+      }
+      harvested_bits = 0;
+      res = [];
+      (function(_this) {
+        return (function(__iced_k) {
+          var _results, _while;
+          _results = [];
+          _while = function(__iced_k) {
+            var _break, _continue, _next;
+            _break = function() {
+              return __iced_k(_results);
+            };
+            _continue = function() {
+              return iced.trampoline(function() {
+                return _while(__iced_k);
+              });
+            };
+            _next = function(__iced_next_arg) {
+              _results.push(__iced_next_arg);
+              return _continue();
+            };
+            if (!(harvested_bits < bits_wanted)) {
+              return _break();
+            } else {
+              (function(__iced_k) {
+                if (_this.entropies.length) {
+                  e = _this.entropies.splice(0, 1)[0];
+                  harvested_bits += e[1];
+                  return __iced_k(res.push(e[0]));
+                } else {
+                  (function(__iced_k) {
+                    __iced_deferrals = new iced.Deferrals(__iced_k, {
+                      parent: ___iced_passed_deferral,
+                      filename: "/Users/chris/git/more-entropy/src/generator.iced",
+                      funcname: "Generator.generate"
+                    });
+                    _this.delay(__iced_deferrals.defer({
+                      lineno: 28
+                    }));
+                    __iced_deferrals._fulfill();
+                  })(__iced_k);
+                }
+              })(_next);
+            }
+          };
+          _while(__iced_k);
+        });
+      })(this)((function(_this) {
+        return function() {
+          if (_this.auto_stop) {
+            _this.stop();
+          }
+          _this.is_generating = false;
+          return cb(res);
+        };
+      })(this));
+    };
+
+    Generator.prototype.stop = function() {
+      return this.running = false;
+    };
+
+    Generator.prototype.resume = function() {
+      this.running = true;
+      return this.timer_race_loop();
+    };
+
+    Generator.prototype.reset = function() {
+      this.entropies = [];
+      return this.total_bits = 0;
+    };
+
+    Generator.prototype.count_unused_bits = function() {
+      var bits, e, _i, _len, _ref;
+      bits = 0;
+      _ref = this.entropies;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        e = _ref[_i];
+        bits += e[1];
+      }
+      return bits;
+    };
+
+    Generator.prototype.delay = function(cb) {
+      var delay, ___iced_passed_deferral, __iced_deferrals, __iced_k;
+      __iced_k = __iced_k_noop;
+      ___iced_passed_deferral = iced.findDeferral(arguments);
+      delay = this.is_generating ? this.loop_delay : this.lazy_loop_delay;
+      (function(_this) {
+        return (function(__iced_k) {
+          __iced_deferrals = new iced.Deferrals(__iced_k, {
+            parent: ___iced_passed_deferral,
+            filename: "/Users/chris/git/more-entropy/src/generator.iced",
+            funcname: "Generator.delay"
+          });
+          setTimeout(__iced_deferrals.defer({
+            lineno: 50
+          }), delay);
+          __iced_deferrals._fulfill();
+        });
+      })(this)((function(_this) {
+        return function() {
+          return cb();
+        };
+      })(this));
+    };
+
+    Generator.prototype.timer_race_loop = function() {
+      var ___iced_passed_deferral, __iced_k, _results, _while;
+      __iced_k = __iced_k_noop;
+      ___iced_passed_deferral = iced.findDeferral(arguments);
+      this._last_count = null;
+      _results = [];
+      _while = (function(_this) {
+        var count, delta, entropy, v, __iced_deferrals;
+        return function(__iced_k) {
+          var _break, _continue, _next;
+          _break = function() {
+            return __iced_k(_results);
+          };
+          _continue = function() {
+            return iced.trampoline(function() {
+              return _while(__iced_k);
+            });
+          };
+          _next = function(__iced_next_arg) {
+            _results.push(__iced_next_arg);
+            return _continue();
+          };
+          if (!_this.running) {
+            return _break();
+          } else {
+            if (_this.count_unused_bits() < _this.auto_stop_bits) {
+              count = _this.millisecond_count();
+              if ((_this._last_count != null) && (delta = count - _this._last_count)) {
+                entropy = Math.floor(_this.log_2(Math.abs(delta)));
+                entropy = Math.min(_this.max_bits_per_delta, entropy);
+                v = [delta, entropy];
+                _this.entropies.push(v);
+              }
+              _this._last_count = count;
+            }
+            (function(__iced_k) {
+              __iced_deferrals = new iced.Deferrals(__iced_k, {
+                parent: ___iced_passed_deferral,
+                filename: "/Users/chris/git/more-entropy/src/generator.iced",
+                funcname: "Generator.timer_race_loop"
+              });
+              _this.delay(__iced_deferrals.defer({
+                lineno: 64
+              }));
+              __iced_deferrals._fulfill();
+            })(_next);
+          }
+        };
+      })(this);
+      _while(__iced_k);
+    };
+
+    Generator.prototype.log_2 = function(x) {
+      return Math.log(x) / Math.LN2;
+    };
+
+    Generator.prototype.millisecond_count = function() {
+      var d, i, x;
+      d = Date.now();
+      i = x = 0;
+      while (Date.now() < d + this.work_min + 1) {
+        i++;
+        x = Math.sin(Math.sqrt(Math.log(i + x)));
+      }
+      return i;
+    };
+
+    return Generator;
+
+  })();
+
+  if (typeof window !== "undefined" && window !== null) {
+    window.Generator = Generator;
+  }
+
+  if (typeof exports !== "undefined" && exports !== null) {
+    exports.Generator = Generator;
+  }
+
+}).call(this);
+
+},{"iced-runtime":204}],216:[function(require,module,exports){
+// Generated by IcedCoffeeScript 1.7.1-c
+(function() {
+  exports.Generator = require('../lib/generator').Generator;
+
+}).call(this);
+
+},{"../lib/generator":215}],217:[function(require,module,exports){
 module.exports={"2.16.840.1.101.3.4.1.1": "aes-128-ecb",
 "2.16.840.1.101.3.4.1.2": "aes-128-cbc",
 "2.16.840.1.101.3.4.1.3": "aes-128-ofb",
@@ -51321,7 +52124,7 @@ module.exports={"2.16.840.1.101.3.4.1.1": "aes-128-ecb",
 "2.16.840.1.101.3.4.1.43": "aes-256-ofb",
 "2.16.840.1.101.3.4.1.44": "aes-256-cfb"
 }
-},{}],212:[function(require,module,exports){
+},{}],218:[function(require,module,exports){
 // from https://github.com/indutny/self-signed/blob/gh-pages/lib/asn1.js
 // Fedor, you are amazing.
 'use strict'
@@ -51445,7 +52248,7 @@ exports.signature = asn1.define('signature', function () {
   )
 })
 
-},{"./certificate":213,"asn1.js":1}],213:[function(require,module,exports){
+},{"./certificate":219,"asn1.js":1}],219:[function(require,module,exports){
 // from https://github.com/Rantanen/node-dtls/blob/25a7dc861bda38cfeac93a723500eea4f0ac2e86/Certificate.js
 // thanks to @Rantanen
 
@@ -51535,7 +52338,7 @@ var X509Certificate = asn.define('X509Certificate', function () {
 
 module.exports = X509Certificate
 
-},{"asn1.js":1}],214:[function(require,module,exports){
+},{"asn1.js":1}],220:[function(require,module,exports){
 (function (Buffer){
 // adapted from https://github.com/apatil/pemstrip
 var findProc = /Proc-Type: 4,ENCRYPTED[\n\r]+DEK-Info: AES-((?:128)|(?:192)|(?:256))-CBC,([0-9A-H]+)[\n\r]+([0-9A-z\n\r\+\/\=]+)[\n\r]+/m
@@ -51570,7 +52373,7 @@ module.exports = function (okey, password) {
 
 }).call(this,require("buffer").Buffer)
 
-},{"browserify-aes":79,"buffer":110,"evp_bytestokey":186}],215:[function(require,module,exports){
+},{"browserify-aes":79,"buffer":110,"evp_bytestokey":186}],221:[function(require,module,exports){
 (function (Buffer){
 var asn1 = require('./asn1')
 var aesid = require('./aesid.json')
@@ -51681,7 +52484,7 @@ function decrypt (data, password) {
 
 }).call(this,require("buffer").Buffer)
 
-},{"./aesid.json":211,"./asn1":212,"./fixProc":214,"browserify-aes":79,"buffer":110,"pbkdf2":217}],216:[function(require,module,exports){
+},{"./aesid.json":217,"./asn1":218,"./fixProc":220,"browserify-aes":79,"buffer":110,"pbkdf2":223}],222:[function(require,module,exports){
 'use strict';
 
 /* !
@@ -51974,13 +52777,13 @@ module.exports = {
   setPathValue: setPathValue,
 };
 
-},{}],217:[function(require,module,exports){
+},{}],223:[function(require,module,exports){
 
 exports.pbkdf2 = require('./lib/async')
 
 exports.pbkdf2Sync = require('./lib/sync')
 
-},{"./lib/async":218,"./lib/sync":221}],218:[function(require,module,exports){
+},{"./lib/async":224,"./lib/sync":227}],224:[function(require,module,exports){
 (function (process,global){
 var checkParameters = require('./precondition')
 var defaultEncoding = require('./default-encoding')
@@ -52083,7 +52886,7 @@ module.exports = function (password, salt, iterations, keylen, digest, callback)
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{"./default-encoding":219,"./precondition":220,"./sync":221,"_process":223,"safe-buffer":248}],219:[function(require,module,exports){
+},{"./default-encoding":225,"./precondition":226,"./sync":227,"_process":229,"safe-buffer":254}],225:[function(require,module,exports){
 (function (process){
 var defaultEncoding
 /* istanbul ignore next */
@@ -52098,7 +52901,7 @@ module.exports = defaultEncoding
 
 }).call(this,require('_process'))
 
-},{"_process":223}],220:[function(require,module,exports){
+},{"_process":229}],226:[function(require,module,exports){
 var MAX_ALLOC = Math.pow(2, 30) - 1 // default in iojs
 module.exports = function (iterations, keylen) {
   if (typeof iterations !== 'number') {
@@ -52118,7 +52921,7 @@ module.exports = function (iterations, keylen) {
   }
 }
 
-},{}],221:[function(require,module,exports){
+},{}],227:[function(require,module,exports){
 var md5 = require('create-hash/md5')
 var rmd160 = require('ripemd160')
 var sha = require('sha.js')
@@ -52221,7 +53024,7 @@ function pbkdf2 (password, salt, iterations, keylen, digest) {
 
 module.exports = pbkdf2
 
-},{"./default-encoding":219,"./precondition":220,"create-hash/md5":149,"ripemd160":247,"safe-buffer":248,"sha.js":251}],222:[function(require,module,exports){
+},{"./default-encoding":225,"./precondition":226,"create-hash/md5":149,"ripemd160":253,"safe-buffer":254,"sha.js":257}],228:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -52270,7 +53073,7 @@ function nextTick(fn, arg1, arg2, arg3) {
 
 }).call(this,require('_process'))
 
-},{"_process":223}],223:[function(require,module,exports){
+},{"_process":229}],229:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
@@ -52456,7 +53259,7 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],224:[function(require,module,exports){
+},{}],230:[function(require,module,exports){
 exports.publicEncrypt = require('./publicEncrypt');
 exports.privateDecrypt = require('./privateDecrypt');
 
@@ -52467,7 +53270,7 @@ exports.privateEncrypt = function privateEncrypt(key, buf) {
 exports.publicDecrypt = function publicDecrypt(key, buf) {
   return exports.privateDecrypt(key, buf, true);
 };
-},{"./privateDecrypt":226,"./publicEncrypt":227}],225:[function(require,module,exports){
+},{"./privateDecrypt":232,"./publicEncrypt":233}],231:[function(require,module,exports){
 (function (Buffer){
 var createHash = require('create-hash');
 module.exports = function (seed, len) {
@@ -52487,7 +53290,7 @@ function i2ops(c) {
 }
 }).call(this,require("buffer").Buffer)
 
-},{"buffer":110,"create-hash":147}],226:[function(require,module,exports){
+},{"buffer":110,"create-hash":147}],232:[function(require,module,exports){
 (function (Buffer){
 var parseKeys = require('parse-asn1');
 var mgf = require('./mgf');
@@ -52599,7 +53402,7 @@ function compare(a, b){
 }
 }).call(this,require("buffer").Buffer)
 
-},{"./mgf":225,"./withPublic":228,"./xor":229,"bn.js":74,"browserify-rsa":97,"buffer":110,"create-hash":147,"parse-asn1":215}],227:[function(require,module,exports){
+},{"./mgf":231,"./withPublic":234,"./xor":235,"bn.js":74,"browserify-rsa":97,"buffer":110,"create-hash":147,"parse-asn1":221}],233:[function(require,module,exports){
 (function (Buffer){
 var parseKeys = require('parse-asn1');
 var randomBytes = require('randombytes');
@@ -52698,7 +53501,7 @@ function nonZero(len, crypto) {
 }
 }).call(this,require("buffer").Buffer)
 
-},{"./mgf":225,"./withPublic":228,"./xor":229,"bn.js":74,"browserify-rsa":97,"buffer":110,"create-hash":147,"parse-asn1":215,"randombytes":231}],228:[function(require,module,exports){
+},{"./mgf":231,"./withPublic":234,"./xor":235,"bn.js":74,"browserify-rsa":97,"buffer":110,"create-hash":147,"parse-asn1":221,"randombytes":237}],234:[function(require,module,exports){
 (function (Buffer){
 var bn = require('bn.js');
 function withPublic(paddedMsg, key) {
@@ -52712,7 +53515,7 @@ function withPublic(paddedMsg, key) {
 module.exports = withPublic;
 }).call(this,require("buffer").Buffer)
 
-},{"bn.js":74,"buffer":110}],229:[function(require,module,exports){
+},{"bn.js":74,"buffer":110}],235:[function(require,module,exports){
 module.exports = function xor(a, b) {
   var len = a.length;
   var i = -1;
@@ -52721,7 +53524,7 @@ module.exports = function xor(a, b) {
   }
   return a
 };
-},{}],230:[function(require,module,exports){
+},{}],236:[function(require,module,exports){
 var OPS = require('bitcoin-ops')
 
 function encodingLength (i) {
@@ -52800,7 +53603,7 @@ module.exports = {
   decode: decode
 }
 
-},{"bitcoin-ops":35}],231:[function(require,module,exports){
+},{"bitcoin-ops":35}],237:[function(require,module,exports){
 (function (process,global){
 'use strict'
 
@@ -52843,7 +53646,7 @@ function randomBytes (size, cb) {
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{"_process":223,"safe-buffer":248}],232:[function(require,module,exports){
+},{"_process":229,"safe-buffer":254}],238:[function(require,module,exports){
 (function (process,global){
 'use strict'
 
@@ -52956,10 +53759,10 @@ function randomFillSync (buf, offset, size) {
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{"_process":223,"randombytes":231,"safe-buffer":248}],233:[function(require,module,exports){
+},{"_process":229,"randombytes":237,"safe-buffer":254}],239:[function(require,module,exports){
 module.exports = require('./lib/_stream_duplex.js');
 
-},{"./lib/_stream_duplex.js":234}],234:[function(require,module,exports){
+},{"./lib/_stream_duplex.js":240}],240:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -53084,7 +53887,7 @@ function forEach(xs, f) {
     f(xs[i], i);
   }
 }
-},{"./_stream_readable":236,"./_stream_writable":238,"core-util-is":145,"inherits":203,"process-nextick-args":222}],235:[function(require,module,exports){
+},{"./_stream_readable":242,"./_stream_writable":244,"core-util-is":145,"inherits":207,"process-nextick-args":228}],241:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -53132,7 +53935,7 @@ function PassThrough(options) {
 PassThrough.prototype._transform = function (chunk, encoding, cb) {
   cb(null, chunk);
 };
-},{"./_stream_transform":237,"core-util-is":145,"inherits":203}],236:[function(require,module,exports){
+},{"./_stream_transform":243,"core-util-is":145,"inherits":207}],242:[function(require,module,exports){
 (function (process,global){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -54151,7 +54954,7 @@ function indexOf(xs, x) {
 }
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{"./_stream_duplex":234,"./internal/streams/BufferList":239,"./internal/streams/destroy":240,"./internal/streams/stream":241,"_process":223,"core-util-is":145,"events":185,"inherits":203,"isarray":242,"process-nextick-args":222,"safe-buffer":248,"string_decoder/":259,"util":76}],237:[function(require,module,exports){
+},{"./_stream_duplex":240,"./internal/streams/BufferList":245,"./internal/streams/destroy":246,"./internal/streams/stream":247,"_process":229,"core-util-is":145,"events":185,"inherits":207,"isarray":248,"process-nextick-args":228,"safe-buffer":254,"string_decoder/":265,"util":76}],243:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -54366,7 +55169,7 @@ function done(stream, er, data) {
 
   return stream.push(null);
 }
-},{"./_stream_duplex":234,"core-util-is":145,"inherits":203}],238:[function(require,module,exports){
+},{"./_stream_duplex":240,"core-util-is":145,"inherits":207}],244:[function(require,module,exports){
 (function (process,global){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -55047,7 +55850,7 @@ Writable.prototype._destroy = function (err, cb) {
 };
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{"./_stream_duplex":234,"./internal/streams/destroy":240,"./internal/streams/stream":241,"_process":223,"core-util-is":145,"inherits":203,"process-nextick-args":222,"safe-buffer":248,"util-deprecate":266}],239:[function(require,module,exports){
+},{"./_stream_duplex":240,"./internal/streams/destroy":246,"./internal/streams/stream":247,"_process":229,"core-util-is":145,"inherits":207,"process-nextick-args":228,"safe-buffer":254,"util-deprecate":272}],245:[function(require,module,exports){
 'use strict';
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -55127,7 +55930,7 @@ if (util && util.inspect && util.inspect.custom) {
     return this.constructor.name + ' ' + obj;
   };
 }
-},{"safe-buffer":248,"util":76}],240:[function(require,module,exports){
+},{"safe-buffer":254,"util":76}],246:[function(require,module,exports){
 'use strict';
 
 /*<replacement>*/
@@ -55202,20 +56005,20 @@ module.exports = {
   destroy: destroy,
   undestroy: undestroy
 };
-},{"process-nextick-args":222}],241:[function(require,module,exports){
+},{"process-nextick-args":228}],247:[function(require,module,exports){
 module.exports = require('events').EventEmitter;
 
-},{"events":185}],242:[function(require,module,exports){
+},{"events":185}],248:[function(require,module,exports){
 var toString = {}.toString;
 
 module.exports = Array.isArray || function (arr) {
   return toString.call(arr) == '[object Array]';
 };
 
-},{}],243:[function(require,module,exports){
+},{}],249:[function(require,module,exports){
 module.exports = require('./readable').PassThrough
 
-},{"./readable":244}],244:[function(require,module,exports){
+},{"./readable":250}],250:[function(require,module,exports){
 exports = module.exports = require('./lib/_stream_readable.js');
 exports.Stream = exports;
 exports.Readable = exports;
@@ -55224,13 +56027,13 @@ exports.Duplex = require('./lib/_stream_duplex.js');
 exports.Transform = require('./lib/_stream_transform.js');
 exports.PassThrough = require('./lib/_stream_passthrough.js');
 
-},{"./lib/_stream_duplex.js":234,"./lib/_stream_passthrough.js":235,"./lib/_stream_readable.js":236,"./lib/_stream_transform.js":237,"./lib/_stream_writable.js":238}],245:[function(require,module,exports){
+},{"./lib/_stream_duplex.js":240,"./lib/_stream_passthrough.js":241,"./lib/_stream_readable.js":242,"./lib/_stream_transform.js":243,"./lib/_stream_writable.js":244}],251:[function(require,module,exports){
 module.exports = require('./readable').Transform
 
-},{"./readable":244}],246:[function(require,module,exports){
+},{"./readable":250}],252:[function(require,module,exports){
 module.exports = require('./lib/_stream_writable.js');
 
-},{"./lib/_stream_writable.js":238}],247:[function(require,module,exports){
+},{"./lib/_stream_writable.js":244}],253:[function(require,module,exports){
 (function (Buffer){
 'use strict'
 var inherits = require('inherits')
@@ -55526,7 +56329,7 @@ module.exports = RIPEMD160
 
 }).call(this,require("buffer").Buffer)
 
-},{"buffer":110,"hash-base":188,"inherits":203}],248:[function(require,module,exports){
+},{"buffer":110,"hash-base":188,"inherits":207}],254:[function(require,module,exports){
 /* eslint-disable node/no-deprecated-api */
 var buffer = require('buffer')
 var Buffer = buffer.Buffer
@@ -55590,7 +56393,7 @@ SafeBuffer.allocUnsafeSlow = function (size) {
   return buffer.SlowBuffer(size)
 }
 
-},{"buffer":110}],249:[function(require,module,exports){
+},{"buffer":110}],255:[function(require,module,exports){
 (function (Buffer){
 var crypto = require('crypto')
 /* eslint-disable camelcase */
@@ -55775,7 +56578,7 @@ module.exports = scrypt
 
 }).call(this,require("buffer").Buffer)
 
-},{"buffer":110,"crypto":152}],250:[function(require,module,exports){
+},{"buffer":110,"crypto":152}],256:[function(require,module,exports){
 var Buffer = require('safe-buffer').Buffer
 
 // prototype class for hash functions
@@ -55858,7 +56661,7 @@ Hash.prototype._update = function () {
 
 module.exports = Hash
 
-},{"safe-buffer":248}],251:[function(require,module,exports){
+},{"safe-buffer":254}],257:[function(require,module,exports){
 var exports = module.exports = function SHA (algorithm) {
   algorithm = algorithm.toLowerCase()
 
@@ -55875,7 +56678,7 @@ exports.sha256 = require('./sha256')
 exports.sha384 = require('./sha384')
 exports.sha512 = require('./sha512')
 
-},{"./sha":252,"./sha1":253,"./sha224":254,"./sha256":255,"./sha384":256,"./sha512":257}],252:[function(require,module,exports){
+},{"./sha":258,"./sha1":259,"./sha224":260,"./sha256":261,"./sha384":262,"./sha512":263}],258:[function(require,module,exports){
 /*
  * A JavaScript implementation of the Secure Hash Algorithm, SHA-0, as defined
  * in FIPS PUB 180-1
@@ -55971,7 +56774,7 @@ Sha.prototype._hash = function () {
 
 module.exports = Sha
 
-},{"./hash":250,"inherits":203,"safe-buffer":248}],253:[function(require,module,exports){
+},{"./hash":256,"inherits":207,"safe-buffer":254}],259:[function(require,module,exports){
 /*
  * A JavaScript implementation of the Secure Hash Algorithm, SHA-1, as defined
  * in FIPS PUB 180-1
@@ -56072,7 +56875,7 @@ Sha1.prototype._hash = function () {
 
 module.exports = Sha1
 
-},{"./hash":250,"inherits":203,"safe-buffer":248}],254:[function(require,module,exports){
+},{"./hash":256,"inherits":207,"safe-buffer":254}],260:[function(require,module,exports){
 /**
  * A JavaScript implementation of the Secure Hash Algorithm, SHA-256, as defined
  * in FIPS 180-2
@@ -56127,7 +56930,7 @@ Sha224.prototype._hash = function () {
 
 module.exports = Sha224
 
-},{"./hash":250,"./sha256":255,"inherits":203,"safe-buffer":248}],255:[function(require,module,exports){
+},{"./hash":256,"./sha256":261,"inherits":207,"safe-buffer":254}],261:[function(require,module,exports){
 /**
  * A JavaScript implementation of the Secure Hash Algorithm, SHA-256, as defined
  * in FIPS 180-2
@@ -56264,7 +57067,7 @@ Sha256.prototype._hash = function () {
 
 module.exports = Sha256
 
-},{"./hash":250,"inherits":203,"safe-buffer":248}],256:[function(require,module,exports){
+},{"./hash":256,"inherits":207,"safe-buffer":254}],262:[function(require,module,exports){
 var inherits = require('inherits')
 var SHA512 = require('./sha512')
 var Hash = require('./hash')
@@ -56323,7 +57126,7 @@ Sha384.prototype._hash = function () {
 
 module.exports = Sha384
 
-},{"./hash":250,"./sha512":257,"inherits":203,"safe-buffer":248}],257:[function(require,module,exports){
+},{"./hash":256,"./sha512":263,"inherits":207,"safe-buffer":254}],263:[function(require,module,exports){
 var inherits = require('inherits')
 var Hash = require('./hash')
 var Buffer = require('safe-buffer').Buffer
@@ -56585,7 +57388,7 @@ Sha512.prototype._hash = function () {
 
 module.exports = Sha512
 
-},{"./hash":250,"inherits":203,"safe-buffer":248}],258:[function(require,module,exports){
+},{"./hash":256,"inherits":207,"safe-buffer":254}],264:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -56714,7 +57517,7 @@ Stream.prototype.pipe = function(dest, options) {
   return dest;
 };
 
-},{"events":185,"inherits":203,"readable-stream/duplex.js":233,"readable-stream/passthrough.js":243,"readable-stream/readable.js":244,"readable-stream/transform.js":245,"readable-stream/writable.js":246}],259:[function(require,module,exports){
+},{"events":185,"inherits":207,"readable-stream/duplex.js":239,"readable-stream/passthrough.js":249,"readable-stream/readable.js":250,"readable-stream/transform.js":251,"readable-stream/writable.js":252}],265:[function(require,module,exports){
 'use strict';
 
 var Buffer = require('safe-buffer').Buffer;
@@ -56987,7 +57790,7 @@ function simpleWrite(buf) {
 function simpleEnd(buf) {
   return buf && buf.length ? this.write(buf) : '';
 }
-},{"safe-buffer":248}],260:[function(require,module,exports){
+},{"safe-buffer":254}],266:[function(require,module,exports){
 (function (global){
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
@@ -57380,7 +58183,7 @@ return typeDetect;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{}],261:[function(require,module,exports){
+},{}],267:[function(require,module,exports){
 var native = require('./native')
 
 function getTypeName (fn) {
@@ -57486,7 +58289,7 @@ module.exports = {
   getValueTypeName: getValueTypeName
 }
 
-},{"./native":264}],262:[function(require,module,exports){
+},{"./native":270}],268:[function(require,module,exports){
 (function (Buffer){
 var NATIVE = require('./native')
 var ERRORS = require('./errors')
@@ -57563,7 +58366,7 @@ module.exports = types
 
 }).call(this,{"isBuffer":require("../is-buffer/index.js")})
 
-},{"../is-buffer/index.js":204,"./errors":261,"./native":264}],263:[function(require,module,exports){
+},{"../is-buffer/index.js":208,"./errors":267,"./native":270}],269:[function(require,module,exports){
 var ERRORS = require('./errors')
 var NATIVE = require('./native')
 
@@ -57803,7 +58606,7 @@ typeforce.TfPropertyTypeError = TfPropertyTypeError
 
 module.exports = typeforce
 
-},{"./errors":261,"./extra":262,"./native":264}],264:[function(require,module,exports){
+},{"./errors":267,"./extra":268,"./native":270}],270:[function(require,module,exports){
 var types = {
   Array: function (value) { return value !== null && value !== undefined && value.constructor === Array },
   Boolean: function (value) { return typeof value === 'boolean' },
@@ -57826,7 +58629,7 @@ for (var typeName in types) {
 
 module.exports = types
 
-},{}],265:[function(require,module,exports){
+},{}],271:[function(require,module,exports){
 (function (root) {
    "use strict";
 
@@ -58270,7 +59073,7 @@ UChar.udata={
    }
 }(this));
 
-},{}],266:[function(require,module,exports){
+},{}],272:[function(require,module,exports){
 (function (global){
 
 /**
@@ -58342,16 +59145,16 @@ function config (name) {
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{}],267:[function(require,module,exports){
-arguments[4][203][0].apply(exports,arguments)
-},{"dup":203}],268:[function(require,module,exports){
+},{}],273:[function(require,module,exports){
+arguments[4][207][0].apply(exports,arguments)
+},{"dup":207}],274:[function(require,module,exports){
 module.exports = function isBuffer(arg) {
   return arg && typeof arg === 'object'
     && typeof arg.copy === 'function'
     && typeof arg.fill === 'function'
     && typeof arg.readUInt8 === 'function';
 }
-},{}],269:[function(require,module,exports){
+},{}],275:[function(require,module,exports){
 (function (process,global){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -58942,7 +59745,7 @@ function hasOwnProperty(obj, prop) {
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{"./support/isBuffer":268,"_process":223,"inherits":267}],270:[function(require,module,exports){
+},{"./support/isBuffer":274,"_process":229,"inherits":273}],276:[function(require,module,exports){
 'use strict'
 var Buffer = require('safe-buffer').Buffer
 
@@ -59034,7 +59837,7 @@ function encodingLength (number) {
 
 module.exports = { encode: encode, decode: decode, encodingLength: encodingLength }
 
-},{"safe-buffer":248}],271:[function(require,module,exports){
+},{"safe-buffer":254}],277:[function(require,module,exports){
 var indexOf = function (xs, item) {
     if (xs.indexOf) return xs.indexOf(item);
     else for (var i = 0; i < xs.length; i++) {
@@ -59181,7 +59984,7 @@ exports.createContext = Script.createContext = function (context) {
     return copy;
 };
 
-},{}],272:[function(require,module,exports){
+},{}],278:[function(require,module,exports){
 (function (Buffer){
 var bs58check = require('bs58check')
 
@@ -59249,7 +60052,7 @@ module.exports = {
 
 }).call(this,require("buffer").Buffer)
 
-},{"bs58check":107,"buffer":110}],273:[function(require,module,exports){
+},{"bs58check":107,"buffer":110}],279:[function(require,module,exports){
 var bip38 = require('bip38');
 var wif = require('wif');
 
@@ -59263,31 +60066,101 @@ function encryptPrivKey(privKey, password) {
 module.exports = {
     encryptPrivKey: encryptPrivKey
 };
-},{"bip38":24,"wif":272}],274:[function(require,module,exports){
+},{"bip38":24,"wif":278}],280:[function(require,module,exports){
+(function (Buffer){
 const bitcoinjs = require('./bitcoinjs-lib_patched').bitcoinjs;
 const bip39 = require('bip39');
+const mEntropy = require('more-entropy');
+var randomBytes = require('randombytes');
+
+const bip39_bitSize = 128; // = 12 words  // https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki#generating-the-mnemonic
+const bip39_byteSize = bip39_bitSize / 8;
 
 var mnemonic;
 var bip32RootKey;
 
-function initiateHDWallet(loadMnemonic, password) {
+var moreEnropyGen = new mEntropy.Generator({
+    'loop_delay':        2, // how many milliseconds to pause between each operation loop. A lower value will generate entropy faster, but will also be harder on the CPU
+    'work_min':           1 ,// milliseconds per loop; a higher value blocks the CPU more, so 1 is recommended
+    'auto_stop_bits':  8192, // the generator prepares entropy for you before you request it; if it reaches this much unclaimed entropy it will stop working
+    'max_bits_per_delta': 8, // a safety cap on how much entropy it can claim per value; 4 (default) is very conservative. a larger value will allow faster entropy generation
+});
+
+// cross-site scripting prevention: remove the generator from window, as it is not needed there.
+// https://github.com/keybase/more-entropy/blob/v0.0.4/lib/generator.js#L173
+if (typeof window !== "undefined" && window !== null) {
+    window.Generator = null;
+}
+
+function getEntropy(useImprovedEntropy, cb){
+    if(useImprovedEntropy){
+        // if(useImprovedEntropy){
+        improveEntropy(bip39_byteSize)
+            .then(function (improvedEntropy) {
+                cb(improvedEntropy);
+            });
+    }else{
+        cb(randomBytes(bip39_byteSize));
+    }
+}
+
+// takes randomBytes() and more-entropy and returns an XOR of both entropies
+async function improveEntropy(amountInBytes){
+
+    return new Promise(function (resolve, reject) {
+        // get an array of integers with at least the given amount of bits of combined entropy:
+        moreEnropyGen.generate(amountInBytes * 8, function (vals) {
+
+            // stuff entropy into a Uint8Array
+            var valsUint8 = new Uint8Array(vals);
+
+            // get randomBytes (uses crypto.getRandomValues)
+            var randBytes = randomBytes(amountInBytes);
+
+            // merge
+            var mergeArray = new Uint8Array(amountInBytes);
+            for (var i = 0; i < amountInBytes; i++) {
+                mergeArray[i] = randBytes[i] ^ valsUint8[i];
+            }
+
+            var mergedEntropy = Buffer.from(mergeArray);
+
+            resolve(mergedEntropy);
+        });
+
+    });
+}
+
+function initiateHDWallet(loadMnemonic, password, useImprovedEntropy, cb) {
+
+    function afterGettingMnemonic(mnemonic, password) {
+        var seed = bip39.mnemonicToSeed(mnemonic, password);
+        bip32RootKey = bitcoinjs.HDNode.fromSeedBuffer(seed);
+
+        cb(mnemonic);
+    }
 
     if (!loadMnemonic) {
-        // create a new mnemonic and return it
-        mnemonic = bip39.generateMnemonic();
+
+        getEntropy(useImprovedEntropy, function (entropy) {
+
+            // create a new mnemonic and return it
+            mnemonic = bip39.entropyToMnemonic(entropy);
+
+            afterGettingMnemonic(mnemonic, password);
+        });
+
+
     } else {
         // import a given mnemonic
         if (bip39.validateMnemonic(loadMnemonic)) {
             mnemonic = loadMnemonic;
+
+            afterGettingMnemonic(mnemonic, password);
         } else {
             throw ('given mnemonic [' + loadMnemonic + '] is not a valid 12 word mnemonic');
         }
     }
-
-    var seed = bip39.mnemonicToSeed(mnemonic, password);
-    bip32RootKey = bitcoinjs.HDNode.fromSeedBuffer(seed);
-
-    return mnemonic;
 }
 
 function createAccount(networkID, index) {
@@ -59502,7 +60375,9 @@ module.exports = {
     networks: bitcoinjs.networks
 };
 
-},{"./bitcoinjs-lib_patched":275,"bip39":25}],275:[function(require,module,exports){
+}).call(this,require("buffer").Buffer)
+
+},{"./bitcoinjs-lib_patched":281,"bip39":25,"buffer":110,"more-entropy":216,"randombytes":237}],281:[function(require,module,exports){
 var bitcoinjs = require('bitcoinjs-lib');
 
 // extensions copied from https://github.com/iancoleman/bip39/blob/master/src/js/segwit-parameters.js
@@ -59591,7 +60466,7 @@ module.exports = {
     bitcoinjs
 }
 
-},{"bitcoinjs-lib":45}],276:[function(require,module,exports){
+},{"bitcoinjs-lib":45}],282:[function(require,module,exports){
 /*
     Adds multi-threading (with web workers) and caching for the bitcoin library
 
@@ -59659,19 +60534,21 @@ initiateWorkerpool()
 // functions
 // //////////////////////////////////////////////////
 
-function initiateHDWallet(mnemonic, password) {
+function initiateHDWallet(loadMnemonic, password, useImprovedEntropy, cb) {
 
     // always reset the cache on new wallets
     cache = [];
-    mnemonic = bitcoin.initiateHDWallet(mnemonic, password);
 
-    return bitcoin.initiateHDWallet(mnemonic, password);
+    bitcoin.initiateHDWallet(mnemonic, password, useImprovedEntropy, function (result) {
+        mnemonic = result;
+        cb(mnemonic);
+    });
 }
 
 function createAccount (networkID, index, callback) {
 
     if(typeof mnemonic === 'undefined'){
-        throw 'run initiateHDWallet before calling createAccount()';
+        throw 'you must run initiateHDWallet before calling createAccount()';
     }
 
     index = index || 0;
@@ -59686,7 +60563,7 @@ function createAccount (networkID, index, callback) {
 function asyncCreateCredentials(networkID, accountIndex, addressIndex, password, callback){
 
     if(typeof mnemonic === 'undefined'){
-        throw 'run initiateHDWallet before calling asyncCreateCredentials()';
+        throw 'you must run initiateHDWallet before calling asyncCreateCredentials()';
     }
 
     createAccount (networkID, accountIndex, function () {
@@ -59963,7 +60840,9 @@ function init() {
     password = currentPage.defaultPassword;
     showXPUB = currentPage.showXPUB;
 
-    loadWallet();
+    initiateWallet(function () {
+        loadWallet();
+    });
 
     // run unit tests
     var runAllTests = getURLparameter(GET.allUnitTests.keyword) == GET.allUnitTests.yes;
@@ -60249,7 +61128,9 @@ function toggleAddressNumbering() {
 
 function changePassword() {
     password = DOM.options.encryption.pass.val();
-    loadWallet(true);
+    initiateWallet(function () {
+        loadWallet();
+    });
 };
 
 
@@ -60298,14 +61179,14 @@ function recalculateWallet() {
     loadWallet();
 }
 
+function initiateWallet(cb){
+    initiateHDWallet('curve swear maze domain knock frozen ordinary climb love possible brave market', password, true, function (result) {
+        mnemonic = result;
+        cb();
+    });
+}
 
-mnemonic = initiateHDWallet('curve swear maze domain knock frozen ordinary climb love possible brave market', password);
-
-function loadWallet(newMnemonic) {
-
-    if(newMnemonic){
-        mnemonic = initiateHDWallet('curve swear maze domain knock frozen ordinary climb love possible brave market', password);
-    }
+function loadWallet() {
 
     if (isAccountsFormEmpty()) {
         initAccountsForm();
@@ -60442,7 +61323,7 @@ function getURLparameter(name, url) {
 init();
 
 
-},{"../../test/bitcoinTest":277,"./bitcoin":274}],277:[function(require,module,exports){
+},{"../../test/bitcoinTest":283,"./bitcoin":280}],283:[function(require,module,exports){
 const assert = require('chai').assert;
 const bitcoin = require('../src/js/bitcoin');
 const bip38 = require('../src/js/bip38encryption');
@@ -60467,28 +61348,47 @@ function bitcoinJStests() {
             describe('Unencrypted seed', function () {
 
                 it('Return new 12 word mnemonic', function () {
-                    var mnemonic = bitcoin.initiateHDWallet();
-                    var mnemonic_array = mnemonic.split(' ');
-                    assert.equal(mnemonic_array.length, 12);
+                    bitcoin.initiateHDWallet(false, false, false, function (mnemonic) {
+                        var mnemonic_array = mnemonic.split(' ');
+                        assert.equal(mnemonic_array.length, 12);
+                    });
+                });
+
+                it('... using more-entropy module', function (done) {
+                    bitcoin.initiateHDWallet(false, false, true, function (mnemonic) {
+                        var mnemonic_array = mnemonic.split(' ');
+                        assert.equal(mnemonic_array.length, 12);
+                        done();
+                    });
                 });
 
                 it('Return given 12 word mnemonic', function () {
-                    var mnemonic = bitcoin.initiateHDWallet(testing_mnemonic);
-                    assert.equal(mnemonic, testing_mnemonic);
+                    bitcoin.initiateHDWallet(testing_mnemonic, false, false, function (mnemonic) {
+                        assert.equal(mnemonic, testing_mnemonic);
+                    });
                 });
-
             });
             describe('Encrypted seed', function () {
 
                 it('Return new 12 word mnemonic', function () {
-                    var mnemonic = bitcoin.initiateHDWallet(false, testing_password);
-                    var mnemonic_array = mnemonic.split(' ');
-                    assert.equal(mnemonic_array.length, 12);
+                    bitcoin.initiateHDWallet(false, testing_password, false, function (mnemonic) {
+                        var mnemonic_array = mnemonic.split(' ');
+                        assert.equal(mnemonic_array.length, 12);
+                    });
+                });
+
+                it('... using more-entropy module', function (done) {
+                    bitcoin.initiateHDWallet(false, testing_password, true, function (mnemonic) {
+                        var mnemonic_array = mnemonic.split(' ');
+                        assert.equal(mnemonic_array.length, 12);
+                        done();
+                    });
                 });
 
                 it('Return given 12 word mnemonic', function () {
-                    var mnemonic = bitcoin.initiateHDWallet(testing_mnemonic, testing_password);
-                    assert.equal(mnemonic, testing_mnemonic);
+                    bitcoin.initiateHDWallet(testing_mnemonic, testing_password, false, function (mnemonic) {
+                        assert.equal(mnemonic, testing_mnemonic);
+                    });
                 });
 
             });
@@ -60498,66 +61398,75 @@ function bitcoinJStests() {
         describe('Extended public key', function () {
             describe('New mnemonic', function () {
                 it('Returns xpub', function () {
-                    bitcoin.initiateHDWallet();
-                    var account = bitcoin.createAccount(MAINNET_NONSEGWIT, 0);
+                    bitcoin.initiateHDWallet(false, false, false, function (mnemonic) {
+                        var account = bitcoin.createAccount(MAINNET_NONSEGWIT, 0);
 
-                    assert.equal(account.xpub.substring(0, 4), 'xpub');
+                        assert.equal(account.xpub.substring(0, 4), 'xpub');
+                    });
                 });
                 it('Returns ypub', function () {
-                    bitcoin.initiateHDWallet();
-                    var account = bitcoin.createAccount(MAINNET_SEGWIT, 0);
+                    bitcoin.initiateHDWallet(false, false, false, function (mnemonic) {
+                        var account = bitcoin.createAccount(MAINNET_SEGWIT, 0);
 
-                    assert.equal(account.xpub.substring(0, 4), 'ypub');
+                        assert.equal(account.xpub.substring(0, 4), 'ypub');
+                    });
                 });
                 it('Returns zpub', function () {
-                    bitcoin.initiateHDWallet();
-                    var account = bitcoin.createAccount(MAINNET_BECH32, 0);
+                    bitcoin.initiateHDWallet(false, false, false, function (mnemonic) {
+                        var account = bitcoin.createAccount(MAINNET_BECH32, 0);
 
-                    assert.equal(account.xpub.substring(0, 4), 'zpub');
+                        assert.equal(account.xpub.substring(0, 4), 'zpub');
+                    });
                 });
                 it('Returns tpub', function () {
-                    bitcoin.initiateHDWallet();
-                    var account = bitcoin.createAccount(TESTNET_NONSEGWIT, 0);
+                    bitcoin.initiateHDWallet(false, false, false, function (mnemonic) {
+                        var account = bitcoin.createAccount(TESTNET_NONSEGWIT, 0);
 
-                    assert.equal(account.xpub.substring(0, 4), 'tpub');
+                        assert.equal(account.xpub.substring(0, 4), 'tpub');
+                    });
                 });
                 it('Returns upub', function () {
-                    bitcoin.initiateHDWallet();
-                    var account = bitcoin.createAccount(TESTNET_SEGWIT, 0);
+                    bitcoin.initiateHDWallet(false, false, false, function (mnemonic) {
+                        var account = bitcoin.createAccount(TESTNET_SEGWIT, 0);
 
-                    assert.equal(account.xpub.substring(0, 4), 'upub');
+                        assert.equal(account.xpub.substring(0, 4), 'upub');
+                    });
                 });
                 it('Returns vpub', function () {
-                    bitcoin.initiateHDWallet();
-                    var account = bitcoin.createAccount(TESTNET_BECH32, 0);
+                    bitcoin.initiateHDWallet(false, false, false, function (mnemonic) {
+                        var account = bitcoin.createAccount(TESTNET_BECH32, 0);
 
-                    assert.equal(account.xpub.substring(0, 4), 'vpub');
+                        assert.equal(account.xpub.substring(0, 4), 'vpub');
+                    });
                 });
             });
             describe('Given mnemonic', function () {
                 it('Returns XPUB [Non-Segwit]', function () {
-                    bitcoin.initiateHDWallet(testing_mnemonic);
-                    var account = bitcoin.createAccount(MAINNET_NONSEGWIT, 0);
+                    bitcoin.initiateHDWallet(testing_mnemonic, false, false, function (mnemonic) {
+                        var account = bitcoin.createAccount(MAINNET_NONSEGWIT, 0);
 
-                    var expected = 'xpub6BgB4HXnJs3gV9t9r4LB6ZXmwbawUEZSwFcCHZC3K3yEN4Lmtzg8bBSpriKgHJLS9Jufgym9osUAVHvyMYdQ82zMzp3voYFbgfUYvq9XhCD';
+                        var expected = 'xpub6BgB4HXnJs3gV9t9r4LB6ZXmwbawUEZSwFcCHZC3K3yEN4Lmtzg8bBSpriKgHJLS9Jufgym9osUAVHvyMYdQ82zMzp3voYFbgfUYvq9XhCD';
 
-                    assert.equal(account.xpub, expected);
+                        assert.equal(account.xpub, expected);
+                    });
                 });
                 it('Returns YPUB [P2SH-P2WPKH]', function () {
-                    bitcoin.initiateHDWallet(testing_mnemonic);
-                    var account = bitcoin.createAccount(MAINNET_SEGWIT, 0);
+                    bitcoin.initiateHDWallet(testing_mnemonic, false, false, function (mnemonic) {
+                        var account = bitcoin.createAccount(MAINNET_SEGWIT, 0);
 
-                    var expected = 'ypub6Xvc2hTW5ziP5tApCAFBM9JeyuriZ8SQ3GZfpdneEueDmmhUYgbqtzDub34jqwKAEe9YNwgKD7mBpBfbh1g6Mt5b3xtcczuZXNeu5Q5yJp8';
+                        var expected = 'ypub6Xvc2hTW5ziP5tApCAFBM9JeyuriZ8SQ3GZfpdneEueDmmhUYgbqtzDub34jqwKAEe9YNwgKD7mBpBfbh1g6Mt5b3xtcczuZXNeu5Q5yJp8';
 
-                    assert.equal(account.xpub, expected);
+                        assert.equal(account.xpub, expected);
+                    });
                 });
                 it('Returns ZPUB [Bech32, 2nd account]', function () {
-                    bitcoin.initiateHDWallet(testing_mnemonic);
-                    var account = bitcoin.createAccount(MAINNET_BECH32, 1);
+                    bitcoin.initiateHDWallet(testing_mnemonic, false, false, function (mnemonic) {
+                        var account = bitcoin.createAccount(MAINNET_BECH32, 1);
 
-                    var expected = 'zpub6s7a2Y5RyxmLZLRMD79crfAeXuwXvChc5MRU5WvipdJHZG84Z1en4LGJCmMVLzYYRprAWShdKgcqPjr3kBuDLPj57j2XA44HaREZ4HMfFHw';
+                        var expected = 'zpub6s7a2Y5RyxmLZLRMD79crfAeXuwXvChc5MRU5WvipdJHZG84Z1en4LGJCmMVLzYYRprAWShdKgcqPjr3kBuDLPj57j2XA44HaREZ4HMfFHw';
 
-                    assert.equal(account.xpub, expected);
+                        assert.equal(account.xpub, expected);
+                    });
                 });
             });
 
@@ -60567,130 +61476,142 @@ function bitcoinJStests() {
 
             it('Non-Segwit address [mainnet]', function () {
                 // load testing mnemonic
-                bitcoin.initiateHDWallet(testing_mnemonic);
-                var account = bitcoin.createAccount(MAINNET_NONSEGWIT, 0);
-                var credentials = bitcoin.createCredentials(account.external, 0);
+                bitcoin.initiateHDWallet(testing_mnemonic, false, false, function (mnemonic) {
+                    var account = bitcoin.createAccount(MAINNET_NONSEGWIT, 0);
+                    var credentials = bitcoin.createCredentials(account.external, 0);
 
-                assert.equal(credentials.address, '16C6UYcvPuiY4nHMbdSFAXgB2QEyxjr8Jx');
+                    assert.equal(credentials.address, '16C6UYcvPuiY4nHMbdSFAXgB2QEyxjr8Jx');
+                });
             });
 
             it('Non-Segwit privKey [mainnet]', function () {
                 // load testing mnemonic
-                bitcoin.initiateHDWallet(testing_mnemonic);
-                var account = bitcoin.createAccount(MAINNET_NONSEGWIT, 0);
-                var credentials = bitcoin.createCredentials(account.external, 0);
+                bitcoin.initiateHDWallet(testing_mnemonic, false, false, function (mnemonic) {
+                    var account = bitcoin.createAccount(MAINNET_NONSEGWIT, 0);
+                    var credentials = bitcoin.createCredentials(account.external, 0);
 
-                assert.equal(credentials.privateKey, 'L2THPE6rBFZBqe1qsXAZvjHwNe1UP3PCePPLsdCv9WxpoeQuXsAd');
+                    assert.equal(credentials.privateKey, 'L2THPE6rBFZBqe1qsXAZvjHwNe1UP3PCePPLsdCv9WxpoeQuXsAd');
+                });
             });
 
             it('3 non-Segwit addresses [testnet]', function () {
                 // load testing mnemonic
-                bitcoin.initiateHDWallet(testing_mnemonic);
-                var account = bitcoin.createAccount(TESTNET_NONSEGWIT, 0);
+                bitcoin.initiateHDWallet(testing_mnemonic, false, false, function (mnemonic) {
+                    var account = bitcoin.createAccount(TESTNET_NONSEGWIT, 0);
 
-                var amount = 3;
-                var addresses = [];
+                    var amount = 3;
+                    var addresses = [];
 
-                for (var x = 0; x < amount; x++) {
-                    addresses[x] = bitcoin.createCredentials(account.external, x).address;
-                }
+                    for (var x = 0; x < amount; x++) {
+                        addresses[x] = bitcoin.createCredentials(account.external, x).address;
+                    }
 
-                assert.deepEqual(addresses,
-                    [
-                        'mopKVYnyG1MXViEtsWSrmCRvfdBh87JEDC',
-                        'n3Efkt9APhTRZS37oP7BQvj4ngjZTmZvEh',
-                        'n4MbxG5MjgJ7KhFgb5639vWA2AbvRBbGmw'
-                    ]);
+                    assert.deepEqual(addresses,
+                        [
+                            'mopKVYnyG1MXViEtsWSrmCRvfdBh87JEDC',
+                            'n3Efkt9APhTRZS37oP7BQvj4ngjZTmZvEh',
+                            'n4MbxG5MjgJ7KhFgb5639vWA2AbvRBbGmw'
+                        ]);
+                });
             });
 
             it('2 non-Segwit privKeys [testnet]', function () {
                 // load testing mnemonic
-                bitcoin.initiateHDWallet(testing_mnemonic);
-                var account = bitcoin.createAccount(TESTNET_NONSEGWIT, 0);
+                bitcoin.initiateHDWallet(testing_mnemonic, false, false, function (mnemonic) {
+                    var account = bitcoin.createAccount(TESTNET_NONSEGWIT, 0);
 
-                var amount = 2;
-                var privKeys = [];
+                    var amount = 2;
+                    var privKeys = [];
 
-                for (var x = 0; x < amount; x++) {
-                    privKeys[x] = bitcoin.createCredentials(account.external, x).privateKey;
-                }
-                assert.deepEqual(privKeys,
-                    [
-                        'cPbsmCBdoz9FkvoYQxcM7neaZXKhXDQpWcZRUJZPtjTttWRKFvTQ',
-                        'cT9PJkpvFxZZe4CUf8kxZKHuwD6KDwue9qZtyvhPAJuYwLR8oyA6'
-                    ]);
+                    for (var x = 0; x < amount; x++) {
+                        privKeys[x] = bitcoin.createCredentials(account.external, x).privateKey;
+                    }
+                    assert.deepEqual(privKeys,
+                        [
+                            'cPbsmCBdoz9FkvoYQxcM7neaZXKhXDQpWcZRUJZPtjTttWRKFvTQ',
+                            'cT9PJkpvFxZZe4CUf8kxZKHuwD6KDwue9qZtyvhPAJuYwLR8oyA6'
+                        ]);
+                });
             });
 
             it('P2SH-P2WPKH address [mainnet]', function () {
                 // load testing mnemonic
-                bitcoin.initiateHDWallet(testing_mnemonic);
-                var account = bitcoin.createAccount(MAINNET_SEGWIT, 0);
-                var credentials = bitcoin.createCredentials(account.external, 0);
+                bitcoin.initiateHDWallet(testing_mnemonic, false, false, function (mnemonic) {
+                    var account = bitcoin.createAccount(MAINNET_SEGWIT, 0);
+                    var credentials = bitcoin.createCredentials(account.external, 0);
 
-                assert.equal(credentials.address, '31uAoP3hMQ2rehKnfEFTMJC4tADveRzx6K');
+                    assert.equal(credentials.address, '31uAoP3hMQ2rehKnfEFTMJC4tADveRzx6K');
+                });
             });
 
             it('P2SH-P2WPKH privKey [mainnet]', function () {
                 // load testing mnemonic
-                bitcoin.initiateHDWallet(testing_mnemonic);
-                var account = bitcoin.createAccount(MAINNET_SEGWIT, 0);
-                var credentials = bitcoin.createCredentials(account.external, 0);
+                bitcoin.initiateHDWallet(testing_mnemonic, false, false, function (mnemonic) {
+                    var account = bitcoin.createAccount(MAINNET_SEGWIT, 0);
+                    var credentials = bitcoin.createCredentials(account.external, 0);
 
-                assert.equal(credentials.privateKey, 'KxxQTCfkZgBBQYRBJTJr41avZJdQ1fHb7gc1Q1poGvSBdJtUeaR7');
+                    assert.equal(credentials.privateKey, 'KxxQTCfkZgBBQYRBJTJr41avZJdQ1fHb7gc1Q1poGvSBdJtUeaR7');
+                });
             });
 
             it('P2SH-P2WPKH address [testnet]', function () {
                 // load testing mnemonic
-                bitcoin.initiateHDWallet(testing_mnemonic);
-                var account = bitcoin.createAccount(TESTNET_SEGWIT, 0);
-                var credentials = bitcoin.createCredentials(account.external, 0);
+                bitcoin.initiateHDWallet(testing_mnemonic, false, false, function (mnemonic) {
+                    var account = bitcoin.createAccount(TESTNET_SEGWIT, 0);
+                    var credentials = bitcoin.createCredentials(account.external, 0);
 
-                assert.equal(credentials.address, '2N7oVd4Xq9TfpCWaVHhFNCPQbi4buiLdpyi');
+                    assert.equal(credentials.address, '2N7oVd4Xq9TfpCWaVHhFNCPQbi4buiLdpyi');
+                });
             });
 
             it('P2SH-P2WPKH privKey [testnet]', function () {
                 // load testing mnemonic
-                bitcoin.initiateHDWallet(testing_mnemonic);
-                var account = bitcoin.createAccount(TESTNET_SEGWIT, 0);
-                var credentials = bitcoin.createCredentials(account.external, 0);
+                bitcoin.initiateHDWallet(testing_mnemonic, false, false, function (mnemonic) {
+                    var account = bitcoin.createAccount(TESTNET_SEGWIT, 0);
+                    var credentials = bitcoin.createCredentials(account.external, 0);
 
-                assert.equal(credentials.privateKey, 'cRsGmgKfnAueMA2DJzT29dvMx4cLJ4gMbTK8CRahP4orPeD15caX');
+                    assert.equal(credentials.privateKey, 'cRsGmgKfnAueMA2DJzT29dvMx4cLJ4gMbTK8CRahP4orPeD15caX');
+                });
             });
 
             it('Bech32 address [mainnet]', function () {
                 // load testing mnemonic
-                bitcoin.initiateHDWallet(testing_mnemonic);
-                var account = bitcoin.createAccount(MAINNET_BECH32, 0);
-                var credentials = bitcoin.createCredentials(account.external, 0);
+                bitcoin.initiateHDWallet(testing_mnemonic, false, false, function (mnemonic) {
+                    var account = bitcoin.createAccount(MAINNET_BECH32, 0);
+                    var credentials = bitcoin.createCredentials(account.external, 0);
 
-                assert.equal(credentials.address, 'bc1qk6rjegtxrvp7ty2tzd4uj88n33vnc3vqn90ps9');
+                    assert.equal(credentials.address, 'bc1qk6rjegtxrvp7ty2tzd4uj88n33vnc3vqn90ps9');
+                });
             });
 
             it('Bech32 privKey [mainnet]', function () {
                 // load testing mnemonic
-                bitcoin.initiateHDWallet(testing_mnemonic);
-                var account = bitcoin.createAccount(MAINNET_BECH32, 0);
-                var credentials = bitcoin.createCredentials(account.external, 0);
+                bitcoin.initiateHDWallet(testing_mnemonic, false, false, function (mnemonic) {
+                    var account = bitcoin.createAccount(MAINNET_BECH32, 0);
+                    var credentials = bitcoin.createCredentials(account.external, 0);
 
-                assert.equal(credentials.privateKey, 'Kzkuno5MDgVcs841HW5HWnSFmZ4xBEjzxNN2FnTv6k7cWMkzkvrc');
+                    assert.equal(credentials.privateKey, 'Kzkuno5MDgVcs841HW5HWnSFmZ4xBEjzxNN2FnTv6k7cWMkzkvrc');
+                });
             });
 
             it('Bech32 address [testnet]', function () {
                 // load testing mnemonic
-                bitcoin.initiateHDWallet(testing_mnemonic);
-                var account = bitcoin.createAccount(TESTNET_BECH32, 0);
-                var credentials = bitcoin.createCredentials(account.external, 0);
+                bitcoin.initiateHDWallet(testing_mnemonic, false, false, function (mnemonic) {
+                    var account = bitcoin.createAccount(TESTNET_BECH32, 0);
+                    var credentials = bitcoin.createCredentials(account.external, 0);
 
-                assert.equal(credentials.address, 'tb1qc45lcycj4upms5v0hzdnhnyq4s09xe7jnsdhtz');
+                    assert.equal(credentials.address, 'tb1qc45lcycj4upms5v0hzdnhnyq4s09xe7jnsdhtz');
+                });
             });
 
             it('Bech32 privKey [testnet]', function () {
                 // load testing mnemonic
-                bitcoin.initiateHDWallet(testing_mnemonic);
-                var account = bitcoin.createAccount(TESTNET_BECH32, 0);
-                var credentials = bitcoin.createCredentials(account.external, 0);
+                bitcoin.initiateHDWallet(testing_mnemonic, false, false, function (mnemonic) {
+                    var account = bitcoin.createAccount(TESTNET_BECH32, 0);
+                    var credentials = bitcoin.createCredentials(account.external, 0);
 
-                assert.equal(credentials.privateKey, 'cSoNGp1yv5yJFsUNKJck5TRufjVZ6aCRUu8tQB6X9o8eNa4ZVP1R');
+                    assert.equal(credentials.privateKey, 'cSoNGp1yv5yJFsUNKJck5TRufjVZ6aCRUu8tQB6X9o8eNa4ZVP1R');
+                });
             });
 
             it('2 accounts with 3 addresses each', function () {
@@ -60698,35 +61619,37 @@ function bitcoinJStests() {
                 var amountAddresses = 3;
 
                 // load testing mnemonic
-                bitcoin.initiateHDWallet(testing_mnemonic);
+                bitcoin.initiateHDWallet(testing_mnemonic, false, false, function (mnemonic) {
 
-                var addresses = [];
+                    var addresses = [];
 
-                for (var accIndex = 0; accIndex < amountAccounts; accIndex++) {
-                    var account = bitcoin.createAccount(TESTNET_BECH32, accIndex);
-                    for (var addressIndex = 0; addressIndex < amountAddresses; addressIndex++) {
-                        addresses.push(bitcoin.createCredentials(account.external, addressIndex).address);
+                    for (var accIndex = 0; accIndex < amountAccounts; accIndex++) {
+                        var account = bitcoin.createAccount(TESTNET_BECH32, accIndex);
+                        for (var addressIndex = 0; addressIndex < amountAddresses; addressIndex++) {
+                            addresses.push(bitcoin.createCredentials(account.external, addressIndex).address);
+                        }
                     }
-                }
 
-                assert.deepEqual(addresses,
-                    [
-                        'tb1qc45lcycj4upms5v0hzdnhnyq4s09xe7jnsdhtz',
-                        'tb1q2cn8tv0uf3gcl7y3jj4eflddeyk3l3sqm29h2s',
-                        'tb1q47ef5s9eyfcyrn5hnsm0p6cdnrld7mvsfjrccm',
-                        'tb1qhgaflwwuxauaz7d8lp937nh9kkegatc4pjuq2a',
-                        'tb1qgds0hznpnfg33nytttaaea6x54yjk6jg60530q',
-                        'tb1qxkhq30zjdfx6xvw55d2pql638pzx4lm044npug'
-                    ]);
+                    assert.deepEqual(addresses,
+                        [
+                            'tb1qc45lcycj4upms5v0hzdnhnyq4s09xe7jnsdhtz',
+                            'tb1q2cn8tv0uf3gcl7y3jj4eflddeyk3l3sqm29h2s',
+                            'tb1q47ef5s9eyfcyrn5hnsm0p6cdnrld7mvsfjrccm',
+                            'tb1qhgaflwwuxauaz7d8lp937nh9kkegatc4pjuq2a',
+                            'tb1qgds0hznpnfg33nytttaaea6x54yjk6jg60530q',
+                            'tb1qxkhq30zjdfx6xvw55d2pql638pzx4lm044npug'
+                        ]);
+                });
             });
 
             it('Password Encrypted Mnemonic', function () {
                 // load testing mnemonic
-                bitcoin.initiateHDWallet(testing_mnemonic, testing_password);
-                var account = bitcoin.createAccount(MAINNET_BECH32, 0);
-                var credentials = bitcoin.createCredentials(account.external, 0);
+                bitcoin.initiateHDWallet(testing_mnemonic, testing_password, false, function (mnemonic) {
+                    var account = bitcoin.createAccount(MAINNET_BECH32, 0);
+                    var credentials = bitcoin.createCredentials(account.external, 0);
 
-                assert.equal(credentials.privateKey, 'L38Umd9kZNjeo98PFbpzaSfpuyREBc1rzBiyHBqQUXkjrysVyDi5');
+                    assert.equal(credentials.privateKey, 'L38Umd9kZNjeo98PFbpzaSfpuyREBc1rzBiyHBqQUXkjrysVyDi5');
+                });
             });
         });
 
@@ -60734,38 +61657,42 @@ function bitcoinJStests() {
 
             it('P2SH-P2WPKH address [mainnet]', function () {
                 // load testing mnemonic
-                bitcoin.initiateHDWallet(testing_mnemonic, testing_password);
-                var account = bitcoin.createAccount(MAINNET_SEGWIT, 0);
-                var credentials = bitcoin.createCredentials(account.external, 0);
+                bitcoin.initiateHDWallet(testing_mnemonic, testing_password, false, function (mnemonic) {
+                    var account = bitcoin.createAccount(MAINNET_SEGWIT, 0);
+                    var credentials = bitcoin.createCredentials(account.external, 0);
 
-                assert.equal(credentials.address, '38799cavJvtfpkK55bsyPGMgQGUfY2EeVW');
+                    assert.equal(credentials.address, '38799cavJvtfpkK55bsyPGMgQGUfY2EeVW');
+                });
             });
 
             it('P2SH-P2WPKH privKey [mainnet]', function () {
                 // load testing mnemonic
-                bitcoin.initiateHDWallet(testing_mnemonic, testing_password);
-                var account = bitcoin.createAccount(MAINNET_SEGWIT, 0);
-                var credentials = bitcoin.createCredentials(account.external, 0);
+                bitcoin.initiateHDWallet(testing_mnemonic, testing_password, false, function (mnemonic) {
+                    var account = bitcoin.createAccount(MAINNET_SEGWIT, 0);
+                    var credentials = bitcoin.createCredentials(account.external, 0);
 
-                assert.equal(credentials.privateKey, 'KyYUc3DRDc4Qi9F1RZf7bVQVfKxZQAp8Se9KeGenpdT8Favounei');
+                    assert.equal(credentials.privateKey, 'KyYUc3DRDc4Qi9F1RZf7bVQVfKxZQAp8Se9KeGenpdT8Favounei');
+                });
             });
 
             it('Bech32 address [mainnet]', function () {
                 // load testing mnemonic
-                bitcoin.initiateHDWallet(testing_mnemonic, testing_password);
-                var account = bitcoin.createAccount(MAINNET_BECH32, 0);
-                var credentials = bitcoin.createCredentials(account.external, 0);
+                bitcoin.initiateHDWallet(testing_mnemonic, testing_password, false, function (mnemonic) {
+                    var account = bitcoin.createAccount(MAINNET_BECH32, 0);
+                    var credentials = bitcoin.createCredentials(account.external, 0);
 
-                assert.equal(credentials.address, 'bc1qwvffxlvr7vhg54gtuarm3w4sv9mmsqmtjqq3x4');
+                    assert.equal(credentials.address, 'bc1qwvffxlvr7vhg54gtuarm3w4sv9mmsqmtjqq3x4');
+                });
             });
 
             it('Bech32 privKey [mainnet]', function () {
                 // load testing mnemonic
-                bitcoin.initiateHDWallet(testing_mnemonic, testing_password);
-                var account = bitcoin.createAccount(MAINNET_BECH32, 0);
-                var credentials = bitcoin.createCredentials(account.external, 0);
+                bitcoin.initiateHDWallet(testing_mnemonic, testing_password, false, function (mnemonic) {
+                    var account = bitcoin.createAccount(MAINNET_BECH32, 0);
+                    var credentials = bitcoin.createCredentials(account.external, 0);
 
-                assert.equal(credentials.privateKey, 'L38Umd9kZNjeo98PFbpzaSfpuyREBc1rzBiyHBqQUXkjrysVyDi5');
+                    assert.equal(credentials.privateKey, 'L38Umd9kZNjeo98PFbpzaSfpuyREBc1rzBiyHBqQUXkjrysVyDi5');
+                });
             });
         });
     });
@@ -60780,22 +61707,24 @@ function bip38Tests() {
 
         it('Encrypted PrivKey', function () {
             // load testing mnemonic
-            bitcoin.initiateHDWallet(testing_mnemonic);
-            var account = bitcoin.createAccount(MAINNET_BECH32, 0);
-            var credentials = bitcoin.createCredentials(account.external, 0);
-            var encryptedPrivKey = bip38.encryptPrivKey(credentials.privateKey, testing_password);
+            bitcoin.initiateHDWallet(testing_mnemonic, false, false, function (mnemonic) {
+                var account = bitcoin.createAccount(MAINNET_BECH32, 0);
+                var credentials = bitcoin.createCredentials(account.external, 0);
+                var encryptedPrivKey = bip38.encryptPrivKey(credentials.privateKey, testing_password);
 
-            assert.equal(encryptedPrivKey, '6PYUjuUte84KiL2kFzuCNTven4WkdRFXmeMGGCVzDkpR1AcTBhLn2jMdoo');
+                assert.equal(encryptedPrivKey, '6PYUjuUte84KiL2kFzuCNTven4WkdRFXmeMGGCVzDkpR1AcTBhLn2jMdoo');
+            });
         });
 
         it('Encrpyted Privkey and Mnemonic', function () {
             // load testing mnemonic
-            bitcoin.initiateHDWallet(testing_mnemonic, testing_password);
-            var account = bitcoin.createAccount(MAINNET_BECH32, 0);
-            var credentials = bitcoin.createCredentials(account.external, 0);
-            var encryptedPrivKey = bip38.encryptPrivKey(credentials.privateKey, testing_password);
+            bitcoin.initiateHDWallet(testing_mnemonic, testing_password, false, function (mnemonic) {
+                var account = bitcoin.createAccount(MAINNET_BECH32, 0);
+                var credentials = bitcoin.createCredentials(account.external, 0);
+                var encryptedPrivKey = bip38.encryptPrivKey(credentials.privateKey, testing_password);
 
-            assert.equal(encryptedPrivKey, '6PYSqLAHxW8CT2sBYVjaZZKJ6yes2itBcvk5WHmsNysTkzM8Z62DZntKYc');;
+                assert.equal(encryptedPrivKey, '6PYSqLAHxW8CT2sBYVjaZZKJ6yes2itBcvk5WHmsNysTkzM8Z62DZntKYc');
+            });
         });
     });
 }
@@ -60804,7 +61733,7 @@ module.exports = {
     bitcoinJStests: bitcoinJStests,
     bip38Tests: bip38Tests
 }
-},{"../src/js/bip38encryption":273,"../src/js/bitcoin":274,"chai":111}]},{},[276])(276)
+},{"../src/js/bip38encryption":279,"../src/js/bitcoin":280,"chai":111}]},{},[282])(282)
 });
 
 //# sourceMappingURL=../maps/bundle.js.map
