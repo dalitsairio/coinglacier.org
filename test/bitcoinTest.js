@@ -28,14 +28,6 @@ function bitcoinJStests() {
                     });
                 });
 
-                it('... using more-entropy module', function (done) {
-                    bitcoin.initiateHDWallet(false, false, true, function (mnemonic) {
-                        var mnemonic_array = mnemonic.split(' ');
-                        assert.equal(mnemonic_array.length, 12);
-                        done();
-                    });
-                });
-
                 it('Return given 12 word mnemonic', function () {
                     bitcoin.initiateHDWallet(testing_mnemonic, false, false, function (mnemonic) {
                         assert.equal(mnemonic, testing_mnemonic);
@@ -48,14 +40,6 @@ function bitcoinJStests() {
                     bitcoin.initiateHDWallet(false, testing_password, false, function (mnemonic) {
                         var mnemonic_array = mnemonic.split(' ');
                         assert.equal(mnemonic_array.length, 12);
-                    });
-                });
-
-                it('... using more-entropy module', function (done) {
-                    bitcoin.initiateHDWallet(false, testing_password, true, function (mnemonic) {
-                        var mnemonic_array = mnemonic.split(' ');
-                        assert.equal(mnemonic_array.length, 12);
-                        done();
                     });
                 });
 
@@ -366,6 +350,23 @@ function bitcoinJStests() {
                     var credentials = bitcoin.createCredentials(account.external, 0);
 
                     assert.equal(credentials.privateKey, 'L38Umd9kZNjeo98PFbpzaSfpuyREBc1rzBiyHBqQUXkjrysVyDi5');
+                });
+            });
+        });
+        describe('More-Entropy feature', function () {
+            it('Initiate unencrypted HD wallet', function (done) {
+                bitcoin.initiateHDWallet(false, false, true, function (mnemonic) {
+                    var mnemonic_array = mnemonic.split(' ');
+                    assert.equal(mnemonic_array.length, 12);
+                    done();
+                });
+            });
+
+            it('Initiate encrypted HD wallet', function (done) {
+                bitcoin.initiateHDWallet(false, testing_password, true, function (mnemonic) {
+                    var mnemonic_array = mnemonic.split(' ');
+                    assert.equal(mnemonic_array.length, 12);
+                    done();
                 });
             });
         });
