@@ -70,7 +70,7 @@ function initiateHDWallet(loadMnemonic, password, useImprovedEntropy, cb) {
     // always reset the cache on new wallets
     cache = [];
 
-    bitcoin.initiateHDWallet(mnemonic, password, useImprovedEntropy, function (result) {
+    bitcoin.initiateHDWallet(loadMnemonic, password, useImprovedEntropy, function (result) {
         mnemonic = result;
         cb(mnemonic);
     });
