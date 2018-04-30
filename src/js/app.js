@@ -9,6 +9,7 @@ var password;
 var accountsForm;
 var mnemonic;
 var showXPUB;
+var useImprovedEntropy;
 
 
 // identical to the id's set in bitcoinjs-lib_patched.js
@@ -203,6 +204,7 @@ function init() {
         loadWallet();
     });
 
+
     // run unit tests
     var runAllTests = getURLparameter(GET.allUnitTests.keyword) == GET.allUnitTests.yes;
     runUnitTests(runAllTests);
@@ -250,6 +252,8 @@ function changePageElements() {
 
 function initMainnet() {
 
+    useImprovedEntropy = true;
+
     // remove GET parameter 'network'
     removeParamFromURL(GET.network.keyword);
 
@@ -269,6 +273,8 @@ function switchToMainnet() {
 }
 
 function initTestnet() {
+
+    useImprovedEntropy = false;
 
     // set GET parameter 'network' to 'testnet'
     addParamToURL({key: GET.network.keyword, value: GET.network.testnet});
@@ -539,7 +545,7 @@ function recalculateWallet() {
 }
 
 function initiateWallet(cb){
-    initiateHDWallet('curve swear maze domain knock frozen ordinary climb love possible brave market', password, true, function (result) {
+    initiateHDWallet('curve swear maze domain knock frozen ordinary climb love possible brave market', password, useImprovedEntropy, function (result) {
         mnemonic = result;
         cb();
     });

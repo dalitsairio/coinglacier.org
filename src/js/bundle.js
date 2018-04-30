@@ -60079,7 +60079,7 @@ const bip39_byteSize = bip39_bitSize / 8;
 var mnemonic;
 var bip32RootKey;
 
-var moreEnropyGen = new mEntropy.Generator({
+var moreEntropyGen = new mEntropy.Generator({
     'loop_delay':        2, // how many milliseconds to pause between each operation loop. A lower value will generate entropy faster, but will also be harder on the CPU
     'work_min':           1 ,// milliseconds per loop; a higher value blocks the CPU more, so 1 is recommended
     'auto_stop_bits':  8192, // the generator prepares entropy for you before you request it; if it reaches this much unclaimed entropy it will stop working
@@ -60109,7 +60109,7 @@ async function improveEntropy(amountInBytes){
 
     return new Promise(function (resolve, reject) {
         // get an array of integers with at least the given amount of bits of combined entropy:
-        moreEnropyGen.generate(amountInBytes * 8, function (vals) {
+        moreEntropyGen.generate(amountInBytes * 8, function (vals) {
 
             // stuff entropy into a Uint8Array
             var valsUint8 = new Uint8Array(vals);
@@ -60650,6 +60650,7 @@ var password;
 var accountsForm;
 var mnemonic;
 var showXPUB;
+var useImprovedEntropy;
 
 
 // identical to the id's set in bitcoinjs-lib_patched.js
@@ -60844,6 +60845,7 @@ function init() {
         loadWallet();
     });
 
+
     // run unit tests
     var runAllTests = getURLparameter(GET.allUnitTests.keyword) == GET.allUnitTests.yes;
     runUnitTests(runAllTests);
@@ -60891,6 +60893,8 @@ function changePageElements() {
 
 function initMainnet() {
 
+    useImprovedEntropy = true;
+
     // remove GET parameter 'network'
     removeParamFromURL(GET.network.keyword);
 
@@ -60910,6 +60914,8 @@ function switchToMainnet() {
 }
 
 function initTestnet() {
+
+    useImprovedEntropy = false;
 
     // set GET parameter 'network' to 'testnet'
     addParamToURL({key: GET.network.keyword, value: GET.network.testnet});
@@ -61180,7 +61186,7 @@ function recalculateWallet() {
 }
 
 function initiateWallet(cb){
-    initiateHDWallet('curve swear maze domain knock frozen ordinary climb love possible brave market', password, true, function (result) {
+    initiateHDWallet('curve swear maze domain knock frozen ordinary climb love possible brave market', password, useImprovedEntropy, function (result) {
         mnemonic = result;
         cb();
     });
@@ -61354,14 +61360,6 @@ function bitcoinJStests() {
                     });
                 });
 
-                it('... using more-entropy module', function (done) {
-                    bitcoin.initiateHDWallet(false, false, true, function (mnemonic) {
-                        var mnemonic_array = mnemonic.split(' ');
-                        assert.equal(mnemonic_array.length, 12);
-                        done();
-                    });
-                });
-
                 it('Return given 12 word mnemonic', function () {
                     bitcoin.initiateHDWallet(testing_mnemonic, false, false, function (mnemonic) {
                         assert.equal(mnemonic, testing_mnemonic);
@@ -61374,14 +61372,6 @@ function bitcoinJStests() {
                     bitcoin.initiateHDWallet(false, testing_password, false, function (mnemonic) {
                         var mnemonic_array = mnemonic.split(' ');
                         assert.equal(mnemonic_array.length, 12);
-                    });
-                });
-
-                it('... using more-entropy module', function (done) {
-                    bitcoin.initiateHDWallet(false, testing_password, true, function (mnemonic) {
-                        var mnemonic_array = mnemonic.split(' ');
-                        assert.equal(mnemonic_array.length, 12);
-                        done();
                     });
                 });
 
@@ -61692,6 +61682,23 @@ function bitcoinJStests() {
                     var credentials = bitcoin.createCredentials(account.external, 0);
 
                     assert.equal(credentials.privateKey, 'L38Umd9kZNjeo98PFbpzaSfpuyREBc1rzBiyHBqQUXkjrysVyDi5');
+                });
+            });
+        });
+        describe('More-Entropy feature', function () {
+            it('Initiate unencrypted HD wallet', function (done) {
+                bitcoin.initiateHDWallet(false, false, true, function (mnemonic) {
+                    var mnemonic_array = mnemonic.split(' ');
+                    assert.equal(mnemonic_array.length, 12);
+                    done();
+                });
+            });
+
+            it('Initiate encrypted HD wallet', function (done) {
+                bitcoin.initiateHDWallet(false, testing_password, true, function (mnemonic) {
+                    var mnemonic_array = mnemonic.split(' ');
+                    assert.equal(mnemonic_array.length, 12);
+                    done();
                 });
             });
         });
