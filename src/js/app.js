@@ -94,6 +94,15 @@ DOM.popovers.showXPUB = $('#showXPUBlabel');
 DOM.popovers.encryption = $('#password-input-group');
 DOM.popovers.numberAddresses = $('#address-numbering-label');
 
+// Wallet
+DOM.wallet = {};
+DOM.wallet.template = $('div#wallet-template');
+DOM.wallet.templateMnemonic = $('div#wallet-template .mnemonic');
+DOM.wallet.container = $('div#wallet');
+DOM.wallet.mnemonic = $('div#wallet h1.mnemonic');
+DOM.wallet.templateAccount = $('#wallet-template div#template-account-0');
+DOM.wallet.templateCredentials = $('div#wallet-template .credentials');
+
 
 // //////////////////////////////////////////////////
 // Pages / Page Options
@@ -545,8 +554,16 @@ function recalculateWallet() {
 }
 
 function initiateWallet(cb){
-    initiateHDWallet('curve swear maze domain knock frozen ordinary climb love possible brave market', password, useImprovedEntropy, function (result) {
+    initiateHDWallet(false, password, useImprovedEntropy, function (result) {
         mnemonic = result;
+        // todo unblock all settings
+        //block them before mnemonic is created
+        // ==> block it in html directly
+
+
+        // besser --> unblock whole website (zuerst blockieren mit jquery)
+
+        // TODO DANACH: MIT BIP39 TOOL CHECKEN OB ZEUGS PASSEND ZU MNEMONIC RAUSKOMMT
         cb();
     });
 }
@@ -557,9 +574,7 @@ function loadWallet() {
         initAccountsForm();
     }
 
-// todo do this the right way
-    var div_tag = document.getElementById('temporary');
-    div_tag.innerHTML = createWalletHTML();
+    createWalletHTML();
 
     if(currentPage.allowAccounts && showXPUB){
         $('h3.xpub').show();
@@ -572,49 +587,70 @@ function loadWallet() {
 }
 
 // todo this function will be replaced properly with templates n' stuff
-function createWalletHTML(){
-    var html_output = "<h1>" + mnemonic + "</h1>";
+function createWalletHTML(accountIndex){
 
-    foreachCredential(function (accountIndex, addressIndex) {
+    DOM.wallet.template.hide();
+    // remove everything from wallet container
+    DOM.wallet.container.html(DOM.wallet.templateMnemonic.clone());
 
-        var title = 'lorem ipsum';
+    DOM.wallet.container.find('.mnemonic').html(mnemonic);
 
-        if (currentPage.numberAddresses) {
-            title += ' [Address ' + (addressIndex + 1) + ']';
+    foreachCredential(
+
+        // per account
+        function (accountIndex){
+
+            $('div#account-' + accountIndex).html('');
+
+            var accountCopy = DOM.wallet.templateAccount.clone();
+            accountCopy.prop('id', 'account-' + accountIndex);
+            accountCopy.find('.xpub').prop('id', 'xpub-' + accountIndex);
+            accountCopy.find('div.credentials').remove();
+
+            DOM.wallet.container.append(accountCopy);
+        },
+
+        // per address
+        function (accountIndex, addressIndex) {
+
+            // var walletCrendentials = $('div#credentials-0-0');
+            var credentialsCopy = DOM.wallet.templateCredentials;
+            console.log('credentials-' + accountIndex + '-' + addressIndex);
+            credentialsCopy.prop('id', 'credentials-' + accountIndex + '-' + addressIndex);
+            credentialsCopy.find('.address').prop('id', 'address-' + accountIndex + '-' + addressIndex);
+            credentialsCopy.find('.privkey').prop('id', 'privkey-' + accountIndex + '-' + addressIndex);
+
+            var walletAccount = $('div#account-' + accountIndex);
+            walletAccount.append(credentialsCopy.clone());
         }
-        html_output += '<h3>' + title + '</h3><table>';
-        html_output += '<tr><td><b>Address</b></td><td id="address-' + accountIndex + '-' + addressIndex + '"> ... wait ... </td></tr>';
-        html_output += '<tr><td><b>Private Key</b></td><td id="privkey-' + accountIndex + '-' + addressIndex + '"> ... wait ... </td></tr>';
-        html_output += "</table>";
-    }, function (accountIndex) {
-        html_output += '<h3 id="xpub-' + accountIndex + '" class="xpub" style="display: none;"> ... wait ... </h3>'
-    });
-
-    return html_output;
+    );
 }
 
 function fillWalletHTML(){
 
-    foreachCredential(function (accountIndex, addressIndex) {
+    foreachCredential(
+        function (accountIndex) {
+            createAccount(network, accountIndex, function (account) {
+                $('h3#xpub-' + accountIndex).text('XPUB: ' + account.xpub);
+            })
+        },
+        function (accountIndex, addressIndex) {
 
-        asyncCreateCredentials(network, accountIndex, addressIndex, password, function (credentials) {
-            $('td#address-' + accountIndex + '-' + addressIndex).text(credentials.address);
-            $('td#privkey-' + accountIndex + '-' + addressIndex).text(credentials.privateKey);
-        });
-    }, function (accountIndex) {
-        createAccount (network, accountIndex, function (account) {
-            $('h3#xpub-' + accountIndex).text('XPUB: ' + account.xpub);
-        });
-    });
+            asyncCreateCredentials(network, accountIndex, addressIndex, password, function (credentials) {
+                $('td#address-' + accountIndex + '-' + addressIndex).text(credentials.address);
+                $('td#privkey-' + accountIndex + '-' + addressIndex).text(credentials.privateKey);
+            });
+        }
+    );
 }
 
-function foreachCredential(callback, callbackPerAccount){
+function foreachCredential(callbackPerAccount, callbackPerAddress){
     // loop through accounts
     for(var accountIndex = 0; accountIndex < accountsForm.length; accountIndex++) {
         callbackPerAccount(accountIndex);
         // loop through addresses
         for (var addressIndex = 0; addressIndex < accountsForm[accountIndex]; addressIndex++) {
-            callback(accountIndex, addressIndex);
+            callbackPerAddress(accountIndex, addressIndex);
         }
     }
 }
