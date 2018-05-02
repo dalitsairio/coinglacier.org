@@ -28,6 +28,10 @@ $bootstrap-sm: 768px;
     #options {
         background: lighten($testnet-primary, 30);
     }
+
+    .small-loader {
+        border-top: 5px solid $testnet-primary;
+    }
 }
 
 // mainnet theme
@@ -212,4 +216,57 @@ div.address, div.privkey {
         font-size: 0.9rem;
     }
 }
+
+
+//////////////////////////////
+///         SPINNER        ///
+//////////////////////////////
+.loader {
+    border: 14px solid #f3f3f3;
+    border-radius: 50%;
+    border-top: 14px solid $mainnet-primary;
+    width: 100px;
+    height: 100px;
+    -webkit-animation: spin 2s linear infinite; /* Safari */
+    animation: spin 1s linear infinite;
+}
+
+.small-loader {
+    border: 5px solid #f3f3f3;
+    border-radius: 50%;
+    border-top: 5px solid $mainnet-primary;
+    width: 25px;
+    height: 25px;
+    -webkit-animation: spin 2s linear infinite; /* Safari */
+    animation: spin 1s linear infinite;
+}
+
+/* Safari */
+@-webkit-keyframes spin {
+    0% { -webkit-transform: rotate(0deg); }
+    100% { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+
+// page loading
+div#page-loader{
+
+    margin-top: 8%;
+
+    h1{
+        text-transform: uppercase;
+    }
+
+    div#spinner-wrapper{
+        width:100px;
+        margin: 0 auto;
+        margin-top:8%;
+    }
+}
+
 

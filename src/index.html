@@ -19,7 +19,12 @@ Git Repo: https://github.com/dalitsairio/coinglacier.org.git
 
 <body>
 
-<div id="root-container" class="container mt-2">
+<div id="page-loader">
+    <h1 class="text-center">loading paper wallet</h1>
+    <div id="spinner-wrapper"><div class="loader"></div></div>
+</div>
+
+<div id="root-container" class="container mt-2" style="display: none;">
 
     <div id="switch-network" class="text-right">
         <button id="mainnet-link" class="btn btn-sm btn-link" href="javascript:void(0);">Switch to Mainnet >></button>
@@ -377,11 +382,11 @@ Git Repo: https://github.com/dalitsairio/coinglacier.org.git
                 <!--<h3> ... wait ... </h3>-->
                 <div class="col-md-1">
                     <h4>Address</h4>
-                    <div id="template-address-0-0" class="address"> ... wait ... </div>
+                    <div id="template-address-0-0" class="address"> ... wait ... <div class="small-loader"></div></div>
                 </div>
                 <div class="col-md-11 pt-md-4 text-right">
                     <h4>Private Key</h4>
-                    <div id="template-privkey-0-0" class="privkey"> ... wait ... </div>
+                    <div id="template-privkey-0-0" class="privkey"> ... wait ... <div class="small-loader"></div></div>
                 </div>
             </div>
         </div>

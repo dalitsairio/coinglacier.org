@@ -5556,6 +5556,8 @@
     color: #6ca91d; }
   .testnet #options {
     background: #e5f7ce; }
+  .testnet .small-loader {
+    border-top: 5px solid #A0E04C; }
 
 /*!
  * Bootstrap v4.1.0 (https://getbootstrap.com/)
@@ -11967,5 +11969,47 @@ div.address, div.privkey {
         width: 50px; }
   div.address, div.privkey {
     font-size: 0.9rem; } }
+
+.loader {
+  border: 14px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 14px solid #53aff6;
+  width: 100px;
+  height: 100px;
+  -webkit-animation: spin 2s linear infinite;
+  /* Safari */
+  animation: spin 1s linear infinite; }
+
+.small-loader {
+  border: 5px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 5px solid #53aff6;
+  width: 25px;
+  height: 25px;
+  -webkit-animation: spin 2s linear infinite;
+  /* Safari */
+  animation: spin 1s linear infinite; }
+
+/* Safari */
+@-webkit-keyframes spin {
+  0% {
+    -webkit-transform: rotate(0deg); }
+  100% {
+    -webkit-transform: rotate(360deg); } }
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg); }
+  100% {
+    transform: rotate(360deg); } }
+
+div#page-loader {
+  margin-top: 8%; }
+  div#page-loader h1 {
+    text-transform: uppercase; }
+  div#page-loader div#spinner-wrapper {
+    width: 100px;
+    margin: 0 auto;
+    margin-top: 8%; }
 
 /*# sourceMappingURL=../maps/coinglacier.org.css.map */

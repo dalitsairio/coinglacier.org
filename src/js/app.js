@@ -56,6 +56,8 @@ classes.testnet = 'testnet';
 var DOM = {};
 
 DOM.body = $('body');
+DOM.root = $('div#root-container');
+DOM.pageLoader = $('div#page-loader');
 
 DOM.network = {};
 DOM.network.mainnet = $('#mainnet-link');
@@ -556,6 +558,9 @@ function recalculateWallet() {
 function initiateWallet(cb){
     initiateHDWallet(false, password, useImprovedEntropy, function (result) {
         mnemonic = result;
+
+        DOM.pageLoader.hide();
+        DOM.root.show();
         // todo unblock all settings
         //block them before mnemonic is created
         // ==> block it in html directly
