@@ -11940,6 +11940,10 @@ input#password {
 #wallet-encryption label {
   margin: 5px; }
 
+div.address, div.privkey {
+  font-family: monospace;
+  font-size: 1.2rem; }
+
 @media screen and (min-width: 768px) and (max-width: 992px) {
   #mainmenu {
     padding-left: 95px; }
@@ -11960,6 +11964,8 @@ input#password {
       margin-top: 12px;
       margin-bottom: -15px; }
       #mainmenu a.navbar-brand img {
-        width: 50px; } }
+        width: 50px; }
+  div.address, div.privkey {
+    font-size: 0.9rem; } }
 
 /*# sourceMappingURL=../maps/coinglacier.org.css.map */

@@ -162,6 +162,16 @@ input#password{
     }
 }
 
+
+// //////////////////////////////////////////////////
+// Wallet (content)
+// //////////////////////////////////////////////////
+
+div.address, div.privkey {
+    font-family: monospace;
+    font-size: 1.2rem;
+}
+
 @media screen and (min-width: $bootstrap-sm) and (max-width: $bootstrap-md){
     #mainmenu {
         padding-left: 95px;
@@ -196,6 +206,10 @@ input#password{
                 width: 50px;
             }
         }
+    }
+
+    div.address, div.privkey {
+        font-size: 0.9rem;
     }
 }
 

@@ -61254,15 +61254,13 @@ function createWalletHTML(accountIndex){
         // per address
         function (accountIndex, addressIndex) {
 
-            // var walletCrendentials = $('div#credentials-0-0');
-            var credentialsCopy = DOM.wallet.templateCredentials;
-            console.log('credentials-' + accountIndex + '-' + addressIndex);
+            var credentialsCopy = DOM.wallet.templateCredentials.clone();
             credentialsCopy.prop('id', 'credentials-' + accountIndex + '-' + addressIndex);
             credentialsCopy.find('.address').prop('id', 'address-' + accountIndex + '-' + addressIndex);
             credentialsCopy.find('.privkey').prop('id', 'privkey-' + accountIndex + '-' + addressIndex);
 
             var walletAccount = $('div#account-' + accountIndex);
-            walletAccount.append(credentialsCopy.clone());
+            walletAccount.append(credentialsCopy);
         }
     );
 }
@@ -61272,14 +61270,14 @@ function fillWalletHTML(){
     foreachCredential(
         function (accountIndex) {
             createAccount(network, accountIndex, function (account) {
-                $('h3#xpub-' + accountIndex).text('XPUB: ' + account.xpub);
+                $('#xpub-' + accountIndex).text('XPUB: ' + account.xpub);
             })
         },
         function (accountIndex, addressIndex) {
 
             asyncCreateCredentials(network, accountIndex, addressIndex, password, function (credentials) {
-                $('td#address-' + accountIndex + '-' + addressIndex).text(credentials.address);
-                $('td#privkey-' + accountIndex + '-' + addressIndex).text(credentials.privateKey);
+                $('#address-' + accountIndex + '-' + addressIndex).text(credentials.address);
+                $('#privkey-' + accountIndex + '-' + addressIndex).text(credentials.privateKey);
             });
         }
     );
