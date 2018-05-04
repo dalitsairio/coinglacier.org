@@ -6,9 +6,6 @@ var randomBytes = require('randombytes');
 const bip39_bitSize = 128; // = 12 words  // https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki#generating-the-mnemonic
 const bip39_byteSize = bip39_bitSize / 8;
 
-var mnemonic;
-var bip32RootKey;
-
 var moreEntropyGen = new mEntropy.Generator({
     'loop_delay':        2, // how many milliseconds to pause between each operation loop. A lower value will generate entropy faster, but will also be harder on the CPU
     'work_min':           1 ,// milliseconds per loop; a higher value blocks the CPU more, so 1 is recommended
@@ -65,9 +62,9 @@ function initiateHDWallet(loadMnemonic, password, useImprovedEntropy, cb) {
 
     function afterGettingMnemonic(mnemonic, password) {
         var seed = bip39.mnemonicToSeed(mnemonic, password);
-        bip32RootKey = bitcoinjs.HDNode.fromSeedBuffer(seed);
+        var bip32RootKey = bitcoinjs.HDNode.fromSeedBuffer(seed);
 
-        cb(mnemonic);
+        cb(mnemonic, bip32RootKey);
     }
 
     if (!loadMnemonic) {
@@ -75,7 +72,7 @@ function initiateHDWallet(loadMnemonic, password, useImprovedEntropy, cb) {
         getEntropy(useImprovedEntropy, function (entropy) {
 
             // create a new mnemonic and return it
-            mnemonic = bip39.entropyToMnemonic(entropy);
+            var mnemonic = bip39.entropyToMnemonic(entropy);
 
             afterGettingMnemonic(mnemonic, password);
         });
@@ -84,16 +81,15 @@ function initiateHDWallet(loadMnemonic, password, useImprovedEntropy, cb) {
     } else {
         // import a given mnemonic
         if (bip39.validateMnemonic(loadMnemonic)) {
-            mnemonic = loadMnemonic;
 
-            afterGettingMnemonic(mnemonic, password);
+            afterGettingMnemonic(loadMnemonic, password);
         } else {
             throw ('given mnemonic [' + loadMnemonic + '] is not a valid 12 word mnemonic');
         }
     }
 }
 
-function createAccount(networkID, index) {
+function createAccount(bip32RootKey, networkID, index) {
 
     index = index || 0;
 
@@ -285,10 +281,7 @@ function findDerivationPathErrors(path, createXPUB, fromMasternode) {
             }
         }
     }
-    // Check root key exists or else derivation path is useless!
-    if (!bip32RootKey) {
-        return "No root key";
-    }
+
     // Check no hardened derivation path when using xpub keys
     var isHardenedPath = path.indexOf("'") > -1;
     if (isHardenedPath && createXPUB) {

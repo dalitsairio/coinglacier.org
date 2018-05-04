@@ -28,6 +28,7 @@ workerState.busy = 1;
 
 var cache;
 var mnemonic;
+var bip32RootKey;
 var workerpool;
 
 
@@ -70,9 +71,10 @@ function initiateHDWallet(loadMnemonic, password, useImprovedEntropy, cb) {
     // always reset the cache on new wallets
     cache = [];
 
-    bitcoin.initiateHDWallet(loadMnemonic, password, useImprovedEntropy, function (result) {
-        mnemonic = result;
-        cb(mnemonic);
+    bitcoin.initiateHDWallet(loadMnemonic, password, useImprovedEntropy, function (resultMnemonic, resultBip32RootKey) {
+        mnemonic = resultMnemonic;
+        bip32RootKey = resultBip32RootKey;
+        cb(mnemonic, bip32RootKey);
     });
 }
 
@@ -86,7 +88,7 @@ function createAccount (networkID, index, callback) {
     cache[networkID] = cache[networkID] || []; // initialize array if that didn't happen before
 
     if (typeof cache[networkID][index] === 'undefined') {
-            cache[networkID][index] = bitcoin.createAccount(networkID, index)
+            cache[networkID][index] = bitcoin.createAccount(bip32RootKey, networkID, index)
     }
     callback(cache[networkID][index]);
 }

@@ -56,43 +56,43 @@ function bitcoinJStests() {
         describe('Extended public key', function () {
             describe('New mnemonic', function () {
                 it('Returns xpub', function () {
-                    bitcoin.initiateHDWallet(false, false, false, function (mnemonic) {
-                        var account = bitcoin.createAccount(MAINNET_NONSEGWIT, 0);
+                    bitcoin.initiateHDWallet(false, false, false, function (mnemonic, bip32RootKey) {
+                        var account = bitcoin.createAccount(bip32RootKey, MAINNET_NONSEGWIT, 0);
 
                         assert.equal(account.xpub.substring(0, 4), 'xpub');
                     });
                 });
                 it('Returns ypub', function () {
-                    bitcoin.initiateHDWallet(false, false, false, function (mnemonic) {
-                        var account = bitcoin.createAccount(MAINNET_SEGWIT, 0);
+                    bitcoin.initiateHDWallet(false, false, false, function (mnemonic, bip32RootKey) {
+                        var account = bitcoin.createAccount(bip32RootKey, MAINNET_SEGWIT, 0);
 
                         assert.equal(account.xpub.substring(0, 4), 'ypub');
                     });
                 });
                 it('Returns zpub', function () {
-                    bitcoin.initiateHDWallet(false, false, false, function (mnemonic) {
-                        var account = bitcoin.createAccount(MAINNET_BECH32, 0);
+                    bitcoin.initiateHDWallet(false, false, false, function (mnemonic, bip32RootKey) {
+                        var account = bitcoin.createAccount(bip32RootKey, MAINNET_BECH32, 0);
 
                         assert.equal(account.xpub.substring(0, 4), 'zpub');
                     });
                 });
                 it('Returns tpub', function () {
-                    bitcoin.initiateHDWallet(false, false, false, function (mnemonic) {
-                        var account = bitcoin.createAccount(TESTNET_NONSEGWIT, 0);
+                    bitcoin.initiateHDWallet(false, false, false, function (mnemonic, bip32RootKey) {
+                        var account = bitcoin.createAccount(bip32RootKey, TESTNET_NONSEGWIT, 0);
 
                         assert.equal(account.xpub.substring(0, 4), 'tpub');
                     });
                 });
                 it('Returns upub', function () {
-                    bitcoin.initiateHDWallet(false, false, false, function (mnemonic) {
-                        var account = bitcoin.createAccount(TESTNET_SEGWIT, 0);
+                    bitcoin.initiateHDWallet(false, false, false, function (mnemonic, bip32RootKey) {
+                        var account = bitcoin.createAccount(bip32RootKey, TESTNET_SEGWIT, 0);
 
                         assert.equal(account.xpub.substring(0, 4), 'upub');
                     });
                 });
                 it('Returns vpub', function () {
-                    bitcoin.initiateHDWallet(false, false, false, function (mnemonic) {
-                        var account = bitcoin.createAccount(TESTNET_BECH32, 0);
+                    bitcoin.initiateHDWallet(false, false, false, function (mnemonic, bip32RootKey) {
+                        var account = bitcoin.createAccount(bip32RootKey, TESTNET_BECH32, 0);
 
                         assert.equal(account.xpub.substring(0, 4), 'vpub');
                     });
@@ -100,8 +100,8 @@ function bitcoinJStests() {
             });
             describe('Given mnemonic', function () {
                 it('Returns XPUB [Non-Segwit]', function () {
-                    bitcoin.initiateHDWallet(testing_mnemonic, false, false, function (mnemonic) {
-                        var account = bitcoin.createAccount(MAINNET_NONSEGWIT, 0);
+                    bitcoin.initiateHDWallet(testing_mnemonic, false, false, function (mnemonic, bip32RootKey) {
+                        var account = bitcoin.createAccount(bip32RootKey, MAINNET_NONSEGWIT, 0);
 
                         var expected = 'xpub6BgB4HXnJs3gV9t9r4LB6ZXmwbawUEZSwFcCHZC3K3yEN4Lmtzg8bBSpriKgHJLS9Jufgym9osUAVHvyMYdQ82zMzp3voYFbgfUYvq9XhCD';
 
@@ -109,8 +109,8 @@ function bitcoinJStests() {
                     });
                 });
                 it('Returns YPUB [P2SH-P2WPKH]', function () {
-                    bitcoin.initiateHDWallet(testing_mnemonic, false, false, function (mnemonic) {
-                        var account = bitcoin.createAccount(MAINNET_SEGWIT, 0);
+                    bitcoin.initiateHDWallet(testing_mnemonic, false, false, function (mnemonic, bip32RootKey) {
+                        var account = bitcoin.createAccount(bip32RootKey, MAINNET_SEGWIT, 0);
 
                         var expected = 'ypub6Xvc2hTW5ziP5tApCAFBM9JeyuriZ8SQ3GZfpdneEueDmmhUYgbqtzDub34jqwKAEe9YNwgKD7mBpBfbh1g6Mt5b3xtcczuZXNeu5Q5yJp8';
 
@@ -118,8 +118,8 @@ function bitcoinJStests() {
                     });
                 });
                 it('Returns ZPUB [Bech32, 2nd account]', function () {
-                    bitcoin.initiateHDWallet(testing_mnemonic, false, false, function (mnemonic) {
-                        var account = bitcoin.createAccount(MAINNET_BECH32, 1);
+                    bitcoin.initiateHDWallet(testing_mnemonic, false, false, function (mnemonic, bip32RootKey) {
+                        var account = bitcoin.createAccount(bip32RootKey, MAINNET_BECH32, 1);
 
                         var expected = 'zpub6s7a2Y5RyxmLZLRMD79crfAeXuwXvChc5MRU5WvipdJHZG84Z1en4LGJCmMVLzYYRprAWShdKgcqPjr3kBuDLPj57j2XA44HaREZ4HMfFHw';
 
@@ -134,8 +134,8 @@ function bitcoinJStests() {
 
             it('Non-Segwit address [mainnet]', function () {
                 // load testing mnemonic
-                bitcoin.initiateHDWallet(testing_mnemonic, false, false, function (mnemonic) {
-                    var account = bitcoin.createAccount(MAINNET_NONSEGWIT, 0);
+                bitcoin.initiateHDWallet(testing_mnemonic, false, false, function (mnemonic, bip32RootKey) {
+                    var account = bitcoin.createAccount(bip32RootKey, MAINNET_NONSEGWIT, 0);
                     var credentials = bitcoin.createCredentials(account.external, 0);
 
                     assert.equal(credentials.address, '16C6UYcvPuiY4nHMbdSFAXgB2QEyxjr8Jx');
@@ -144,8 +144,8 @@ function bitcoinJStests() {
 
             it('Non-Segwit privKey [mainnet]', function () {
                 // load testing mnemonic
-                bitcoin.initiateHDWallet(testing_mnemonic, false, false, function (mnemonic) {
-                    var account = bitcoin.createAccount(MAINNET_NONSEGWIT, 0);
+                bitcoin.initiateHDWallet(testing_mnemonic, false, false, function (mnemonic, bip32RootKey) {
+                    var account = bitcoin.createAccount(bip32RootKey, MAINNET_NONSEGWIT, 0);
                     var credentials = bitcoin.createCredentials(account.external, 0);
 
                     assert.equal(credentials.privateKey, 'L2THPE6rBFZBqe1qsXAZvjHwNe1UP3PCePPLsdCv9WxpoeQuXsAd');
@@ -154,8 +154,8 @@ function bitcoinJStests() {
 
             it('3 non-Segwit addresses [testnet]', function () {
                 // load testing mnemonic
-                bitcoin.initiateHDWallet(testing_mnemonic, false, false, function (mnemonic) {
-                    var account = bitcoin.createAccount(TESTNET_NONSEGWIT, 0);
+                bitcoin.initiateHDWallet(testing_mnemonic, false, false, function (mnemonic, bip32RootKey) {
+                    var account = bitcoin.createAccount(bip32RootKey, TESTNET_NONSEGWIT, 0);
 
                     var amount = 3;
                     var addresses = [];
@@ -175,8 +175,8 @@ function bitcoinJStests() {
 
             it('2 non-Segwit privKeys [testnet]', function () {
                 // load testing mnemonic
-                bitcoin.initiateHDWallet(testing_mnemonic, false, false, function (mnemonic) {
-                    var account = bitcoin.createAccount(TESTNET_NONSEGWIT, 0);
+                bitcoin.initiateHDWallet(testing_mnemonic, false, false, function (mnemonic, bip32RootKey) {
+                    var account = bitcoin.createAccount(bip32RootKey, TESTNET_NONSEGWIT, 0);
 
                     var amount = 2;
                     var privKeys = [];
@@ -194,8 +194,8 @@ function bitcoinJStests() {
 
             it('P2SH-P2WPKH address [mainnet]', function () {
                 // load testing mnemonic
-                bitcoin.initiateHDWallet(testing_mnemonic, false, false, function (mnemonic) {
-                    var account = bitcoin.createAccount(MAINNET_SEGWIT, 0);
+                bitcoin.initiateHDWallet(testing_mnemonic, false, false, function (mnemonic, bip32RootKey) {
+                    var account = bitcoin.createAccount(bip32RootKey, MAINNET_SEGWIT, 0);
                     var credentials = bitcoin.createCredentials(account.external, 0);
 
                     assert.equal(credentials.address, '31uAoP3hMQ2rehKnfEFTMJC4tADveRzx6K');
@@ -204,8 +204,8 @@ function bitcoinJStests() {
 
             it('P2SH-P2WPKH privKey [mainnet]', function () {
                 // load testing mnemonic
-                bitcoin.initiateHDWallet(testing_mnemonic, false, false, function (mnemonic) {
-                    var account = bitcoin.createAccount(MAINNET_SEGWIT, 0);
+                bitcoin.initiateHDWallet(testing_mnemonic, false, false, function (mnemonic, bip32RootKey) {
+                    var account = bitcoin.createAccount(bip32RootKey, MAINNET_SEGWIT, 0);
                     var credentials = bitcoin.createCredentials(account.external, 0);
 
                     assert.equal(credentials.privateKey, 'KxxQTCfkZgBBQYRBJTJr41avZJdQ1fHb7gc1Q1poGvSBdJtUeaR7');
@@ -214,8 +214,8 @@ function bitcoinJStests() {
 
             it('P2SH-P2WPKH address [testnet]', function () {
                 // load testing mnemonic
-                bitcoin.initiateHDWallet(testing_mnemonic, false, false, function (mnemonic) {
-                    var account = bitcoin.createAccount(TESTNET_SEGWIT, 0);
+                bitcoin.initiateHDWallet(testing_mnemonic, false, false, function (mnemonic, bip32RootKey) {
+                    var account = bitcoin.createAccount(bip32RootKey, TESTNET_SEGWIT, 0);
                     var credentials = bitcoin.createCredentials(account.external, 0);
 
                     assert.equal(credentials.address, '2N7oVd4Xq9TfpCWaVHhFNCPQbi4buiLdpyi');
@@ -224,8 +224,8 @@ function bitcoinJStests() {
 
             it('P2SH-P2WPKH privKey [testnet]', function () {
                 // load testing mnemonic
-                bitcoin.initiateHDWallet(testing_mnemonic, false, false, function (mnemonic) {
-                    var account = bitcoin.createAccount(TESTNET_SEGWIT, 0);
+                bitcoin.initiateHDWallet(testing_mnemonic, false, false, function (mnemonic, bip32RootKey) {
+                    var account = bitcoin.createAccount(bip32RootKey, TESTNET_SEGWIT, 0);
                     var credentials = bitcoin.createCredentials(account.external, 0);
 
                     assert.equal(credentials.privateKey, 'cRsGmgKfnAueMA2DJzT29dvMx4cLJ4gMbTK8CRahP4orPeD15caX');
@@ -234,8 +234,8 @@ function bitcoinJStests() {
 
             it('Bech32 address [mainnet]', function () {
                 // load testing mnemonic
-                bitcoin.initiateHDWallet(testing_mnemonic, false, false, function (mnemonic) {
-                    var account = bitcoin.createAccount(MAINNET_BECH32, 0);
+                bitcoin.initiateHDWallet(testing_mnemonic, false, false, function (mnemonic, bip32RootKey) {
+                    var account = bitcoin.createAccount(bip32RootKey, MAINNET_BECH32, 0);
                     var credentials = bitcoin.createCredentials(account.external, 0);
 
                     assert.equal(credentials.address, 'bc1qk6rjegtxrvp7ty2tzd4uj88n33vnc3vqn90ps9');
@@ -244,8 +244,8 @@ function bitcoinJStests() {
 
             it('Bech32 privKey [mainnet]', function () {
                 // load testing mnemonic
-                bitcoin.initiateHDWallet(testing_mnemonic, false, false, function (mnemonic) {
-                    var account = bitcoin.createAccount(MAINNET_BECH32, 0);
+                bitcoin.initiateHDWallet(testing_mnemonic, false, false, function (mnemonic, bip32RootKey) {
+                    var account = bitcoin.createAccount(bip32RootKey, MAINNET_BECH32, 0);
                     var credentials = bitcoin.createCredentials(account.external, 0);
 
                     assert.equal(credentials.privateKey, 'Kzkuno5MDgVcs841HW5HWnSFmZ4xBEjzxNN2FnTv6k7cWMkzkvrc');
@@ -254,8 +254,8 @@ function bitcoinJStests() {
 
             it('Bech32 address [testnet]', function () {
                 // load testing mnemonic
-                bitcoin.initiateHDWallet(testing_mnemonic, false, false, function (mnemonic) {
-                    var account = bitcoin.createAccount(TESTNET_BECH32, 0);
+                bitcoin.initiateHDWallet(testing_mnemonic, false, false, function (mnemonic, bip32RootKey) {
+                    var account = bitcoin.createAccount(bip32RootKey, TESTNET_BECH32, 0);
                     var credentials = bitcoin.createCredentials(account.external, 0);
 
                     assert.equal(credentials.address, 'tb1qc45lcycj4upms5v0hzdnhnyq4s09xe7jnsdhtz');
@@ -264,8 +264,8 @@ function bitcoinJStests() {
 
             it('Bech32 privKey [testnet]', function () {
                 // load testing mnemonic
-                bitcoin.initiateHDWallet(testing_mnemonic, false, false, function (mnemonic) {
-                    var account = bitcoin.createAccount(TESTNET_BECH32, 0);
+                bitcoin.initiateHDWallet(testing_mnemonic, false, false, function (mnemonic, bip32RootKey) {
+                    var account = bitcoin.createAccount(bip32RootKey, TESTNET_BECH32, 0);
                     var credentials = bitcoin.createCredentials(account.external, 0);
 
                     assert.equal(credentials.privateKey, 'cSoNGp1yv5yJFsUNKJck5TRufjVZ6aCRUu8tQB6X9o8eNa4ZVP1R');
@@ -277,12 +277,12 @@ function bitcoinJStests() {
                 var amountAddresses = 3;
 
                 // load testing mnemonic
-                bitcoin.initiateHDWallet(testing_mnemonic, false, false, function (mnemonic) {
+                bitcoin.initiateHDWallet(testing_mnemonic, false, false, function (mnemonic, bip32RootKey) {
 
                     var addresses = [];
 
                     for (var accIndex = 0; accIndex < amountAccounts; accIndex++) {
-                        var account = bitcoin.createAccount(TESTNET_BECH32, accIndex);
+                        var account = bitcoin.createAccount(bip32RootKey, TESTNET_BECH32, accIndex);
                         for (var addressIndex = 0; addressIndex < amountAddresses; addressIndex++) {
                             addresses.push(bitcoin.createCredentials(account.external, addressIndex).address);
                         }
@@ -302,8 +302,8 @@ function bitcoinJStests() {
 
             it('Password Encrypted Mnemonic', function () {
                 // load testing mnemonic
-                bitcoin.initiateHDWallet(testing_mnemonic, testing_password, false, function (mnemonic) {
-                    var account = bitcoin.createAccount(MAINNET_BECH32, 0);
+                bitcoin.initiateHDWallet(testing_mnemonic, testing_password, false, function (mnemonic, bip32RootKey) {
+                    var account = bitcoin.createAccount(bip32RootKey, MAINNET_BECH32, 0);
                     var credentials = bitcoin.createCredentials(account.external, 0);
 
                     assert.equal(credentials.privateKey, 'L38Umd9kZNjeo98PFbpzaSfpuyREBc1rzBiyHBqQUXkjrysVyDi5');
@@ -315,8 +315,8 @@ function bitcoinJStests() {
 
             it('P2SH-P2WPKH address [mainnet]', function () {
                 // load testing mnemonic
-                bitcoin.initiateHDWallet(testing_mnemonic, testing_password, false, function (mnemonic) {
-                    var account = bitcoin.createAccount(MAINNET_SEGWIT, 0);
+                bitcoin.initiateHDWallet(testing_mnemonic, testing_password, false, function (mnemonic, bip32RootKey) {
+                    var account = bitcoin.createAccount(bip32RootKey, MAINNET_SEGWIT, 0);
                     var credentials = bitcoin.createCredentials(account.external, 0);
 
                     assert.equal(credentials.address, '38799cavJvtfpkK55bsyPGMgQGUfY2EeVW');
@@ -325,8 +325,8 @@ function bitcoinJStests() {
 
             it('P2SH-P2WPKH privKey [mainnet]', function () {
                 // load testing mnemonic
-                bitcoin.initiateHDWallet(testing_mnemonic, testing_password, false, function (mnemonic) {
-                    var account = bitcoin.createAccount(MAINNET_SEGWIT, 0);
+                bitcoin.initiateHDWallet(testing_mnemonic, testing_password, false, function (mnemonic, bip32RootKey) {
+                    var account = bitcoin.createAccount(bip32RootKey, MAINNET_SEGWIT, 0);
                     var credentials = bitcoin.createCredentials(account.external, 0);
 
                     assert.equal(credentials.privateKey, 'KyYUc3DRDc4Qi9F1RZf7bVQVfKxZQAp8Se9KeGenpdT8Favounei');
@@ -335,8 +335,8 @@ function bitcoinJStests() {
 
             it('Bech32 address [mainnet]', function () {
                 // load testing mnemonic
-                bitcoin.initiateHDWallet(testing_mnemonic, testing_password, false, function (mnemonic) {
-                    var account = bitcoin.createAccount(MAINNET_BECH32, 0);
+                bitcoin.initiateHDWallet(testing_mnemonic, testing_password, false, function (mnemonic, bip32RootKey) {
+                    var account = bitcoin.createAccount(bip32RootKey, MAINNET_BECH32, 0);
                     var credentials = bitcoin.createCredentials(account.external, 0);
 
                     assert.equal(credentials.address, 'bc1qwvffxlvr7vhg54gtuarm3w4sv9mmsqmtjqq3x4');
@@ -345,8 +345,8 @@ function bitcoinJStests() {
 
             it('Bech32 privKey [mainnet]', function () {
                 // load testing mnemonic
-                bitcoin.initiateHDWallet(testing_mnemonic, testing_password, false, function (mnemonic) {
-                    var account = bitcoin.createAccount(MAINNET_BECH32, 0);
+                bitcoin.initiateHDWallet(testing_mnemonic, testing_password, false, function (mnemonic, bip32RootKey) {
+                    var account = bitcoin.createAccount(bip32RootKey, MAINNET_BECH32, 0);
                     var credentials = bitcoin.createCredentials(account.external, 0);
 
                     assert.equal(credentials.privateKey, 'L38Umd9kZNjeo98PFbpzaSfpuyREBc1rzBiyHBqQUXkjrysVyDi5');
@@ -382,8 +382,8 @@ function bip38Tests() {
 
         it('Encrypted PrivKey', function () {
             // load testing mnemonic
-            bitcoin.initiateHDWallet(testing_mnemonic, false, false, function (mnemonic) {
-                var account = bitcoin.createAccount(MAINNET_BECH32, 0);
+            bitcoin.initiateHDWallet(testing_mnemonic, false, false, function (mnemonic, bip32RootKey) {
+                var account = bitcoin.createAccount(bip32RootKey, MAINNET_BECH32, 0);
                 var credentials = bitcoin.createCredentials(account.external, 0);
                 var encryptedPrivKey = bip38.encryptPrivKey(credentials.privateKey, testing_password);
 
@@ -393,8 +393,8 @@ function bip38Tests() {
 
         it('Encrpyted Privkey and Mnemonic', function () {
             // load testing mnemonic
-            bitcoin.initiateHDWallet(testing_mnemonic, testing_password, false, function (mnemonic) {
-                var account = bitcoin.createAccount(MAINNET_BECH32, 0);
+            bitcoin.initiateHDWallet(testing_mnemonic, testing_password, false, function (mnemonic, bip32RootKey) {
+                var account = bitcoin.createAccount(bip32RootKey, MAINNET_BECH32, 0);
                 var credentials = bitcoin.createCredentials(account.external, 0);
                 var encryptedPrivKey = bip38.encryptPrivKey(credentials.privateKey, testing_password);
 
