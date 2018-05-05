@@ -378,6 +378,7 @@ function setupPageOptions() {
     }
 
     password = currentPage.defaultPassword;
+    DOM.options.encryption.pass.val(currentPage.defaultPassword);
 }
 
 function enableAccounts() {
