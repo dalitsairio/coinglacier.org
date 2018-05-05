@@ -1,6 +1,6 @@
 .testnet {
   /*!
- * Bootstrap v4.1.0 (https://getbootstrap.com/)
+ * Bootstrap v4.1.1 (https://getbootstrap.com/)
  * Copyright 2011-2018 The Bootstrap Authors
  * Copyright 2011-2018 Twitter, Inc.
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
@@ -48,7 +48,7 @@
 
 @-ms-viewport {
   width: device-width; }
-  .testnet article, .testnet aside, .testnet dialog, .testnet figcaption, .testnet figure, .testnet footer, .testnet header, .testnet hgroup, .testnet main, .testnet nav, .testnet section {
+  .testnet article, .testnet aside, .testnet figcaption, .testnet figure, .testnet footer, .testnet header, .testnet hgroup, .testnet main, .testnet nav, .testnet section {
     display: block; }
   .testnet body {
     margin: 0;
@@ -135,7 +135,7 @@
   .testnet code,
   .testnet kbd,
   .testnet samp {
-    font-family: monospace, monospace;
+    font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
     font-size: 1em; }
   .testnet pre {
     margin-top: 0;
@@ -334,11 +334,6 @@
   .testnet .figure-caption {
     font-size: 90%;
     color: #6c757d; }
-  .testnet code,
-  .testnet kbd,
-  .testnet pre,
-  .testnet samp {
-    font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
   .testnet code {
     font-size: 87.5%;
     color: #e83e8c;
@@ -1273,6 +1268,10 @@
     .testnet .custom-select.is-valid ~ .valid-feedback,
     .testnet .custom-select.is-valid ~ .valid-tooltip {
       display: block; }
+  .was-validated .testnet .form-control-file:valid ~ .valid-feedback,
+  .was-validated .testnet .form-control-file:valid ~ .valid-tooltip, .testnet .form-control-file.is-valid ~ .valid-feedback,
+  .testnet .form-control-file.is-valid ~ .valid-tooltip {
+    display: block; }
   .was-validated .testnet .form-check-input:valid ~ .form-check-label, .testnet .form-check-input.is-valid ~ .form-check-label {
     color: #28a745; }
   .was-validated .testnet .form-check-input:valid ~ .valid-feedback,
@@ -1338,6 +1337,10 @@
     .testnet .custom-select.is-invalid ~ .invalid-feedback,
     .testnet .custom-select.is-invalid ~ .invalid-tooltip {
       display: block; }
+  .was-validated .testnet .form-control-file:invalid ~ .invalid-feedback,
+  .was-validated .testnet .form-control-file:invalid ~ .invalid-tooltip, .testnet .form-control-file.is-invalid ~ .invalid-feedback,
+  .testnet .form-control-file.is-invalid ~ .invalid-tooltip {
+    display: block; }
   .was-validated .testnet .form-check-input:invalid ~ .form-check-label, .testnet .form-check-input.is-invalid ~ .form-check-label {
     color: #dc3545; }
   .was-validated .testnet .form-check-input:invalid ~ .invalid-feedback,
@@ -2123,8 +2126,7 @@
       .testnet .input-group > .custom-file:not(:last-child) .custom-file-label::after {
         border-top-right-radius: 0;
         border-bottom-right-radius: 0; }
-      .testnet .input-group > .custom-file:not(:first-child) .custom-file-label,
-      .testnet .input-group > .custom-file:not(:first-child) .custom-file-label::after {
+      .testnet .input-group > .custom-file:not(:first-child) .custom-file-label {
         border-top-left-radius: 0;
         border-bottom-left-radius: 0; }
   .testnet .input-group-prepend,
@@ -2205,11 +2207,12 @@
       .testnet .custom-control-input:disabled ~ .custom-control-label::before {
         background-color: #e9ecef; }
   .testnet .custom-control-label {
+    position: relative;
     margin-bottom: 0; }
     .testnet .custom-control-label::before {
       position: absolute;
       top: 0.25rem;
-      left: 0;
+      left: -1.5rem;
       display: block;
       width: 1rem;
       height: 1rem;
@@ -2220,7 +2223,7 @@
     .testnet .custom-control-label::after {
       position: absolute;
       top: 0.25rem;
-      left: 0;
+      left: -1.5rem;
       display: block;
       width: 1rem;
       height: 1rem;
@@ -2329,7 +2332,7 @@
       bottom: 0;
       z-index: 3;
       display: block;
-      height: calc(calc(2.25rem + 2px) - 1px * 2);
+      height: 2.25rem;
       padding: 0.375rem 0.75rem;
       line-height: 1.5;
       color: #495057;
@@ -3732,6 +3735,7 @@
       margin-right: 3px;
       margin-left: 3px;
       text-indent: -999px;
+      cursor: pointer;
       background-color: rgba(255, 255, 255, 0.5); }
       .testnet .carousel-indicators li::before {
         position: absolute;
@@ -5551,7 +5555,17 @@
         background-color: #fff !important; }
     .testnet .table-bordered th,
     .testnet .table-bordered td {
-      border: 1px solid #dee2e6 !important; } }
+      border: 1px solid #dee2e6 !important; }
+    .testnet .table-dark {
+      color: inherit; }
+      .testnet .table-dark th,
+      .testnet .table-dark td,
+      .testnet .table-dark thead th,
+      .testnet .table-dark tbody + tbody {
+        border-color: #dee2e6; }
+    .testnet .table .thead-dark th {
+      color: inherit;
+      border-color: #dee2e6; } }
   .testnet #mainmenu .active a {
     color: #6ca91d; }
   .testnet #options {
@@ -5560,7 +5574,7 @@
     border-top: 5px solid #A0E04C; }
 
 /*!
- * Bootstrap v4.1.0 (https://getbootstrap.com/)
+ * Bootstrap v4.1.1 (https://getbootstrap.com/)
  * Copyright 2011-2018 The Bootstrap Authors
  * Copyright 2011-2018 Twitter, Inc.
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
@@ -5611,7 +5625,7 @@ html {
 @-ms-viewport {
   width: device-width; }
 
-article, aside, dialog, figcaption, figure, footer, header, hgroup, main, nav, section {
+article, aside, figcaption, figure, footer, header, hgroup, main, nav, section {
   display: block; }
 
 body {
@@ -5719,7 +5733,7 @@ pre,
 code,
 kbd,
 samp {
-  font-family: monospace, monospace;
+  font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   font-size: 1em; }
 
 pre {
@@ -5973,12 +5987,6 @@ mark,
 .figure-caption {
   font-size: 90%;
   color: #6c757d; }
-
-code,
-kbd,
-pre,
-samp {
-  font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
 
 code {
   font-size: 87.5%;
@@ -7045,6 +7053,11 @@ select.form-control-lg:not([size]):not([multiple]), .testnet .input-group-lg > s
   .custom-select.is-valid ~ .valid-tooltip {
     display: block; }
 
+.was-validated .form-control-file:valid ~ .valid-feedback,
+.was-validated .form-control-file:valid ~ .valid-tooltip, .form-control-file.is-valid ~ .valid-feedback,
+.form-control-file.is-valid ~ .valid-tooltip {
+  display: block; }
+
 .was-validated .form-check-input:valid ~ .form-check-label, .form-check-input.is-valid ~ .form-check-label {
   color: #28a745; }
 
@@ -7121,6 +7134,11 @@ select.form-control-lg:not([size]):not([multiple]), .testnet .input-group-lg > s
   .custom-select.is-invalid ~ .invalid-feedback,
   .custom-select.is-invalid ~ .invalid-tooltip {
     display: block; }
+
+.was-validated .form-control-file:invalid ~ .invalid-feedback,
+.was-validated .form-control-file:invalid ~ .invalid-tooltip, .form-control-file.is-invalid ~ .invalid-feedback,
+.form-control-file.is-invalid ~ .invalid-tooltip {
+  display: block; }
 
 .was-validated .form-check-input:invalid ~ .form-check-label, .form-check-input.is-invalid ~ .form-check-label {
   color: #dc3545; }
@@ -7977,8 +7995,7 @@ input[type="button"].btn-block {
     .input-group > .custom-file:not(:last-child) .custom-file-label::after {
       border-top-right-radius: 0;
       border-bottom-right-radius: 0; }
-    .input-group > .custom-file:not(:first-child) .custom-file-label,
-    .input-group > .custom-file:not(:first-child) .custom-file-label::after {
+    .input-group > .custom-file:not(:first-child) .custom-file-label {
       border-top-left-radius: 0;
       border-bottom-left-radius: 0; }
 
@@ -8069,11 +8086,12 @@ input[type="button"].btn-block {
       background-color: #e9ecef; }
 
 .custom-control-label {
+  position: relative;
   margin-bottom: 0; }
   .custom-control-label::before {
     position: absolute;
     top: 0.25rem;
-    left: 0;
+    left: -1.5rem;
     display: block;
     width: 1rem;
     height: 1rem;
@@ -8084,7 +8102,7 @@ input[type="button"].btn-block {
   .custom-control-label::after {
     position: absolute;
     top: 0.25rem;
-    left: 0;
+    left: -1.5rem;
     display: block;
     width: 1rem;
     height: 1rem;
@@ -8210,7 +8228,7 @@ input[type="button"].btn-block {
     bottom: 0;
     z-index: 3;
     display: block;
-    height: calc(calc(2.25rem + 2px) - 1px * 2);
+    height: 2.25rem;
     padding: 0.375rem 0.75rem;
     line-height: 1.5;
     color: #495057;
@@ -9783,6 +9801,7 @@ button.close {
     margin-right: 3px;
     margin-left: 3px;
     text-indent: -999px;
+    cursor: pointer;
     background-color: rgba(255, 255, 255, 0.5); }
     .carousel-indicators li::before {
       position: absolute;
@@ -11855,7 +11874,17 @@ a.text-dark:hover, a.text-dark:focus {
       background-color: #fff !important; }
   .table-bordered th,
   .table-bordered td {
-    border: 1px solid #dee2e6 !important; } }
+    border: 1px solid #dee2e6 !important; }
+  .table-dark {
+    color: inherit; }
+    .table-dark th,
+    .table-dark td,
+    .table-dark thead th,
+    .table-dark tbody + tbody {
+      border-color: #dee2e6; }
+  .table .thead-dark th {
+    color: inherit;
+    border-color: #dee2e6; } }
 
 #mainmenu .active a {
   color: #0b7fd8;
@@ -11969,6 +11998,12 @@ div.address, div.privkey {
         width: 50px; }
   div.address, div.privkey {
     font-size: 0.9rem; } }
+
+@media screen and (max-width: 360px) {
+  #mainmenu {
+    min-height: 56px; }
+    #mainmenu img {
+      display: none; } }
 
 .loader {
   border: 14px solid #f3f3f3;
