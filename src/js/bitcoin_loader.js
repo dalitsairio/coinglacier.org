@@ -30,10 +30,12 @@ var cache;
 var mnemonic;
 var bip32RootKey;
 var workerpool;
+var queue;
 
 
 function initiateWorkerpool(){
     workerpool = [];
+    queue = [];
 
     var workerCode = 'WORKER_CODE_PLACEHOLDER'; // is replaced with actual JS code by gulp task
     var blob = new Blob([workerCode], {type: 'application/javascript'});
@@ -42,21 +44,53 @@ function initiateWorkerpool(){
         workerpool.push({state: workerState.available, worker: new Worker(URL.createObjectURL(blob))});
     }
 
+    serveQueue();
 };
 
-function getAvailableWorkerIndex(callback){
+function serveQueue(){
 
-    // check every hundert milliseconds for a free worker
+    // check every hundred milliseconds for a free worker
     var checkingInterval = setInterval(function () {
-        for(var index = 0; index < workerpool.length; index++){
-            if(workerpool[index].state === workerState.available){
-                // return index;
-                clearInterval(checkingInterval);
-                callback(index);
-                return;
+
+        // is set to the amount of work to be done, but maximum the amount of workers available
+        var workForThisInterval = (queue.length < amountOfWorkers) ? queue.length : amountOfWorkers;
+
+        for (var workerIndex = 0; workerIndex < workForThisInterval; workerIndex++) {
+            if (workerpool[workerIndex].state === workerState.available) {
+                var callback = getElementFromQueue();
+                callback(workerIndex);
             }
         }
     }, 100);
+}
+
+function addToQueue(callback){
+    queue.push(callback);
+}
+
+function getElementFromQueue(){
+    return queue.shift();
+}
+
+function clearQueue(){
+    queue = [];
+}
+
+function interruptWorkers(){
+
+    clearQueue();
+
+    for(var index = 0; index < workerpool.length; index++){
+        if(workerpool[index].state === workerState.busy){
+
+            // reset the worker
+            workerpool[index].worker.terminate();
+            workerpool[index].worker = undefined;
+
+            // make worker available to the pool again
+            workerpool[index].state = workerState.available;
+        }
+    }
 }
 
 initiateWorkerpool()
@@ -131,7 +165,7 @@ function asyncCreateCredentials(networkID, accountIndex, addressIndex, password,
 
                 // asynchronous BIP38 encryption with web workers
 
-                getAvailableWorkerIndex(function (workerID) {
+                addToQueue(function (workerID) {
 
                     workerpool[workerID].state = workerState.busy;
                     var worker = workerpool[workerID].worker;
