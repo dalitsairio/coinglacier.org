@@ -37,15 +37,20 @@ function initiateWorkerpool(){
     workerpool = [];
     queue = [];
 
-    var workerCode = 'WORKER_CODE_PLACEHOLDER'; // is replaced with actual JS code by gulp task
-    var blob = new Blob([workerCode], {type: 'application/javascript'});
-
     for(var x = 0; x < amountOfWorkers; x++){
-        workerpool.push({state: workerState.available, worker: new Worker(URL.createObjectURL(blob))});
+        workerpool.push({state: workerState.available, worker: createWorker()});
     }
 
     serveQueue();
 };
+
+function createWorker() {
+
+    var workerCode = 'WORKER_CODE_PLACEHOLDER'; // is replaced with actual JS code by gulp task
+    var blob = new Blob([workerCode], {type: 'application/javascript'});
+
+    return new Worker(URL.createObjectURL(blob));
+}
 
 function getFreeWorkerIndex(){
     for (var index = 0; index < amountOfWorkers; index++) {
@@ -97,7 +102,7 @@ function interruptWorkers(){
 
             // reset the worker
             workerpool[index].worker.terminate();
-            workerpool[index].worker = undefined;
+            workerpool[index].worker = createWorker();
 
             // make worker available to the pool again
             workerpool[index].state = workerState.available;

@@ -239,6 +239,7 @@ function initiatePage(newPage) {
 }
 
 function changePage(newPage) {
+    interruptWorkers();
     initiatePage(newPage);
     loadWallet();
 }
@@ -279,6 +280,7 @@ function initMainnet() {
     setNetwork();
 }
 function switchToMainnet() {
+    interruptWorkers();
     initMainnet();
     loadWallet();
 }
@@ -301,6 +303,7 @@ function initTestnet() {
     setNetwork();
 }
 function switchToTestnet() {
+    interruptWorkers();
     initTestnet();
     loadWallet();
 }
@@ -344,6 +347,7 @@ function changeToBech32() {
 }
 
 function changeAddressType(newType) {
+    interruptWorkers();
     switchURLparam({key: GET.addressTypes.keyword, value: newType});
     recalculateWallet();
 }
@@ -504,6 +508,7 @@ function toggleAddressNumbering() {
 };
 
 function changePassword() {
+    interruptWorkers();
     password = DOM.options.encryption.pass.val();
     initiateWallet(function () {
         loadWallet();
