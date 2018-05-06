@@ -47,6 +47,15 @@ function initiateWorkerpool(){
     serveQueue();
 };
 
+function getFreeWorkerIndex(){
+    for (var index = 0; index < amountOfWorkers; index++) {
+        if (workerpool[index].state === workerState.available) {
+            return index;
+        }
+    }
+    return false;
+}
+
 function serveQueue(){
 
     // check every hundred milliseconds for a free worker
@@ -55,10 +64,13 @@ function serveQueue(){
         // is set to the amount of work to be done, but maximum the amount of workers available
         var workForThisInterval = (queue.length < amountOfWorkers) ? queue.length : amountOfWorkers;
 
-        for (var workerIndex = 0; workerIndex < workForThisInterval; workerIndex++) {
-            if (workerpool[workerIndex].state === workerState.available) {
+        for (var w = 0; w < workForThisInterval; w++) {
+
+            var workerIndex = getFreeWorkerIndex();
+
+            if(workerIndex !== false) {
                 var callback = getElementFromQueue();
-                callback(workerIndex);
+                callback(getFreeWorkerIndex());
             }
         }
     }, 100);
