@@ -188,12 +188,10 @@ gulp.task('watch', function () {
 });
 
 gulp.task('watch-worker', function () {
-    return;
     gulp.watch(['src/js/**/encryptionWorker.js'], gulp.parallel('javascript'));
 });
 
 gulp.task('watch-ui', function () {
-    return;
     gulp.watch('src/**/*.html', gulp.parallel('html'));
     gulp.watch('src/**/*.scss', gulp.parallel('sass'));
 });
