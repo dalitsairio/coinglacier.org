@@ -88,7 +88,7 @@ gulp.task('create-main', gulp.series('create-bundle', 'prepare-worker-code', 'in
 // create web worker
 // //////////////////////////////////////////////////
 
-gulp.task('create-worker', function () {
+gulp.task('create-webworker', function () {
 
     var b = browserify({
         entries: ['./src/js/encryptionWorker.js']
@@ -104,7 +104,7 @@ gulp.task('create-worker', function () {
         .pipe(gulp.dest('./src/js'));
 });
 
-gulp.task('javascript', gulp.series('create-worker', 'create-main'));
+gulp.task('javascript', gulp.series('create-webworker', 'create-main'));
 
 
 // //////////////////////////////////////////////////
@@ -188,10 +188,12 @@ gulp.task('watch', function () {
 });
 
 gulp.task('watch-worker', function () {
+    return;
     gulp.watch(['src/js/**/encryptionWorker.js'], gulp.parallel('javascript'));
 });
 
 gulp.task('watch-ui', function () {
+    return;
     gulp.watch('src/**/*.html', gulp.parallel('html'));
     gulp.watch('src/**/*.scss', gulp.parallel('sass'));
 });
@@ -210,7 +212,7 @@ gulp.task('tests', function () {
 // Default Task
 // //////////////////////////////////////////////////
 
-gulp.task('default', gulp.parallel('tests', 'javascript', 'sass', 'browser-sync', 'watch', 'watch-ui', 'watch-worker', 'move-dependencies'));
+gulp.task('default', gulp.parallel(gulp.series('move-dependencies', 'javascript', 'sass', 'browser-sync', 'watch', 'watch-ui', 'watch-worker'), 'tests'));
 
 
 // //////////////////////////////////////////////////
