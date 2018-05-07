@@ -156,7 +156,9 @@ input#password{
     flex: none;
 }
 
-#address-numbering .form-check, #show-xpub .form-check{
+#address-numbering .form-check,
+#show-xpub .form-check,
+#qrcode-links .form-check {
     padding-left: 0px;
 }
 

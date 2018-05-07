@@ -92,12 +92,14 @@ DOM.options.encryption = {};
 DOM.options.encryption.pass = $('input#password');
 DOM.options.encryption.hidePass = $('span#hidePass');
 DOM.options.numberAddresses = $('input#number-addresses');
+DOM.options.qrcodeLink = $('input#qrcode-links-check');
 
 DOM.popovers = {};
 DOM.popovers.testnetWarning = $('#testnet-warning');
 DOM.popovers.showXPUB = $('#showXPUBlabel');
 DOM.popovers.encryption = $('#password-input-group');
 DOM.popovers.numberAddresses = $('#address-numbering-label');
+DOM.popovers.qrcodeLinks = $('#qrcode-links-label');
 
 // Wallet
 DOM.wallet = {};
@@ -123,6 +125,7 @@ pages.singleWallet.addressesPerAccount = 1;
 pages.singleWallet.allowAccounts = false;
 pages.singleWallet.showXPUB = false;
 pages.singleWallet.numberAddresses = false;
+pages.singleWallet.useLinkInQrcode = true;
 pages.singleWallet.defaultPassword = '';
 
 pages.paperWallet = {};
@@ -134,6 +137,7 @@ pages.paperWallet.addressesPerAccount = 3;
 pages.paperWallet.allowAccounts = true;
 pages.paperWallet.showXPUB = false;
 pages.paperWallet.numberAddresses = true;
+pages.paperWallet.useLinkInQrcode = true;
 pages.paperWallet.defaultPassword = '';
 
 
@@ -175,6 +179,8 @@ DOM.options.encryption.hidePass.click(togglePasswordVisibility);
 DOM.options.encryption.pass.change(changePassword);
 // Address Numbering
 DOM.options.numberAddresses.change(toggleAddressNumbering);
+// Bitcoin link in QR code
+DOM.options.qrcodeLink.change(toggleQRcodeLink);
 
 
 // //////////////////////////////////////////////////
@@ -213,6 +219,7 @@ function init() {
 
     password = currentPage.defaultPassword;
     showXPUB = currentPage.showXPUB;
+    useLinkInQrcode = currentPage.useLinkInQrcode;
 
     initiateWallet(function () {
         loadWallet();
@@ -516,6 +523,11 @@ function toggleAddressNumbering() {
     loadWallet();
 };
 
+function toggleQRcodeLink() {
+    useLinkInQrcode = DOM.options.qrcodeLink.prop('checked');
+    loadWallet();
+};
+
 function changePassword() {
     interruptWorkers();
     password = DOM.options.encryption.pass.val();
@@ -682,10 +694,14 @@ function fillCredentials(accIndex, addIndex, address, privKey){
     var addressLink = false;
 
     if(useLinkInQrcode) {
-        var addressLink = 'bitcoin:' + address +
-            '?message=paperwallet:%20' +
-            'account%20' + accIndex + ',%20' +
-            'address%20' + addIndex;
+        var addressLink = 'bitcoin:' + address;
+
+        // for paper wallets add account and address information to the link
+        if(currentPage == pages.paperWallet) {
+            addressLink += '?message=paperwallet:%20' +
+                'account%20' + accIndex + ',%20' +
+                'address%20' + addIndex;
+        }
     }
 
     fillCredentialsElement('address-' + accIndex + '-' + addIndex, address, addressLink);

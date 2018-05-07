@@ -316,12 +316,12 @@ Git Repo: https://github.com/dalitsairio/coinglacier.org.git
                 <div class="row">
                     <div class="col-md">
 
-                        <div id="checkmark-options" class= "page-element paper-wallet">
+                        <div id="checkmark-options" class= "page-element single-wallet paper-wallet">
                             <h6>Features</h6>
 
                             <!-- show xpub -->
-                            <div id="show-xpub">
-                                <div class="form-check page-element paper-wallet">
+                            <div id="show-xpub" class="page-element paper-wallet">
+                                <div class="form-check">
                                     <label id="showXPUBlabel" class="form-check-label" for="showXPUB" data-trigger="hover" data-placement="bottom"
                                            title="Benefit & Drawback" data-content="<div id='make-fat-hack'><p>Ext. pubKeys allow you to check the balances of
                                                 all your addresses [per account] in one go.</p>
@@ -337,12 +337,24 @@ Git Repo: https://github.com/dalitsairio/coinglacier.org.git
                             </div>
 
                             <!-- number the addresses consecutively -->
-                            <div id="address-numbering">
-                                <div class="form-check page-element paper-wallet">
+                            <div id="address-numbering" class="page-element paper-wallet">
+                                <div class="form-check">
                                     <label id="address-numbering-label" class="form-check-label" for="number-addresses" data-trigger="hover" data-placement="bottom"
                                            title="Purely Informative Feature" data-content="<div class='normal-popover'>
                                                 This option merely adds a consecutive numbering to your addresses, without introducing any technical implications.</div>">
                                         <input id="number-addresses" type="checkbox" checked>&nbsp;Number Addresses Consecutively
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- use links in QR Codes such as bitcoin:1BitcoinEaterAddressDontSendf59kuE?message=trash -->
+                            <div id="qrcode-links" class="page-element single-wallet paper-wallet">
+                                <div class="form-check">
+                                    <label id="qrcode-links-label" class="form-check-label" for="qrcode-links-check" data-trigger="hover" data-placement="bottom"
+                                           title="Address in the QR Code" data-content="<div class='normal-popover'>
+                                                Wrap the address in a bitcoin: link that the scanning device understands,
+                                                so you can directly open the scanned link with your Bitcoin wallet.</div>">
+                                        <input id="qrcode-links-check" type="checkbox" checked>&nbsp;Inlcude Bitcoin Link in QR Code
                                     </label>
                                 </div>
                             </div>
