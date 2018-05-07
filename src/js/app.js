@@ -639,6 +639,10 @@ function createWalletHTML(accountIndex){
             credentialsCopy.find('.privkey').prop('id', 'privkey-' + accountIndex + '-' + addressIndex);
             credentialsCopy.find('.canvas-privkey').prop('id', 'canvas-privkey-' + accountIndex + '-' + addressIndex);
 
+            if(currentPage.numberAddresses){
+                credentialsCopy.find('.address-title').append(' ' + (addressIndex + 1));
+            }
+
             var walletAccount = $('div#account-' + accountIndex);
             walletAccount.append(credentialsCopy);
         }
