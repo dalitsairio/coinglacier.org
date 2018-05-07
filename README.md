@@ -93,6 +93,7 @@ gulp build-major
 | BIP84 | [Native SegWit Paths][BIP84] |
 | BIP141 | [Segregated Witness][BIP141] |
 | BIP173 | [Bech32 Addresses][BIP173] |
+| BIP21 | [URI Scheme][BIP21] |
 
    [BIP38]: <https://github.com/bitcoin/bips/blob/master/bip-0038.mediawiki>
    [BIP32]: <https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki>
@@ -102,6 +103,7 @@ gulp build-major
    [BIP84]: <https://github.com/bitcoin/bips/blob/master/bip-0084.mediawiki>
    [BIP141]: <https://github.com/bitcoin/bips/blob/master/bip-0141.mediawiki>
    [BIP173]: <https://github.com/bitcoin/bips/blob/master/bip-0173.mediawiki>
+   [BIP21]: <https://github.com/bitcoin/bips/blob/master/bip-0021.mediawiki>
 
 
 # To be done ....

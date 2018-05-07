@@ -1,4 +1,5 @@
 const QRCode = require('qrcode');
+const bip21 = require('bip21');
 
 // //////////////////////////////////////////////////
 // Constants and Variables
@@ -11,7 +12,7 @@ var password;
 var accountsForm;
 var mnemonic;
 var showXPUB;
-var useLinkInQrcode;
+var useBitcoinLink;
 var useImprovedEntropy;
 
 
@@ -125,7 +126,7 @@ pages.singleWallet.addressesPerAccount = 1;
 pages.singleWallet.allowAccounts = false;
 pages.singleWallet.showXPUB = false;
 pages.singleWallet.numberAddresses = false;
-pages.singleWallet.useLinkInQrcode = true;
+pages.singleWallet.useBitcoinLink = true;
 pages.singleWallet.defaultPassword = '';
 
 pages.paperWallet = {};
@@ -137,7 +138,7 @@ pages.paperWallet.addressesPerAccount = 3;
 pages.paperWallet.allowAccounts = true;
 pages.paperWallet.showXPUB = false;
 pages.paperWallet.numberAddresses = true;
-pages.paperWallet.useLinkInQrcode = true;
+pages.paperWallet.useBitcoinLink = true;
 pages.paperWallet.defaultPassword = '';
 
 
@@ -219,7 +220,7 @@ function init() {
 
     password = currentPage.defaultPassword;
     showXPUB = currentPage.showXPUB;
-    useLinkInQrcode = currentPage.useLinkInQrcode;
+    useBitcoinLink = currentPage.useBitcoinLink;
 
     initiateWallet(function () {
         loadWallet();
@@ -524,7 +525,7 @@ function toggleAddressNumbering() {
 };
 
 function toggleQRcodeLink() {
-    useLinkInQrcode = DOM.options.qrcodeLink.prop('checked');
+    useBitcoinLink = DOM.options.qrcodeLink.prop('checked');
     loadWallet();
 };
 
@@ -691,34 +692,57 @@ function foreachCredential(callbackPerAccount, callbackPerAddress){
 
 function fillCredentials(accIndex, addIndex, address, privKey){
 
-    var addressLink = false;
+    var addressLink = useBitcoinLink ? createBitcoinLink(address, accIndex, addIndex) : false;
 
-    if(useLinkInQrcode) {
-        var addressLink = 'bitcoin:' + address;
+    var addressIdentifier = 'address-' + accIndex + '-' + addIndex;
+    var privKeyIdentifier = 'privkey-' + accIndex + '-' + addIndex;
 
-        // for paper wallets add account and address information to the link
-        if(currentPage == pages.paperWallet) {
-            addressLink += '?message=paperwallet:%20' +
-                'account%20' + accIndex + ',%20' +
-                'address%20' + addIndex;
-        }
-    }
-
-    fillCredentialsElement('address-' + accIndex + '-' + addIndex, address, addressLink);
-    fillCredentialsElement('privkey-' + accIndex + '-' + addIndex, privKey);
+    fillCredentialsElement(addressIdentifier, address, addressLink);
+    fillCredentialsElement(privKeyIdentifier, privKey);
 }
 
-function fillCredentialsElement(id, plaintext, qrcode){
+function fillCredentialsElement(id, plaintext, link){
 
-    qrcode = qrcode || plaintext;
+    var qrCodeData;
 
-    $('#' + id).text(plaintext);
+    if(!link){
+        $('#' + id).text(plaintext);
+        qrCodeData = plaintext;
+    }else{
+        $('#' + id).html(wrapLinkAroundAddress(id, plaintext, link));
+        qrCodeData = link;
+    }
 
-    QRCode.toCanvas($('#canvas-' + id).get(0), qrcode, function (error) {
+    QRCode.toCanvas($('#canvas-' + id).get(0), qrCodeData, function (error) {
         if (error){
             console.error(error);
         }
     });
+}
+
+function wrapLinkAroundAddress(id, plaintext, link){
+    var html = '<a href="' + link + '" target="_blank">';
+    html += plaintext;
+    html += '</a>';
+
+    return html;
+}
+
+function createBitcoinLink(address, accIndex, addIndex){
+
+    var label;
+
+    switch(currentPage){
+        case pages.paperWallet:
+            label = 'Paper wallet: Account ' + accIndex + ', Address ' + addIndex;
+            break;
+        case pages.singleWallet:
+        default:
+            label = 'Address generated on coinglacier.org';
+            break;
+    }
+
+    return bip21.encode(address, {label: label});
 }
 
 // //////////////////////////////////////////////////
