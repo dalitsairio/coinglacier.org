@@ -290,7 +290,13 @@ function switchToMainnet() {
 
 function initTestnet() {
 
-    useImprovedEntropy = false;
+    // todo: this is not the right way to do this:
+    // useImprovedEntropy = false;
+    // todo: even though this extra layer of entropy is not needed
+    // todo: on testnet, simply turning it off is wrong,
+    // todo: since the user can afterwards change to the mainnet
+    // todo: and then misses out on this extra protection
+    useImprovedEntropy = true;
 
     // set GET parameter 'network' to 'testnet'
     addParamToURL({key: GET.network.keyword, value: GET.network.testnet});
