@@ -1,3 +1,5 @@
+const QRCode = require('qrcode');
+
 // //////////////////////////////////////////////////
 // Constants and Variables
 // //////////////////////////////////////////////////
@@ -9,6 +11,7 @@ var password;
 var accountsForm;
 var mnemonic;
 var showXPUB;
+var useLinkInQrcode;
 var useImprovedEntropy;
 
 
@@ -597,7 +600,6 @@ function loadWallet() {
 
 }
 
-// todo this function will be replaced properly with templates n' stuff
 function createWalletHTML(accountIndex){
 
     DOM.wallet.template.hide();
@@ -627,7 +629,9 @@ function createWalletHTML(accountIndex){
             var credentialsCopy = DOM.wallet.templateCredentials.clone();
             credentialsCopy.prop('id', 'credentials-' + accountIndex + '-' + addressIndex);
             credentialsCopy.find('.address').prop('id', 'address-' + accountIndex + '-' + addressIndex);
+            credentialsCopy.find('.canvas-address').prop('id', 'canvas-address-' + accountIndex + '-' + addressIndex);
             credentialsCopy.find('.privkey').prop('id', 'privkey-' + accountIndex + '-' + addressIndex);
+            credentialsCopy.find('.canvas-privkey').prop('id', 'canvas-privkey-' + accountIndex + '-' + addressIndex);
 
             var walletAccount = $('div#account-' + accountIndex);
             walletAccount.append(credentialsCopy);
@@ -646,8 +650,7 @@ function fillWalletHTML(){
         function (accountIndex, addressIndex) {
 
             asyncCreateCredentials(network, accountIndex, addressIndex, password, function (credentials) {
-                $('#address-' + accountIndex + '-' + addressIndex).text(credentials.address);
-                $('#privkey-' + accountIndex + '-' + addressIndex).text(credentials.privateKey);
+                fillCredentials(accountIndex, addressIndex, credentials.address, credentials.privateKey);
             });
         }
     );
@@ -664,6 +667,33 @@ function foreachCredential(callbackPerAccount, callbackPerAddress){
     }
 }
 
+function fillCredentials(accIndex, addIndex, address, privKey){
+
+    var addressLink = false;
+
+    if(useLinkInQrcode) {
+        var addressLink = 'bitcoin:' + address +
+            '?message=paperwallet:%20' +
+            'account%20' + accIndex + ',%20' +
+            'address%20' + addIndex;
+    }
+
+    fillCredentialsElement('address-' + accIndex + '-' + addIndex, address, addressLink);
+    fillCredentialsElement('privkey-' + accIndex + '-' + addIndex, privKey);
+}
+
+function fillCredentialsElement(id, plaintext, qrcode){
+
+    qrcode = qrcode || plaintext;
+
+    $('#' + id).text(plaintext);
+
+    QRCode.toCanvas($('#canvas-' + id).get(0), qrcode, function (error) {
+        if (error){
+            console.error(error);
+        }
+    });
+}
 
 // //////////////////////////////////////////////////
 // Handle GET Parameters
