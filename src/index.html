@@ -287,36 +287,8 @@ Git Repo: https://github.com/dalitsairio/coinglacier.org.git
 
                     </div>
                     <div class="col-xl-7 col-md-6">
-
-                        <div id="wallet-encryption" class= "page-element paper-wallet">
-                            <h6>Encrypt with Password</h6>
-
-                            <!-- encrypt private keys and mnemonic -->
-                            <div class="form-inline">
-                                <div id="password-input-group" class="input-group"
-                                     data-trigger="hover" data-placement="bottom" title="Never forget your password!"
-                                     data-content="<div class='normal-popover'>Both the mnemonic and the resulting private keys get encrypted
-                                           (using standards BIP39 resp. BIP38). <span class='popover-highlight'>If you lose your password,
-                                           you lose all of your funds!</span><br /><br/>
-                                           This option is resource-intensive and might slow down or even corrupt this service,
-                                           depending on how many addresses you need and what device you are on.</div>"
-                                     aria-label="Hide Password" aria-describedby="hidePass">
-                                    <div class="input-group-append">
-                                        <span class="input-group-text text-center" id="hidePass">Hide</span>
-                                    </div>
-                                    <input id="password" data-toggle="Not Encrypted" class="form-control form-control-sm" type="text" placeholder="Not Encrypted">
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-            <div class="col-xl">
-                <div class="row">
-                    <div class="col-md">
-
                         <div id="checkmark-options" class= "page-element single-wallet paper-wallet">
+
                             <h6>Features</h6>
 
                             <!-- show xpub -->
@@ -358,10 +330,14 @@ Git Repo: https://github.com/dalitsairio/coinglacier.org.git
                                     </label>
                                 </div>
                             </div>
-                        </div>
 
+                        </div>
                     </div>
-                    <div class="col-md">
+                </div>
+            </div>
+            <div class="col-xl">
+                <div class="row">
+                    <div class="col-md-6">
 
                         <!-- amount of accounts and addresses -->
                         <div class="page-element paper-wallet" class="form-control">
@@ -374,6 +350,29 @@ Git Repo: https://github.com/dalitsairio/coinglacier.org.git
                                     <input id="addresses-amount-template" type="number" class="addresses-amounts-input" min="1" placeholder="1" />
                                     <button class="btn btn-success btn-sm account-insertion account-add" href="javascript:void(0);" style="display: none;">+</button>
                                     <button class="btn btn-danger btn-sm account-insertion account-remove" href="javascript:void(0);" style="display: none;">-</button>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-md-6">
+
+                        <!-- encrypt private keys and mnemonic -->
+                        <div id="wallet-encryption" class= "page-element paper-wallet">
+                            <h6>Encrypt with Password</h6>
+                            <div class="form-inline">
+                                <div id="password-input-group" class="input-group"
+                                     data-trigger="hover" data-placement="bottom" title="Never forget your password!"
+                                     data-content="<div class='normal-popover'>Both the mnemonic and the resulting private keys get encrypted
+                                           (using standards BIP39 resp. BIP38). <span class='popover-highlight'>If you lose your password,
+                                           you lose all of your funds!</span><br /><br/>
+                                           This option is resource-intensive and might slow down or even corrupt this service,
+                                           depending on how many addresses you need and what device you are on.</div>"
+                                     aria-label="Hide Password" aria-describedby="hidePass">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text text-center" id="hidePass">Hide</span>
+                                    </div>
+                                    <input id="password" data-toggle="Not Encrypted" class="form-control form-control-sm" type="text" placeholder="Not Encrypted">
                                 </div>
                             </div>
                         </div>
