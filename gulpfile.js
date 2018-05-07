@@ -177,23 +177,23 @@ gulp.task('html', function () {
 // //////////////////////////////////////////////////
 
 gulp.task('watch', function () {
-    gulp.watch([
+    return gulp.watch([
         'src/js/**/*.js',
         '!src/js/bundle.js',
         '!src/js/' + concatFile,
         '!src/js/encryptionWorker.js',
         '!src/js/' + encWorkerBundleFile,
         'test/**/*.js'
-    ], gulp.parallel('javascript'));
+    ], gulp.parallel('javascript'));//
 });
 
 gulp.task('watch-worker', function () {
-    gulp.watch(['src/js/**/encryptionWorker.js'], gulp.parallel('javascript'));
+    return gulp.watch(['src/js/**/encryptionWorker.js'], gulp.parallel('javascript'));
 });
 
 gulp.task('watch-ui', function () {
     gulp.watch('src/**/*.html', gulp.parallel('html'));
-    gulp.watch('src/**/*.scss', gulp.parallel('sass'));
+    return gulp.watch('src/**/*.scss', gulp.parallel('sass'));
 });
 
 // //////////////////////////////////////////////////
@@ -210,7 +210,10 @@ gulp.task('tests', function () {
 // Default Task
 // //////////////////////////////////////////////////
 
-gulp.task('default', gulp.parallel(gulp.series('move-dependencies', 'javascript', 'sass', 'browser-sync', 'watch', 'watch-ui', 'watch-worker'), 'tests'));
+gulp.task('watcher-tasks', gulp.parallel('browser-sync', 'watch', 'watch-ui', 'watch-worker'));
+gulp.task('compile', gulp.parallel('javascript', 'sass'));
+gulp.task('page-setup', gulp.series('move-dependencies', 'compile', 'watcher-tasks'));
+gulp.task('default', gulp.parallel('page-setup', 'tests'));
 
 
 // //////////////////////////////////////////////////
