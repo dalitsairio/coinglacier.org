@@ -8,5 +8,4 @@ src/js/encryptionWorker_bundled.min.js
 src/js/libs
 src/maps
 src/scss/libs
-src/css/libs
-src/css/coinglacier.org.css
+src/css
