@@ -58,6 +58,7 @@ Download coinglacier.org
 ```sh
 git clone https://github.com/dalitsairio/coinglacier.org.git
 cd coinglacier.org
+git checkout develop
 ```
 
 Install dependencies
