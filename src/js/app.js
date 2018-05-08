@@ -589,14 +589,7 @@ function initiateWallet(cb){
 
         DOM.pageLoader.hide();
         DOM.root.show();
-        // todo unblock all settings
-        //block them before mnemonic is created
-        // ==> block it in html directly
 
-
-        // besser --> unblock whole website (zuerst blockieren mit jquery)
-
-        // TODO DANACH: MIT BIP39 TOOL CHECKEN OB ZEUGS PASSEND ZU MNEMONIC RAUSKOMMT
         cb();
     });
 }
@@ -615,6 +608,12 @@ function loadWallet() {
         $('div.xpub-wrapper').hide();
     }
 
+    if(accountsForm.length > 1){
+        $('.account-title').show();
+    }else{
+        $('.account-title').hide();
+    }
+
     fillWalletHTML();
 
 }
@@ -623,6 +622,14 @@ function createWalletHTML(accountIndex){
 
     DOM.wallet.template.hide();
     DOM.wallet.container.html(DOM.wallet.templateMnemonicWrapper.clone());
+
+    if(!password){
+        $('.mnemonic-title').html('Mnemonic');
+        $('.privkey-title').html('Private Key');
+    }else{
+        $('.mnemonic-title').html('Mnemonic [encrypted]');
+        $('.privkey-title').html('Private Key [encrypted]');
+    }
 
     DOM.wallet.container.find('.mnemonic').html(mnemonic);
 
@@ -643,6 +650,10 @@ function createWalletHTML(accountIndex){
 
             var accountCopy = DOM.wallet.templateAccount.clone();
             accountCopy.prop('id', 'account-' + accountIndex);
+            if(accountIndex == 0){
+                accountCopy.addClass('first-account');
+            }
+            accountCopy.find('.account-title').html('Account ' + (accountIndex + 1));
             accountCopy.find('.xpub').prop('id', 'xpub-' + accountIndex);
             accountCopy.find('.canvas-xpub').prop('id', 'canvas-xpub-' + accountIndex);
             accountCopy.find('div.credentials').remove();
@@ -675,7 +686,7 @@ function fillWalletHTML(){
     foreachCredential(
         function (accountIndex) {
             createAccount(network, accountIndex, function (account) {
-                $('#xpub-' + accountIndex).text('XPUB: ' + account.xpub);
+                $('#xpub-' + accountIndex).html(account.xpub);
 
                 var xpubCanvas = $('#canvas-xpub-' + accountIndex).get(0);
                 QRCode.toCanvas(xpubCanvas, account.xpub, function (error) {
