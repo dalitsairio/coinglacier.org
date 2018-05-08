@@ -385,9 +385,15 @@ Git Repo: https://github.com/dalitsairio/coinglacier.org.git
 
     <!-- THE WALLET: mnemonics, xpubs, addresses, private keys and QR codes-->
     <div id="wallet-template">
-        <h1 class="mnemonic page-element paper-wallet"> ... loading wallet ... </h1>
+        <div class="mnemonic-wrapper">
+            <h1 class="mnemonic page-element paper-wallet"> ... loading wallet ... </h1>
+            <canvas class="canvas-mnemonic page-element paper-wallet"></canvas>
+        </div>
         <div id="template-account-0" class="wallet-account">
-            <h3 id="xpub-0'" class="xpub" style="display: none;"> ... wait ... </h3>
+            <div class="xpub-wrapper" style="display: none;">
+                <h3 id="xpub-0'" class="xpub"> ... wait ... </h3>
+                <canvas id="template-canvas-xpub-0" class="canvas-xpub page-element paper-wallet"></canvas>
+            </div>
 
             <div id="template-credentials-0-0" class="credentials row">
                 <div class="col-md-1">

@@ -105,7 +105,7 @@ DOM.popovers.qrcodeLinks = $('#qrcode-links-label');
 // Wallet
 DOM.wallet = {};
 DOM.wallet.template = $('div#wallet-template');
-DOM.wallet.templateMnemonic = $('div#wallet-template .mnemonic');
+DOM.wallet.templateMnemonicWrapper = $('div#wallet-template .mnemonic-wrapper');
 DOM.wallet.container = $('div#wallet');
 DOM.wallet.mnemonic = $('div#wallet h1.mnemonic');
 DOM.wallet.templateAccount = $('#wallet-template div#template-account-0');
@@ -610,9 +610,9 @@ function loadWallet() {
     createWalletHTML();
 
     if(currentPage.allowAccounts && showXPUB){
-        $('h3.xpub').show();
+        $('div.xpub-wrapper').show();
     }else{
-        $('h3.xpub').hide();
+        $('div.xpub-wrapper').hide();
     }
 
     fillWalletHTML();
@@ -622,10 +622,17 @@ function loadWallet() {
 function createWalletHTML(accountIndex){
 
     DOM.wallet.template.hide();
-    // remove everything from wallet container
-    DOM.wallet.container.html(DOM.wallet.templateMnemonic.clone());
+    DOM.wallet.container.html(DOM.wallet.templateMnemonicWrapper.clone());
 
     DOM.wallet.container.find('.mnemonic').html(mnemonic);
+
+    var mnemonicCanvas = DOM.wallet.container.find('.canvas-mnemonic').get(0);
+    QRCode.toCanvas(mnemonicCanvas, mnemonic, function (error) {
+        if (error){
+            console.error(error);
+        }
+    });
+
 
     foreachCredential(
 
@@ -637,6 +644,7 @@ function createWalletHTML(accountIndex){
             var accountCopy = DOM.wallet.templateAccount.clone();
             accountCopy.prop('id', 'account-' + accountIndex);
             accountCopy.find('.xpub').prop('id', 'xpub-' + accountIndex);
+            accountCopy.find('.canvas-xpub').prop('id', 'canvas-xpub-' + accountIndex);
             accountCopy.find('div.credentials').remove();
 
             DOM.wallet.container.append(accountCopy);
@@ -668,7 +676,14 @@ function fillWalletHTML(){
         function (accountIndex) {
             createAccount(network, accountIndex, function (account) {
                 $('#xpub-' + accountIndex).text('XPUB: ' + account.xpub);
-            })
+
+                var xpubCanvas = $('#canvas-xpub-' + accountIndex).get(0);
+                QRCode.toCanvas(xpubCanvas, account.xpub, function (error) {
+                    if (error) {
+                        console.error(error);
+                    }
+                });
+            });
         },
         function (accountIndex, addressIndex) {
 
