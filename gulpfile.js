@@ -177,7 +177,7 @@ gulp.task('html', function () {
 // //////////////////////////////////////////////////
 
 gulp.task('watch', function () {
-    return gulp.watch([
+    gulp.watch([
         'src/js/**/*.js',
         '!src/js/bundle.js',
         '!src/js/' + concatFile,
@@ -188,13 +188,20 @@ gulp.task('watch', function () {
 });
 
 gulp.task('watch-worker', function () {
-    return gulp.watch(['src/js/**/encryptionWorker.js'], gulp.parallel('javascript'));
+    gulp.watch(['src/js/**/encryptionWorker.js'], gulp.parallel('javascript'));
 });
 
-gulp.task('watch-ui', function () {
-    gulp.watch('src/**/*.html', gulp.parallel('html'));
-    return gulp.watch('src/**/*.scss', gulp.parallel('sass'));
+
+
+gulp.task('watch-scss', function () {
+    gulp.watch('src/**/*.scss', gulp.parallel('sass'));
 });
+
+gulp.task('watch-html', function () {
+    gulp.watch('src/**/*.html', gulp.parallel('html'));
+});
+
+gulp.task('watch-ui', gulp.parallel('watch-scss', 'watch-html'));
 
 // //////////////////////////////////////////////////
 // Unit Tests Task
