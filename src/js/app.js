@@ -699,6 +699,7 @@ function fillWalletHTML(){
         function (accountIndex, addressIndex) {
 
             asyncCreateCredentials(network, accountIndex, addressIndex, password, function (credentials) {
+                removeCredentialsLoadingGui(accountIndex, addressIndex);
                 fillCredentials(accountIndex, addressIndex, credentials.address, credentials.privateKey);
             });
         }
@@ -769,6 +770,16 @@ function createBitcoinLink(address, accIndex, addIndex){
     }
 
     return bip21.encode(address, {label: label});
+}
+
+function removeCredentialsLoadingGui(accountIndex, addressIndex){
+    var credentialsDiv = $('div#credentials-' + accountIndex + '-' + addressIndex);
+
+    credentialsDiv.find('.address-wrapper').removeClass('loading');
+    credentialsDiv.find('.privkey-wrapper').removeClass('loading');
+    credentialsDiv.find('.okay-to-share').show();
+    credentialsDiv.find('.keep-secret').show();
+    credentialsDiv.find('canvas').show();
 }
 
 // //////////////////////////////////////////////////

@@ -339,6 +339,13 @@ div.address-wrapper {
     }
 }
 
+
+div.address-wrapper.loading{
+    .small-loader{
+        margin: 1.5rem 0 0 2.6rem;
+    }
+}
+
 div.privkey-wrapper{
 
     margin-top: -12rem;
@@ -367,6 +374,16 @@ div.privkey-wrapper{
 
     .privkey-title{
         padding-top: 5rem;
+    }
+}
+
+div.privkey-wrapper.loading{
+
+    margin-top: -11.5rem;
+
+    .small-loader{
+        float: right;
+        margin: 1rem 3.2rem 2.5rem 0;
     }
 }
 
