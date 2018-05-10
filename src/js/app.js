@@ -14,6 +14,7 @@ var mnemonic;
 var showXPUB;
 var useBitcoinLink;
 var useImprovedEntropy;
+var showUnitTests;
 
 
 // identical to the id's set in bitcoinjs-lib_patched.js
@@ -111,6 +112,16 @@ DOM.wallet.mnemonic = $('div#wallet h1.mnemonic');
 DOM.wallet.templateAccount = $('#wallet-template div#template-account-0');
 DOM.wallet.templateCredentials = $('div#wallet-template .credentials');
 
+// Footer
+DOM.footer = {};
+DOM.footer.status = {};
+DOM.footer.status.online = $('footer #status-online');
+DOM.footer.status.crypto = $('footer #status-crypto');
+DOM.footer.status.unittests = $('footer #status-unittests');
+DOM.footer.mochaWrapper = $('footer #mocha-wrapper');
+DOM.footer.mochaTitle = $('footer #mocha-title');
+DOM.footer.failedDescription = $('footer #mocha-failed-description');
+
 
 // //////////////////////////////////////////////////
 // Pages / Page Options
@@ -183,6 +194,8 @@ DOM.options.numberAddresses.change(toggleAddressNumbering);
 // Bitcoin link in QR code
 DOM.options.qrcodeLink.change(toggleQRcodeLink);
 
+// Footer
+DOM.footer.status.unittests.click(toggleUnitTests);
 
 // //////////////////////////////////////////////////
 // Page Loading
@@ -221,6 +234,7 @@ function init() {
     password = currentPage.defaultPassword;
     showXPUB = currentPage.showXPUB;
     useBitcoinLink = currentPage.useBitcoinLink;
+    showUnitTests = false;
 
     initiateWallet(function () {
         loadWallet();
@@ -229,7 +243,29 @@ function init() {
 
     // run unit tests
     var runAllTests = getURLparameter(GET.allUnitTests.keyword) == GET.allUnitTests.yes;
-    runUnitTests(runAllTests);
+    runUnitTests(runAllTests, onUnittestsSuccesful, onUnittestsFailed);
+}
+
+function onUnittestsSuccesful(){
+    DOM.footer.mochaTitle.html('Unit tests successful');
+    DOM.footer.mochaTitle.addClass('success');
+    onStatusSuccessful(DOM.footer.status.unittests);
+}
+
+function onUnittestsFailed(){
+    DOM.footer.mochaTitle.html('Unit tests failed!');
+    DOM.footer.mochaTitle.addClass('failed');
+    DOM.footer.failedDescription.show();
+    onStatusFailed(DOM.footer.status.unittests);
+}
+
+function onStatusSuccessful(domElement){
+    domElement.html('✔');
+}
+
+function onStatusFailed(domElement){
+    domElement.html('⚠');
+    domElement.addClass('warning');
 }
 
 
@@ -536,6 +572,22 @@ function changePassword() {
         loadWallet();
     });
 };
+
+
+// //////////////////////////////////////////////////
+// Footer
+// //////////////////////////////////////////////////
+
+function toggleUnitTests(){
+    if(showUnitTests) {
+        DOM.footer.mochaWrapper.show();
+        // todo remove the other views
+    }else{
+        DOM.footer.mochaWrapper.hide();
+    }
+
+    showUnitTests = !showUnitTests;
+}
 
 
 // //////////////////////////////////////////////////

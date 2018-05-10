@@ -443,6 +443,66 @@ div#page-loader{
 
 
 //////////////////////////////
+///         Footer         ///
+//////////////////////////////
+
+footer{
+
+    padding: 0.2rem 1.4rem;
+
+    color: white;
+
+    .statusicon {
+        margin: 0 0.2rem 0 0;
+        font-size: 1.6rem;
+        text-decoration: none;
+        color: #fff;
+
+        .small-loader{
+            float: left;
+            margin: 0.4rem 0.8rem 0 0;
+        }
+    }
+
+    .statusicon.warning {
+        color: #ff7820;
+    }
+
+    .status-wrapper{
+        background: #fff;
+        color: #000;
+        margin-top: 1rem;
+        padding: 2rem;
+    }
+
+    #mocha-wrapper{
+
+        // override mocha defaults
+        #mocha {
+            margin: 0;
+
+            ul#mocha-stats{
+
+                position: relative;
+                top: 0px;
+                right: 0px;
+                margin-top: 0;
+            }
+        }
+    }
+
+    h1 {
+        color: #222;
+    }
+    h1.success {
+        color: #009500;
+    }
+    h1.failed {
+        color: #800000;
+    }
+}
+
+//////////////////////////////
 ///      RESPONSIVE        ///
 //////////////////////////////
 

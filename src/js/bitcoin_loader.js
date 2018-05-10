@@ -213,7 +213,7 @@ function asyncCreateCredentials(networkID, accountIndex, addressIndex, password,
 // Unit Tests
 // //////////////////////////////////////////////////
 
-function runUnitTests(runSlowTests) {
+function runUnitTests(runSlowTests, cbSuccessful, cbFailure) {
     mocha.setup('bdd');
     tests.bitcoinJStests();
 
@@ -221,5 +221,16 @@ function runUnitTests(runSlowTests) {
         tests.bip38Tests();
     }
 
-    mocha.run();
+    var testsFailed = false;
+
+    mocha.run()
+        .on('fail', function () {
+            testsFailed = true;
+            cbFailure();
+        })
+        .on('end', function () {
+            if(!testsFailed) {
+                cbSuccessful();
+            }
+        });
 }
