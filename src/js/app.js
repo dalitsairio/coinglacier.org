@@ -579,14 +579,15 @@ function changePassword() {
 // //////////////////////////////////////////////////
 
 function toggleUnitTests(){
+
+    showUnitTests = !showUnitTests;
+
     if(showUnitTests) {
         DOM.footer.mochaWrapper.show();
         // todo remove the other views
     }else{
         DOM.footer.mochaWrapper.hide();
     }
-
-    showUnitTests = !showUnitTests;
 }
 
 
