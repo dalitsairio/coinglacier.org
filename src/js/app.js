@@ -121,6 +121,8 @@ DOM.footer.status.unittests = $('footer #status-unittests');
 DOM.footer.mochaWrapper = $('footer #mocha-wrapper');
 DOM.footer.mochaTitle = $('footer #mocha-title');
 DOM.footer.failedDescription = $('footer #mocha-failed-description');
+DOM.footer.encryptionDialog = $('footer #encryption-tests-dialog');
+DOM.footer.encTestButton = $('footer #run-enc-tests-button');
 
 
 // //////////////////////////////////////////////////
@@ -196,6 +198,7 @@ DOM.options.qrcodeLink.change(toggleQRcodeLink);
 
 // Footer
 DOM.footer.status.unittests.click(toggleUnitTests);
+DOM.footer.encTestButton.click(reloadAndRunAllTests);
 
 // //////////////////////////////////////////////////
 // Page Loading
@@ -243,6 +246,10 @@ function init() {
 
     // run unit tests
     var runAllTests = getURLparameter(GET.allUnitTests.keyword) == GET.allUnitTests.yes;
+    if(runAllTests){
+        removeParamFromURL(GET.allUnitTests.keyword);
+        DOM.footer.encryptionDialog.hide();
+    }
     runUnitTests(runAllTests, onUnittestsSuccesful, onUnittestsFailed);
 }
 
@@ -590,6 +597,12 @@ function toggleUnitTests(){
     }
 }
 
+function reloadAndRunAllTests(){
+    addParamToURL({key: GET.allUnitTests.keyword, value: GET.allUnitTests.yes});
+
+    // looks ridiculous but this is actually a page reload
+    window.location.href = window.location.href;
+}
 
 // //////////////////////////////////////////////////
 // Bitcoin Stuff

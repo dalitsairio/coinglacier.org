@@ -441,6 +441,20 @@ Git Repo: https://github.com/dalitsairio/coinglacier.org.git
             <div style="clear: both;"></div>
             <div id="mocha-wrapper" class="status-wrapper" style="display:none;">
                 <h1 id="mocha-title">Unit tests still running ... </h1>
+                <div id="encryption-tests-dialog">
+                    <div class="description">
+                        If you want to password protect your data,
+                        you might want to run the encryption unit tests
+                        to ensure everything works fine in your browser.
+                    </div>
+                    <div class="notice">
+                        Notice 1: This will reload your page and all the already created data is lost.
+                    </div>
+                    <div class="notice">
+                        Notice 2: This process will take some time and leave your browser unresponsive in the meantime.
+                    </div>
+                    <button id="run-enc-tests-button" type="button" class="btn btn-secondary">Run encryption tests</button>
+                </div>
                 <div id="mocha-failed-description" style="display: none;">
                     Coinglacier.org is not compatible with your browser. <b>Use this service in a better browser or you may loose your Bitcoin!</b>
                 </div>

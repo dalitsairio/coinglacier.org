@@ -47,6 +47,11 @@ $screen-xs: 360px;
         font-size: 1.3rem;
         font-weight: bold;
     }
+
+    .statusicon {
+        text-decoration: none;
+        color: #fff;
+    }
 }
 
 // mainnet theme
@@ -473,8 +478,8 @@ footer{
     .status-wrapper{
         background: #fff;
         color: #000;
-        margin: 1rem 0;
-        padding: 2rem;
+        margin: 0.8rem 0;
+        padding: 1.5rem 1.8rem;
     }
 
     #mocha-wrapper{
@@ -501,6 +506,23 @@ footer{
     }
     h1.failed {
         color: #800000;
+    }
+
+    #encryption-tests-dialog{
+        padding: 1rem;
+        border: 1px solid lightgray;
+        margin-bottom: 0.2rem;
+
+        .description{
+            // no specific design so far
+        }
+        .notice{
+            font-style: italic;
+        }
+
+        button {
+            margin-top: 1rem;
+        }
     }
 }
 
