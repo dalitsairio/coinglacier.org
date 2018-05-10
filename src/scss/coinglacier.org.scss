@@ -448,6 +448,7 @@ div#page-loader{
 
 footer{
 
+    margin-bottom: 6rem;
     padding: 0.2rem 1.4rem;
 
     color: white;
@@ -455,6 +456,7 @@ footer{
     .statusicon {
         margin: 0 0.2rem 0 0;
         font-size: 1.6rem;
+        
         text-decoration: none;
         color: #fff;
 
@@ -471,7 +473,7 @@ footer{
     .status-wrapper{
         background: #fff;
         color: #000;
-        margin-top: 1rem;
+        margin: 1rem 0;
         padding: 2rem;
     }
 
