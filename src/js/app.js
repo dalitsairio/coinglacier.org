@@ -14,7 +14,7 @@ var mnemonic;
 var showXPUB;
 var useBitcoinLink;
 var useImprovedEntropy;
-var showUnitTests;
+var shownStatus;
 
 
 // identical to the id's set in bitcoinjs-lib_patched.js
@@ -24,6 +24,10 @@ const MAINNET_BECH32 = 2;
 const TESTNET_NONSEGWIT = 10;
 const TESTNET_SEGWIT = 11;
 const TESTNET_BECH32 = 12;
+
+const STATUS_ONLINE = 0;
+const STATUS_CRYPTO = 1;
+const STATUS_UNITTESTS = 2;
 
 // GET parameters
 var GET = {};
@@ -115,9 +119,15 @@ DOM.wallet.templateCredentials = $('div#wallet-template .credentials');
 // Footer
 DOM.footer = {};
 DOM.footer.status = {};
-DOM.footer.status.online = $('footer #status-online');
+DOM.footer.status.onlineCheck = $('footer #status-online');
+DOM.footer.status.browserOnline = $('footer #browser-online');
+DOM.footer.status.browserOffline = $('footer #browser-offline');
 DOM.footer.status.crypto = $('footer #status-crypto');
+DOM.footer.status.cryptoSupported= $('footer #crypto-supported');
+DOM.footer.status.cryptoNotSupported= $('footer #crypto-not-supported');
 DOM.footer.status.unittests = $('footer #status-unittests');
+DOM.footer.onlineWrapper = $('footer #online-check-wrapper');
+DOM.footer.cryptoWrapper = $('footer #crypto-check-wrapper');
 DOM.footer.mochaWrapper = $('footer #mocha-wrapper');
 DOM.footer.mochaTitle = $('footer #mocha-title');
 DOM.footer.failedDescription = $('footer #mocha-failed-description');
@@ -197,6 +207,8 @@ DOM.options.numberAddresses.change(toggleAddressNumbering);
 DOM.options.qrcodeLink.change(toggleQRcodeLink);
 
 // Footer
+DOM.footer.status.onlineCheck.click(toggleOnlineCheck);
+DOM.footer.status.crypto.click(toggleCryptoCheck);
 DOM.footer.status.unittests.click(toggleUnitTests);
 DOM.footer.encTestButton.click(reloadAndRunAllTests);
 
@@ -237,12 +249,16 @@ function init() {
     password = currentPage.defaultPassword;
     showXPUB = currentPage.showXPUB;
     useBitcoinLink = currentPage.useBitcoinLink;
-    showUnitTests = false;
+    shownStatus = null;
 
     initiateWallet(function () {
         loadWallet();
     });
 
+    // check whether browser is online or not
+    checkStatusOnline();
+    // check whether window.crypto.getRandomValues is supported
+    checkCrypto();
 
     // run unit tests
     var runAllTests = getURLparameter(GET.allUnitTests.keyword) == GET.allUnitTests.yes;
@@ -251,6 +267,26 @@ function init() {
         DOM.footer.encryptionDialog.hide();
     }
     runUnitTests(runAllTests, onUnittestsSuccesful, onUnittestsFailed);
+}
+
+function checkStatusOnline(){
+    if(navigator.onLine){
+        onStatusFailed(DOM.footer.status.onlineCheck);
+        DOM.footer.status.browserOnline.show();
+    }else{
+        onStatusSuccessful(DOM.footer.status.onlineCheck)
+        DOM.footer.status.browserOffline.show();
+    }
+}
+
+function checkCrypto(){
+    if(window.crypto && window.crypto.getRandomValues){
+        onStatusSuccessful(DOM.footer.status.crypto)
+        DOM.footer.status.cryptoSupported.show();
+    }else{
+        onStatusFailed(DOM.footer.status.crypto);
+        DOM.footer.status.cryptoNotSupported.show();
+    }
 }
 
 function onUnittestsSuccesful(){
@@ -267,11 +303,11 @@ function onUnittestsFailed(){
 }
 
 function onStatusSuccessful(domElement){
-    domElement.html('✔');
+    domElement.html('&#10004;'); // &#10004; = ✔
 }
 
 function onStatusFailed(domElement){
-    domElement.html('⚠');
+    domElement.html('&#9888;'); // &#9888; = ⚠
     domElement.addClass('warning');
 }
 
@@ -585,16 +621,46 @@ function changePassword() {
 // Footer
 // //////////////////////////////////////////////////
 
+function toggleOnlineCheck(){
+
+    hideAllStatusWindows();
+
+    if(shownStatus !== STATUS_ONLINE){
+        DOM.footer.onlineWrapper.show();
+        shownStatus = STATUS_ONLINE;
+    }else{
+        shownStatus = null;
+    }
+}
+
+function toggleCryptoCheck(){
+
+    hideAllStatusWindows();
+
+    if(shownStatus !== STATUS_CRYPTO){
+        DOM.footer.cryptoWrapper.show();
+        shownStatus = STATUS_CRYPTO;
+    }else{
+        shownStatus = null;
+    }
+}
+
 function toggleUnitTests(){
 
-    showUnitTests = !showUnitTests;
+    hideAllStatusWindows();
 
-    if(showUnitTests) {
+    if(shownStatus !== STATUS_UNITTESTS){
         DOM.footer.mochaWrapper.show();
-        // todo remove the other views
+        shownStatus = STATUS_UNITTESTS;
     }else{
-        DOM.footer.mochaWrapper.hide();
+        shownStatus = null;
     }
+}
+
+function hideAllStatusWindows(){
+    DOM.footer.onlineWrapper.hide();
+    DOM.footer.cryptoWrapper.hide();
+    DOM.footer.mochaWrapper.hide();
 }
 
 function reloadAndRunAllTests(){
@@ -912,5 +978,6 @@ function getURLparameter(name, url) {
     var results = regex.exec(url);
     return results == null ? null : results[1];
 }
+
 
 init();

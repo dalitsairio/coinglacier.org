@@ -439,6 +439,43 @@ Git Repo: https://github.com/dalitsairio/coinglacier.org.git
                 <a id="status-unittests" class="statusicon" href="javascript:void(0);"><div class="small-loader"></div></a>
             </div>
             <div style="clear: both;"></div>
+            <div id="online-check-wrapper" class="status-wrapper" style="display:none;">
+                <div id="browser-online" style="display:none;">
+                    <div>
+                        <span class="status-warn">&#9888; Think twice!</span>
+                        <span>You appear to be running coinglacier.org online from a live website.</span>
+                    </div>
+                    <div>
+                        <span>For valuable wallets it is recommended to</span>
+                        <a href="https://github.com/dalitsairio/coinglacier.org/releases">download</a>
+                        <span>the zip file from GitHub and run coinglacier.org offline as a local html file.</span>
+                    </div>
+                </div>
+                <div id="browser-offline" style="display:none;">
+                    <div>
+                        <span class="status-good">&#10004; Good!</span>
+                        <span>You are running coinglacier.org from your local computer.</span>
+                    </div>
+                    <div>
+                        <span>Tip: Double check you are offline by trying</span>
+                        <a href="http://www.google.com" target="_blank">www.google.com</a>
+                    </div>
+                </div>
+            </div>
+            <div id="crypto-check-wrapper" class="status-wrapper" style="display:none;">
+                <div id="crypto-supported" style="display:none;">
+                    <div>
+                        <span class="status-good">&#10004; Good!</span>
+                        <span>Your browser can generate cryptographically random keys using window.crypto.getRandomValues</span>
+                    </div>
+                </div>
+                <div id="crypto-not-supported" style="display:none;">
+                    <div>
+                        <span class="status-warn">&#9888; Oh no!</span>
+                        <span>Your browser does NOT support window.crypto.getRandomValues. You should use a more modern browser with coinglacier.org to increase the security of the keys generated.</span>
+                    </div>
+                </div>
+            </div>
             <div id="mocha-wrapper" class="status-wrapper" style="display:none;">
                 <h1 id="mocha-title">Unit tests still running ... </h1>
                 <div id="encryption-tests-dialog">
@@ -456,7 +493,7 @@ Git Repo: https://github.com/dalitsairio/coinglacier.org.git
                     <button id="run-enc-tests-button" type="button" class="btn btn-secondary">Run encryption tests</button>
                 </div>
                 <div id="mocha-failed-description" style="display: none;">
-                    Coinglacier.org is not compatible with your browser. <b>Use this service in a better browser or you may loose your Bitcoin!</b>
+                    Coinglacier.org is not compatible with your browser. <b>Use this service in another browser or you may loose your Bitcoin!</b>
                 </div>
                 <div id="mocha"></div>
             </div>

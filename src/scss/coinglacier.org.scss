@@ -48,9 +48,28 @@ $screen-xs: 360px;
         font-weight: bold;
     }
 
-    .statusicon {
-        text-decoration: none;
-        color: #fff;
+    footer {
+        .statusicon {
+            text-decoration: none;
+            color: #fff;
+        }
+
+        .status-wrapper{
+
+            a{
+                color: darken($testnet-primary, 30);
+            }
+        }
+
+        h1 {
+            color: #222;
+        }
+        h1.success {
+            color: #009500;
+        }
+        h1.failed {
+            color: #800000;
+        }
     }
 }
 
@@ -459,15 +478,15 @@ footer{
     color: white;
 
     .statusicon {
-        margin: 0 0.2rem 0 0;
+        float: left;
+        margin: 0 0.5rem 0 0;
         font-size: 1.6rem;
         
         text-decoration: none;
         color: #fff;
 
         .small-loader{
-            float: left;
-            margin: 0.4rem 0.8rem 0 0;
+            margin: 0.4rem 0.4rem 0 0.4rem;
         }
     }
 
@@ -480,6 +499,19 @@ footer{
         color: #000;
         margin: 0.8rem 0;
         padding: 1.5rem 1.8rem;
+
+        a{
+            color: darken($mainnet-primary, 20);
+        }
+    }
+
+    .status-good{
+        color: #009500;
+        font-weight: bold;
+    }
+    .status-warn{
+        color: #ff7820;
+        font-weight: bold;
     }
 
     #mocha-wrapper{
@@ -494,6 +526,17 @@ footer{
                 top: 0px;
                 right: 0px;
                 margin-top: 0;
+            }
+
+            .replay {
+                display: none;
+            }
+
+            // disable the title links
+            h1{
+                a{
+                    pointer-events: none;
+                }
             }
         }
     }
