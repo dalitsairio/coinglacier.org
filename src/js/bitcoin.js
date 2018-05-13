@@ -111,8 +111,8 @@ function createAccount(bip32RootKey, networkID, index) {
     // Masternode / BIP44 | BIP49 | BIP84 / Bitcoin | Testnet / Account / External / First Address
     //                                                                   ^^^^^^^^^
     var externalPath = '0';
-    var pathError = findDerivationPathErrors(externalPath, false, false);
-    if (pathError) throw 'Derivation Path Error: ' + pathError;
+    var pathError2 = findDerivationPathErrors(externalPath, false, false);
+    if (pathError2) throw 'Derivation Path Error: ' + pathError;
     result.external = account.derivePath(externalPath);
 
     return result;
