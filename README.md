@@ -83,6 +83,20 @@ Backwards incompatible releases:
 ```sh
 gulp build-major
 ```
+
+### Commit tags
+
+Each commit message should begin with one of the following tags:
+
+* **[FEAT]**: A new feature
+* **[FIX]**: A bug fix
+* **[DOCS]**: Documentation only changes (documentation files as well as source code documentation)
+* **[REFACTOR]**: Changes that do not affect the meaning of the code
+* **[TEST]**: Handling unit tests
+* **[CHORE]**: Changes to the build process or auxiliary tools
+* **[STYLING]**: UI design changes that do not affect functionality
+* **[MISC]**: Everything that doesn't fit the above types
+
 # Supported Bitcoin Standards
 | BIP | Description |
 | ------ | ------ |
