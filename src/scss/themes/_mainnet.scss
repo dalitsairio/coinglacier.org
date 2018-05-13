@@ -1,0 +1,355 @@
+body {
+    background: #f6f6f0;
+}
+
+$theme-colors: (
+    "primary": $mainnet-primary
+);
+
+#options {
+    background: lighten($mainnet-primary, 30);
+    border: 1px solid $dark;
+    border-top: none;
+}
+
+// //////////////////////////////////////////////////
+// Ambiance (major settings, background colors, ...)
+// //////////////////////////////////////////////////
+div#wallet {
+    background: white;
+    padding: 1.1rem 1.6rem;
+}
+
+div#page {
+    -webkit-box-shadow: 0px 0px 50px 1px rgba(136, 136, 136, 0.25);
+    -moz-box-shadow: 0px 0px 50px 1px rgba(136, 136, 136, 0.25);
+    box-shadow: 0px 0px 50px 1px rgba(136, 136, 136, 0.25);
+}
+
+div#testnet-warning {
+    border: 1px #856404 dotted;
+}
+
+// this is a hack. Usually popovers have a max-width of 276px
+// however some of them should be bigger.
+// therefore we changed the popovers size to 630px.
+// the content of the small popover must always be encapsulated
+// in a div with the class .normal-popover to keep them small
+.popover, .testnet .popover {
+    max-width: 630px;
+}
+
+.popover .normal-popover {
+    max-width: 276px;
+}
+
+#options {
+    padding: 0rem 0rem 0.8rem 1.2rem;
+}
+
+#account-row-template {
+    display: none;
+}
+
+.account-row .form-text {
+    span {
+        margin-right: 1rem;
+    }
+
+    input {
+        margin-left: 0.4rem;
+        width: 4rem;
+    }
+
+    button {
+        margin-bottom: 0.25rem;
+        padding: 0.05rem 0.25rem;
+    }
+
+    button.account-add {
+        margin-left: 0.5rem;
+    }
+
+    button.account-remove{
+        padding: 0.05rem 0.42rem;
+    }
+}
+
+span#hidePass {
+    min-width: 60px;
+}
+
+input#password {
+    flex: none;
+    width: 10.2rem;
+}
+
+#address-numbering .form-check,
+#show-xpub .form-check,
+#qrcode-links .form-check {
+    padding-left: 0px;
+}
+
+#wallet-encryption {
+    label {
+        margin: 5px;
+    }
+}
+
+
+// //////////////////////////////////////////////////
+// Wallet (content)
+// //////////////////////////////////////////////////
+
+.mnemonic-wrapper {
+    border-bottom: 1px #000 dashed;
+    margin-bottom: 1.2rem;
+    padding-bottom: 0.4rem;
+    
+    .keep-secret {
+        float: left;
+        margin: 5.2rem -4.5rem 0 -5.1rem;
+        -webkit-transform: rotate(270deg);
+        -moz-transform: rotate(270deg);
+        -o-transform: rotate(270deg);
+        -ms-transform: rotate(270deg);
+        transform: rotate(270deg);
+    }
+}
+
+.mnemonic-wrapper h1 {
+    margin-bottom: 1.1rem;
+    margin-left: 3.2rem;
+}
+
+.canvas-mnemonic {
+    float: left;
+    margin-top: -1rem;
+}
+
+.wallet-account:not(.first-account) {
+    border-top: 1px #7c7c7c dashed;
+    margin-top: 0.3rem;
+    padding-top: 1.3rem;
+}
+
+.xpub-wrapper {
+    border-bottom: 1px lightgrey dotted;
+    margin-bottom: 1.2rem;
+    padding-bottom: 0.4rem;
+    
+    canvas {
+        float:right;
+        margin-top: -1rem;
+        
+    }
+
+    .okay-to-share {
+        float:right;
+        margin: 4.75rem -4.6rem 0 -5rem;
+        -webkit-transform: rotate(90deg);
+        -moz-transform: rotate(90deg);
+        -o-transform: rotate(90deg);
+        -ms-transform: rotate(90deg);
+        transform: rotate(90deg);
+    }
+}
+
+div.credentials {
+    margin: 2rem 0 1rem 0;
+}
+
+div.address-wrapper {
+    .okay-to-share {
+        float:left;
+        margin: 4.2rem -3.9rem 0 -4.2rem;
+        -webkit-transform: rotate(270deg);
+        -moz-transform: rotate(270deg);
+        -o-transform: rotate(270deg);
+        -ms-transform: rotate(270deg);
+        transform: rotate(270deg);
+    }
+
+    .canvas-address {
+        float: left;
+        margin-top: -0.7rem;
+    }
+}
+
+
+div.address-wrapper.loading {
+    .small-loader {
+        margin: 1.5rem 0 0 2.6rem;
+    }
+}
+
+div.privkey-wrapper {
+    margin-top: -12rem;
+
+    .keep-secret {
+        float: right;
+        margin: 3.4rem -2.8rem 0 -3.4rem;
+        -webkit-transform: rotate(90deg);
+        -moz-transform: rotate(90deg);
+        -o-transform: rotate(90deg);
+        -ms-transform: rotate(90deg);
+        transform: rotate(90deg);
+    }
+
+    .canvas-privkey {
+        float: right;
+        margin-top: -0.8rem;
+    }
+
+    .privkey-title {
+        padding-top: 5rem;
+    }
+}
+
+div.privkey-wrapper.loading {
+    margin-top: -11.5rem;
+
+    .small-loader {
+        float: right;
+        margin: 1rem 3.2rem 2.5rem 0;
+    }
+}
+
+
+//////////////////////////////
+///         SPINNER        ///
+//////////////////////////////
+.loader {
+    -webkit-animation: spin 2s linear infinite; /* Safari */
+    animation: spin 1s linear infinite;
+    border: 14px solid #f3f3f3;
+    border-radius: 50%;
+    border-top: 14px solid $mainnet-primary;
+    height: 100px;
+    width: 100px;
+}
+
+.small-loader {
+    -webkit-animation: spin 2s linear infinite; /* Safari */
+    animation: spin 1s linear infinite;
+    border: 5px solid #f3f3f3;
+    border-radius: 50%;
+    border-top: 5px solid $mainnet-primary;
+    height: 25px;
+    width: 25px;
+}
+
+/* Safari */
+@-webkit-keyframes spin {
+    0% { -webkit-transform: rotate(0deg); }
+    100% { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+// page loading
+div#page-loader {
+    margin-top: 8%;
+
+    div#spinner-wrapper {
+        margin: 0 auto;
+        margin-top:8%;
+        width:100px;
+    }
+}
+
+@media screen and (max-width: $bootstrap-sm){
+    // spinner
+    .loader {
+        border: 8px solid #f3f3f3;
+        border-top: 8px solid $mainnet-primary;
+        height: 60px;
+        width: 60px;
+    }
+
+    div#spinner-wrapper {
+        width:60px;
+    }
+
+    div.mnemonic-wrapper {
+        .keep-secret {
+            margin: 3.4rem -3rem 0 -3.2rem;
+        }
+        .mnemonic-title {
+            margin-left: 1.6rem;
+        }
+
+        canvas.canvas-mnemonic {
+            height: 100px !important;
+            width: 100px !important;
+        }
+    }
+
+    div.xpub-wrapper {
+        .keep-secret {
+            margin: 3.4rem -3rem 0 -3.2rem;
+        }
+
+        canvas.canvas-xpub {
+            height: 110px !important;
+            margin-top: -0.3rem;
+            width: 110px !important;
+        }
+
+        .okay-to-share {
+            margin: 2.8rem -3rem 0 -2.8rem;
+        }
+    }
+
+    div.credentials {
+        border-bottom: grey dotted 1px;
+        margin: 0 0 0.5rem 0;
+        padding-bottom: 0.5rem;
+    }
+
+    div.address-wrapper {
+        .canvas-address {
+            display: none;
+        }
+
+        .okay-to-share {
+            float: none;
+            margin: 0;
+            -webkit-transform: rotate(0deg);
+            -moz-transform: rotate(0deg);
+            -o-transform: rotate(0deg);
+            -ms-transform: rotate(0deg);
+            transform: rotate(0deg);
+        }
+
+        .address-title {
+            margin: 0;
+        }
+    }
+
+    div.privkey-wrapper {
+        margin-top: 0;
+
+        .canvas-privkey {
+            display:none;
+        }
+
+        .keep-secret{
+            float: none;
+            margin: 0;
+            -webkit-transform: rotate(0deg);
+            -moz-transform: rotate(0deg);
+            -o-transform: rotate(0deg);
+            -ms-transform: rotate(0deg);
+            transform: rotate(0deg);
+        }
+
+        .privkey-title {
+            margin: 0;
+            padding: 0;
+        }
+    }
+}

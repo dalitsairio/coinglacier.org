@@ -1,0 +1,70 @@
+#mainmenu {
+	padding-left: 285px;
+    position: relative;
+
+    span#service-name {
+        margin-right: 10px;
+    }
+
+    a.navbar-brand{
+        left: 26px;
+        position: absolute;
+        top: -14px;
+        
+        img {
+            width: 75px;
+        }
+    }
+}
+
+@media screen and (min-width: $bootstrap-sm) and (max-width: $bootstrap-md) {
+	#mainmenu {
+        padding-left: 95px;
+
+        a.navbar-brand {
+            left: 10px;
+        }
+    }
+
+    div.privkey-wrapper {
+        margin-top: -8rem;
+    }
+
+}
+
+@media screen and (max-width: $bootstrap-sm) {
+    #mainmenu {
+        padding: 0px;
+
+        .navbar-toggler {
+            position: absolute;
+            right: 12px;
+            top: 8px;
+        }
+
+        #navbarNav {
+            margin: 0 18px;
+        }
+
+        a.navbar-brand {
+            position: relative;
+            margin-top: 12px;
+            margin-bottom: -15px;
+
+            img {
+                width: 50px;
+            }
+        }
+    }
+}
+
+@media screen and (max-width: $screen-xs) {
+    #mainmenu {
+
+        min-height: 56px;
+
+        img {
+            display: none;
+        }
+    }
+}

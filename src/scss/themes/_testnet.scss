@@ -1,0 +1,18 @@
+.testnet {
+    $theme-colors: (
+        "primary": $testnet-primary
+    );
+
+    #options {
+        background: lighten($testnet-primary, 30);
+    }
+
+    .loader {
+        // should be 14px for big loader and 8px for small one. But who cares, I'm too lazy for this.
+        border-top: 12px solid $testnet-primary;
+    }
+    
+    .small-loader {
+        border-top: 5px solid $testnet-primary;
+    }
+}

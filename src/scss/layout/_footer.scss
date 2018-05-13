@@ -1,0 +1,59 @@
+footer{
+    margin-bottom: 6rem;
+    padding: 0.2rem 1.4rem;
+
+    .statusicon {
+        float: left;
+        margin: 0 0.5rem 0 0;
+
+        .small-loader {
+            margin: 0.4rem 0.4rem 0 0.4rem;
+        }
+    }
+
+    .status-wrapper {
+        background: #fff;
+        margin: 0.8rem 0;
+        padding: 1.5rem 1.8rem;
+    }
+
+    #mocha-wrapper{
+
+        // override mocha defaults
+        #mocha {
+            margin: 0;
+
+            ul#mocha-stats{
+                margin-top: 0;
+                position: relative;
+                right: 0px;
+                top: 0px;    
+            }
+
+            .replay {
+                display: none;
+            }
+
+            // disable the title links
+            h1 {
+                a {
+                    pointer-events: none;
+                }
+            }
+        }
+    }
+
+    #encryption-tests-dialog {
+        border: 1px solid lightgray;
+        margin-bottom: 0.2rem;
+        padding: 1rem;
+        
+        .description {
+            // no specific design so far
+        }
+
+        button {
+            margin-top: 1rem;
+        }
+    }
+}

@@ -1,0 +1,310 @@
+h1 {
+    color: darken($mainnet-primary, 35);
+    font-size: 1.6rem;
+    font-style: italic;
+}
+
+h2 {
+    font-size: 1.3rem;
+    font-weight: bold;
+}
+
+#mainmenu {
+	font-weight: bold;
+
+    .active a {
+        color: darken($mainnet-primary, 20);
+        text-shadow: 0px 0px 3px #000;
+    }
+
+    span#service-name {
+        color: #c1dfff;
+        font-size: 15px;
+        font-style: italic;
+    }
+}
+
+#switch-network {
+    button, button:visited {
+        color: $gray-700 !important;
+    }
+
+    button:hover, button:active {
+        color: $gray-900 !important;
+    }
+}
+
+.popover-highlight {
+    color: #800000;
+    font-style: italic;
+}
+
+#options {
+    font-size: smaller;
+
+    h6 {
+        margin-top: 1.2rem;
+    }
+}
+
+.account-row .form-text {
+	span {
+        font-weight: bold;
+    }
+
+    button {
+        font-size: 1.2rem;
+        line-height: 1;
+    }
+}
+
+span#hidePass {
+    font-size: smaller;
+    text-transform: uppercase;
+}
+
+.mnemonic {
+    font-family: monospace;
+    font-size: 1.5rem;
+}
+
+.mnemonic-wrapper {
+	.keep-secret {
+		font-size: 1.6rem;
+	}
+}
+
+.xpub-wrapper {
+	.okay-to-share {
+		font-size: 1.25rem;
+	}
+}
+
+div.address-wrapper {
+	.okay-to-share {
+		 font-size: 1.1rem;
+	}
+}
+
+div.privkey-wrapper {
+	.keep-secret {
+		font-size: 1.15rem;
+	}
+}
+
+div.address, div.privkey, div.xpub {
+    font-family: monospace;
+    font-size: 1.2rem;
+}
+
+.keep-secret {
+    color: #f00000;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.okay-to-share {
+    color: #009500;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.xpub {
+    word-break: break-all;
+}
+
+div.address-wrapper {
+    .address{
+        font-size: 1rem;
+
+        a:link, a:visited, a:hover, a:active{
+            color: #000;
+        }
+    }
+
+}
+
+div.privkey-wrapper {
+    .privkey {
+        font-size: 1rem;
+    }
+}
+
+div#page-loader {
+	h1 {
+        font-size: 2.4rem;
+        font-style: normal;
+        text-transform: uppercase;
+    }
+}
+
+footer {
+	color: white;
+
+	h1 {
+        color: #222;
+    }
+
+    h1.success {
+        color: #009500;
+    }
+
+    h1.failed {
+        color: #800000;
+    }
+
+	.statusicon {
+		color: #fff;
+		font-size: 1.6rem;
+        text-decoration: none;
+	}
+
+	.statusicon.warning {
+        color: #ff7820;
+    }
+
+    .status-wrapper {
+    	color: #000;
+
+    	a {
+            color: darken($mainnet-primary, 20);
+        }
+    }
+
+    .status-good {
+        color: #009500;
+        font-weight: bold;
+    }
+
+    .status-warn {
+        color: #ff7820;
+        font-weight: bold;
+    }
+
+    #encryption-tests-dialog {
+    	.notice{
+            font-style: italic;
+        }
+    }
+}
+
+.testnet {
+	h1 {
+        color: darken($testnet-primary, 30);
+        font-size: 1.6rem;
+    }
+
+    h2 {
+        font-size: 1.3rem;
+        font-weight: bold;
+    }
+
+    #mainmenu {
+        .active a {
+            color: darken($testnet-primary, 20);
+        }
+    }
+
+    footer {
+    	.statusicon {
+            color: #fff;
+            text-decoration: none; 
+        }
+
+        .status-wrapper {
+            a {
+                color: darken($testnet-primary, 30);
+            }
+        }
+
+        h1 {
+            color: #222;
+        }
+
+        h1.success {
+            color: #009500;
+        }
+
+        h1.failed {
+            color: #800000;
+        }
+    }
+}
+
+@media screen and (max-width: $bootstrap-xl) {
+    div.address-wrapper .address, div.privkey-wrapper .privkey {
+        font-size: 0.8rem;
+    }
+}
+
+@media screen and (max-width: $bootstrap-sm) {
+	div#page-loader {
+        h1 {
+            font-size: 1.8rem;
+        }
+    }
+
+    div.address, div.privkey {
+        font-size: 0.9rem;
+    }
+
+    div.address, div.privkey, div.mnemonic, div.xpub {
+        font-size: 0.8rem;
+    }
+
+    div.mnemonic-wrapper {
+    	.keep-secret {
+    		font-size: 1rem;
+    	}
+
+    	.mnemonic-title {
+    		font-size: 1.2rem;
+    	}
+    }
+
+    div.xpub-wrapper {
+        .keep-secret {
+            font-size: 1rem;
+        }
+
+        .account-title {
+            font-size: 1rem;
+        }
+
+        .xpub-title {
+            font-size: 0.8rem;
+        }
+
+        .okay-to-share {
+            font-size: 0.8rem;
+        }
+    }
+
+    div.address-wrapper {
+        .okay-to-share {
+            font-size: 0.9rem;
+        }
+
+        .address-title {
+            font-size:0rem;
+        }
+
+        .address {
+            word-break: break-all;
+        }
+    }
+
+    div.privkey-wrapper {
+    	.keep-secret {
+    		font-size: 0.9rem;
+    	}
+
+    	.privkey-title {
+    		font-size: 1rem;
+    	}
+
+    	.privkey {
+            word-break: break-all;
+        }
+    }
+}
