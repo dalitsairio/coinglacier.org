@@ -7,5 +7,5 @@ src/js/temporary_concat.js
 src/js/encryptionWorker_bundled.min.js
 src/js/libs
 src/maps
-src/scss/libs
+src/scss/vendors
 src/css

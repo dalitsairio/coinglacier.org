@@ -112,7 +112,7 @@ gulp.task('javascript', gulp.series('create-webworker', 'create-main'));
 // //////////////////////////////////////////////////
 
 gulp.task('sass', function () {
-    return gulp.src('src/scss/*.scss')
+    return gulp.src('src/scss/coinglacier.org.scss')
         .pipe(sourcemaps.init({loadMaps: true}))
         .pipe(sass().on('error', sass.logError))
         .pipe(sourcemaps.write('../maps/'))
@@ -138,13 +138,13 @@ gulp.task('move-dependencies', function () {
         .pipe(gulp.dest('src/css/libs'));
 
     gulp.src('node_modules/bootstrap/scss/*.scss')
-        .pipe(gulp.dest('src/scss/libs/bootstrap'));
+        .pipe(gulp.dest('src/scss/vendors/bootstrap'));
 
     gulp.src('node_modules/bootstrap/scss/mixins/*.scss')
-        .pipe(gulp.dest('src/scss/libs/bootstrap/mixins'));
+        .pipe(gulp.dest('src/scss/vendors/bootstrap/mixins'));
 
     return gulp.src('node_modules/bootstrap/scss/utilities/*.scss')
-        .pipe(gulp.dest('src/scss/libs/bootstrap/utilities'));
+        .pipe(gulp.dest('src/scss/vendors/bootstrap/utilities'));
 
 });
 
