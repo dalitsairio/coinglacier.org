@@ -1,0 +1,51 @@
+#options {
+    background: lighten($mainnet-primary-color, 30);
+    border: 1px solid $dark;
+    border-top: none;
+    padding: 0rem 0rem 0.8rem 1.2rem;
+
+    .account-row .form-text {
+		span {
+			margin-right: 1rem;
+		}
+
+		input {
+			margin-left: 0.4rem;
+			width: 4rem;
+		}
+
+		button {
+			margin-bottom: 0.25rem;
+			padding: 0.05rem 0.25rem;
+		}
+
+		button.account-add {
+			margin-left: 0.5rem;
+		}
+
+		button.account-remove{
+			padding: 0.05rem 0.42rem;
+		}
+	}
+
+    #wallet-encryption {
+    	label {
+        	margin: 5px;
+    	}
+
+    	#hidePass {
+    		min-width: 60px;
+		}
+
+    	#password {
+			flex: none;
+			width: 10.2rem;
+		}
+	}
+}
+
+@media print {
+	#options {
+		display: none;
+	}
+}

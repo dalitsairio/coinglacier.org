@@ -1,0 +1,239 @@
+#wallet {
+    background: white;
+    padding: 1.1rem 1.6rem;
+
+    .mnemonic-wrapper {
+	    border-bottom: 1px #000 dashed;
+	    padding-bottom: 1.5rem;
+	    padding-top: 1.5rem;
+
+	    h1 {
+	    	margin-bottom: 1.1rem;
+    		margin-left: 3.2rem;
+	    }
+
+	    .canvas-mnemonic {
+    		float: left;
+    		margin-top: -1rem;
+		}
+	    
+	    .keep-secret {
+			float: left;
+			margin: 6.4rem -4.5rem 0 -5.1rem;
+			-webkit-transform: rotate(270deg);
+			-moz-transform: rotate(270deg);
+			-o-transform: rotate(270deg);
+			-ms-transform: rotate(270deg);
+			transform: rotate(270deg);
+	    }
+	}
+
+	.wallet-account:not(.first-account) {
+    	border-top: 1px #7c7c7c dashed;
+	}
+
+	.xpub-wrapper {
+		border-bottom: 1px lightgrey dotted;
+		padding-bottom: 1.5rem;
+		padding-top: 1.5rem;
+
+		canvas {
+			float:right;
+			margin-top: -1rem;
+		}
+
+		.okay-to-share {
+			float:right;
+			margin: 4.75rem -4.6rem 0 -5rem;
+			-webkit-transform: rotate(90deg);
+			-moz-transform: rotate(90deg);
+			-o-transform: rotate(90deg);
+			-ms-transform: rotate(90deg);
+			transform: rotate(90deg);
+		}
+	}
+
+	.credentials {
+		padding-bottom: 1.5em;
+    	padding-top: 1.5em;
+
+    	.address-wrapper {
+		    .okay-to-share {
+				float:left;
+				margin: 4.2rem -3.9rem 0 -4.2rem;
+				-webkit-transform: rotate(270deg);
+				-moz-transform: rotate(270deg);
+				-o-transform: rotate(270deg);
+				-ms-transform: rotate(270deg);
+				transform: rotate(270deg);
+		    }
+
+		    .canvas-address {
+				float: left;
+				margin-top: -0.7rem;
+		    }
+
+		    &.loading {
+		    	.small-loader {
+        			margin: 1.5rem 0 0 2.6rem;
+    			}
+		    }
+
+		    &:after {
+		    	content: '';
+    			display: block;
+    			clear: both;
+		    }
+		}
+
+		.privkey-wrapper {
+			margin-top: -12rem;
+
+			.keep-secret {
+				float: right;
+				margin: 3.4rem -2.8rem 0 -3.4rem;
+				-webkit-transform: rotate(90deg);
+				-moz-transform: rotate(90deg);
+				-o-transform: rotate(90deg);
+				-ms-transform: rotate(90deg);
+				transform: rotate(90deg);
+			}
+
+			.canvas-privkey {
+				float: right;
+				margin-top: -0.8rem;
+			}
+
+			.privkey-title {
+				padding-top: 5rem;
+			}
+
+			&.loading {
+				margin-top: -11.5rem;
+
+				.small-loader {
+					float: right;
+					margin: 1rem 3.2rem 2.5rem 0;
+				}
+			}
+
+			&:after {
+		    	content: '';
+    			display: block;
+    			clear: both;
+		    }
+		}
+	}
+}
+
+@media screen and (max-width: $bootstrap-sm) {
+	#wallet {
+		.mnemonic-wrapper {
+			.keep-secret {
+				margin: 3.9rem -3rem 0 -3.2rem;
+			}
+
+			.mnemonic-title {
+				margin-left: 1.6rem;
+			}
+
+			.canvas-mnemonic {
+				height: 100px !important;
+				width: 100px !important;
+			}
+		}
+
+		.xpub-wrapper {
+			.keep-secret {
+				margin: 3.4rem -3rem 0 -3.2rem;
+			}
+
+			.canvas-xpub {
+				height: 110px !important;
+				margin-top: -0.3rem;
+				width: 110px !important;
+			}
+
+			.okay-to-share {
+				margin: 2.8rem -3rem 0 -2.8rem;
+			}
+		}
+
+		.credentials {
+			border-bottom: grey dotted 1px;
+			padding-bottom: 0.5rem;
+			padding-top: 0.5rem;
+
+			.address-wrapper {
+				.canvas-address {
+					display: none;
+				}
+
+				.okay-to-share {
+					float: none;
+					margin: 0;
+					-webkit-transform: rotate(0deg);
+					-moz-transform: rotate(0deg);
+					-o-transform: rotate(0deg);
+					-ms-transform: rotate(0deg);
+					transform: rotate(0deg);
+				}
+
+				.address-title {
+					margin: 0;
+				}
+			}
+
+			.privkey-wrapper {
+				margin-top: 0;
+
+				.canvas-privkey {
+					display:none;
+				}
+
+				.keep-secret{
+					float: none;
+					margin: 0;
+					-webkit-transform: rotate(0deg);
+					-moz-transform: rotate(0deg);
+					-o-transform: rotate(0deg);
+					-ms-transform: rotate(0deg);
+					transform: rotate(0deg);
+				}
+
+				.privkey-title {
+					margin: 0;
+					padding: 0;
+					position: relative;
+				}
+			}
+		}
+	}
+}
+
+@media print {
+    #wallet {
+        .mnemonic-wrapper {
+            border-bottom: none;
+            page-break-after: always;
+        }
+
+        .wallet-account{
+			border-top: none !important;
+        	page-break-after: always;
+
+        	.xpub-wrapper {
+        		border-bottom: none;
+
+        		canvas {
+        			margin-top: 0;
+        		}
+        	}
+        }
+
+        .credentials {
+        	border-top: 1px #757677 dotted;
+        	page-break-inside: avoid;
+        }
+    }
+}

@@ -2,11 +2,11 @@
 	padding-left: 285px;
     position: relative;
 
-    span#service-name {
+    #service-name {
         margin-right: 10px;
     }
 
-    a.navbar-brand{
+    .navbar-brand{
         left: 26px;
         position: absolute;
         top: -14px;
@@ -26,7 +26,7 @@
         }
     }
 
-    div.privkey-wrapper {
+    .privkey-wrapper {
         margin-top: -8rem;
     }
 
@@ -46,7 +46,7 @@
             margin: 0 18px;
         }
 
-        a.navbar-brand {
+        .navbar-brand {
             position: relative;
             margin-top: 12px;
             margin-bottom: -15px;
@@ -60,7 +60,6 @@
 
 @media screen and (max-width: $screen-xs) {
     #mainmenu {
-
         min-height: 56px;
 
         img {

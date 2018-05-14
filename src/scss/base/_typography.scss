@@ -1,5 +1,5 @@
 h1 {
-    color: darken($mainnet-primary, 35);
+    color: darken($mainnet-primary-color, 35);
     font-size: 1.6rem;
     font-style: italic;
 }
@@ -13,11 +13,11 @@ h2 {
 	font-weight: bold;
 
     .active a {
-        color: darken($mainnet-primary, 20);
+        color: darken($mainnet-primary-color, 20);
         text-shadow: 0px 0px 3px #000;
     }
 
-    span#service-name {
+    #service-name {
         color: #c1dfff;
         font-size: 15px;
         font-style: italic;
@@ -58,7 +58,7 @@ h2 {
     }
 }
 
-span#hidePass {
+#hidePass {
     font-size: smaller;
     text-transform: uppercase;
 }
@@ -80,19 +80,31 @@ span#hidePass {
 	}
 }
 
-div.address-wrapper {
-	.okay-to-share {
-		 font-size: 1.1rem;
-	}
+.address-wrapper {
+    .address{
+        font-size: 1rem;
+
+        a:link, a:visited, a:hover, a:active{
+            color: #000;
+        }
+    }
+
+    .okay-to-share {
+        font-size: 1.1rem;
+    }
 }
 
-div.privkey-wrapper {
+.privkey-wrapper {
 	.keep-secret {
 		font-size: 1.15rem;
 	}
+
+    .privkey {
+        font-size: 1rem;
+    }
 }
 
-div.address, div.privkey, div.xpub {
+.address, .privkey, .xpub {
     font-family: monospace;
     font-size: 1.2rem;
 }
@@ -113,24 +125,7 @@ div.address, div.privkey, div.xpub {
     word-break: break-all;
 }
 
-div.address-wrapper {
-    .address{
-        font-size: 1rem;
-
-        a:link, a:visited, a:hover, a:active{
-            color: #000;
-        }
-    }
-
-}
-
-div.privkey-wrapper {
-    .privkey {
-        font-size: 1rem;
-    }
-}
-
-div#page-loader {
+#page-loader {
 	h1 {
         font-size: 2.4rem;
         font-style: normal;
@@ -143,31 +138,31 @@ footer {
 
 	h1 {
         color: #222;
-    }
 
-    h1.success {
-        color: #009500;
-    }
+        &.success {
+            color: #009500;
+        }
 
-    h1.failed {
-        color: #800000;
+        &.failed {
+            color: #800000;
+        }
     }
 
 	.statusicon {
 		color: #fff;
 		font-size: 1.6rem;
         text-decoration: none;
-	}
 
-	.statusicon.warning {
-        color: #ff7820;
-    }
+        &.warning {
+            color: #ff7820;
+        }
+	}
 
     .status-wrapper {
     	color: #000;
 
     	a {
-            color: darken($mainnet-primary, 20);
+            color: darken($mainnet-primary-color, 20);
         }
     }
 
@@ -190,7 +185,7 @@ footer {
 
 .testnet {
 	h1 {
-        color: darken($testnet-primary, 30);
+        color: darken($testnet-primary-color, 30);
         font-size: 1.6rem;
     }
 
@@ -201,7 +196,7 @@ footer {
 
     #mainmenu {
         .active a {
-            color: darken($testnet-primary, 20);
+            color: darken($testnet-primary-color, 20);
         }
     }
 
@@ -213,46 +208,46 @@ footer {
 
         .status-wrapper {
             a {
-                color: darken($testnet-primary, 30);
+                color: darken($testnet-primary-color, 30);
             }
         }
 
         h1 {
             color: #222;
-        }
 
-        h1.success {
-            color: #009500;
-        }
+            &.success {
+                color: #009500;
+            }
 
-        h1.failed {
-            color: #800000;
+            &.failed {
+                color: #800000;
+            }
         }
     }
 }
 
 @media screen and (max-width: $bootstrap-xl) {
-    div.address-wrapper .address, div.privkey-wrapper .privkey {
+    .address-wrapper .address, .privkey-wrapper .privkey {
         font-size: 0.8rem;
     }
 }
 
 @media screen and (max-width: $bootstrap-sm) {
-	div#page-loader {
+	#page-loader {
         h1 {
             font-size: 1.8rem;
         }
     }
 
-    div.address, div.privkey {
+    .address, .privkey {
         font-size: 0.9rem;
     }
 
-    div.address, div.privkey, div.mnemonic, div.xpub {
+    .address, .privkey, .mnemonic, .xpub {
         font-size: 0.8rem;
     }
 
-    div.mnemonic-wrapper {
+    .mnemonic-wrapper {
     	.keep-secret {
     		font-size: 1rem;
     	}
@@ -262,7 +257,7 @@ footer {
     	}
     }
 
-    div.xpub-wrapper {
+    .xpub-wrapper {
         .keep-secret {
             font-size: 1rem;
         }
@@ -280,7 +275,7 @@ footer {
         }
     }
 
-    div.address-wrapper {
+    .address-wrapper {
         .okay-to-share {
             font-size: 0.9rem;
         }
@@ -294,7 +289,7 @@ footer {
         }
     }
 
-    div.privkey-wrapper {
+    .privkey-wrapper {
     	.keep-secret {
     		font-size: 0.9rem;
     	}
@@ -305,6 +300,57 @@ footer {
 
     	.privkey {
             word-break: break-all;
+        }
+    }
+}
+
+@media print {
+    .address {
+        a {
+            text-decoration: none;
+        }
+    }
+
+    .print-title{
+        color: #c1dfff;
+        font-size: 3rem;
+        font-style: italic;
+        margin-bottom: 0.25rem;
+        text-align: center;
+    }
+
+    .print-subtitle{
+        color: #000;
+        font-size: 1.2rem;
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+
+    #wallet {
+        .mnemonic-wrapper {
+            .mnemonic {
+                font-size: 2rem;
+            }
+        }
+
+        .wallet-account {
+            .xpub {
+                font-size: 1.7rem;
+            }
+        }
+
+        .credentials {
+            .address-wrapper {
+                .address {
+                    font-size: 1.3rem;
+                }
+            }
+
+            .privkey-wrapper {
+                .privkey {
+                    font-size: 1.3rem;
+                }
+            }
         }
     }
 }

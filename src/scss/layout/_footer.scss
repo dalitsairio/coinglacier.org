@@ -23,7 +23,7 @@ footer{
         #mocha {
             margin: 0;
 
-            ul#mocha-stats{
+            #mocha-stats{
                 margin-top: 0;
                 position: relative;
                 right: 0px;
@@ -55,5 +55,11 @@ footer{
         button {
             margin-top: 1rem;
         }
+    }
+}
+
+@media print {
+    footer {
+        display: none;
     }
 }
