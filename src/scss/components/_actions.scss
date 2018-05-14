@@ -1,0 +1,15 @@
+#actions {
+    background: $actions-bg;
+    border-bottom: 1px solid #A9A9A9;
+    padding: 0.5rem 1.2rem;
+
+    // shadow below the action bar
+    position: relative;
+    -webkit-box-shadow: 0px 1px 20px -4px rgba(145, 145, 145, 0.35);
+    -moz-box-shadow:    0px 1px 20px -4px rgba(145, 145, 200, 0.35);
+    box-shadow:         0px 1px 20px -4px rgba(145, 145, 145, 0.35);
+
+    #print-button {
+        float: right;
+    }
+}
