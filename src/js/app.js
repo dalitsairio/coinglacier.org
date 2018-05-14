@@ -100,6 +100,11 @@ DOM.options.encryption.hidePass = $('span#hidePass');
 DOM.options.numberAddresses = $('input#number-addresses');
 DOM.options.qrcodeLink = $('input#qrcode-links-check');
 
+DOM.actions = {};
+DOM.actions.newAddress = $('#actions #new-address');
+DOM.actions.newMnemonic = $('#actions #new-mnemonic');
+DOM.actions.print = $('#actions #print-button');
+
 DOM.popovers = {};
 DOM.popovers.testnetWarning = $('#testnet-warning');
 DOM.popovers.showXPUB = $('#showXPUBlabel');
@@ -206,6 +211,11 @@ DOM.options.numberAddresses.change(toggleAddressNumbering);
 // Bitcoin link in QR code
 DOM.options.qrcodeLink.change(toggleQRcodeLink);
 
+// Actions
+DOM.actions.newAddress.click(createWallet);
+DOM.actions.newMnemonic.click(createWallet);
+DOM.actions.print.click(print);
+
 // Footer
 DOM.footer.status.onlineCheck.click(toggleOnlineCheck);
 DOM.footer.status.crypto.click(toggleCryptoCheck);
@@ -251,9 +261,7 @@ function init() {
     useBitcoinLink = currentPage.useBitcoinLink;
     shownStatus = null;
 
-    initiateWallet(function () {
-        loadWallet();
-    });
+    createWallet();
 
     // check whether browser is online or not
     checkStatusOnline();
@@ -267,6 +275,17 @@ function init() {
         DOM.footer.encryptionDialog.hide();
     }
     runUnitTests(runAllTests, onUnittestsSuccesful, onUnittestsFailed);
+}
+
+function createWallet(){
+
+    if(password) {
+        interruptWorkers();
+    }
+
+    initiateWallet(function () {
+        loadWallet();
+    });
 }
 
 function checkStatusOnline(){
@@ -611,9 +630,7 @@ function toggleQRcodeLink() {
 function changePassword() {
     interruptWorkers();
     password = DOM.options.encryption.pass.val();
-    initiateWallet(function () {
-        loadWallet();
-    });
+    createWallet();
 };
 
 
@@ -977,6 +994,10 @@ function getURLparameter(name, url) {
     var regex = new RegExp(regexS);
     var results = regex.exec(url);
     return results == null ? null : results[1];
+}
+
+function print(){
+    window.print();
 }
 
 
