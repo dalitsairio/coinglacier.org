@@ -6,7 +6,7 @@ const bip21 = require('bip21');
 // //////////////////////////////////////////////////
 
 // bitcoin network
-var network;
+var networkId;
 var currentPage;
 var password;
 var accountsForm;
@@ -699,13 +699,13 @@ function setNetwork() {
         case GET.network.testnet:
             switch (addressType) {
                 case GET.addressTypes.nonSegwit:
-                    network = TESTNET_NONSEGWIT;
+                    networkId = TESTNET_NONSEGWIT;
                     break;
                 case GET.addressTypes.segwit:
-                    network = TESTNET_SEGWIT;
+                    networkId = TESTNET_SEGWIT;
                     break;
                 case GET.addressTypes.bech32:
-                    network = TESTNET_BECH32;
+                    networkId = TESTNET_BECH32;
                     break;
             }
             break;
@@ -713,13 +713,13 @@ function setNetwork() {
         default:
             switch (addressType) {
                 case GET.addressTypes.nonSegwit:
-                    network = MAINNET_NONSEGWIT;
+                    networkId = MAINNET_NONSEGWIT;
                     break;
                 case GET.addressTypes.segwit:
-                    network = MAINNET_SEGWIT;
+                    networkId = MAINNET_SEGWIT;
                     break;
                 case GET.addressTypes.bech32:
-                    network = MAINNET_BECH32;
+                    networkId = MAINNET_BECH32;
                     break;
             }
             break;
@@ -834,7 +834,7 @@ function fillWalletHTML(){
 
     foreachCredential(
         function (accountIndex) {
-            createAccount(network, accountIndex, function (account) {
+            createAccount(networkId, accountIndex, function (account) {
                 $('#xpub-' + accountIndex).html(account.xpub);
 
                 var xpubCanvas = $('#canvas-xpub-' + accountIndex).get(0);
@@ -847,7 +847,7 @@ function fillWalletHTML(){
         },
         function (accountIndex, addressIndex) {
 
-            asyncCreateCredentials(network, accountIndex, addressIndex, password, function (credentials) {
+            asyncCreateCredentials(networkId, accountIndex, addressIndex, password, function (credentials) {
                 removeCredentialsLoadingGui(accountIndex, addressIndex);
                 fillCredentials(accountIndex, addressIndex, credentials.address, credentials.privateKey);
             });
