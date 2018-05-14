@@ -377,8 +377,7 @@ function bip38Tests() {
     describe('BIP38 tests', function () {
 
     this.timeout(50000); // all tests may take up to 50 seconds
-    this.slow(20000); // a test is considered slow if it takes more than 3 seconds to completes
-
+    this.slow(25000); // a test is considered slow if it takes more than 25 seconds to complete
 
         it('Encrypted PrivKey', function () {
             // load testing mnemonic
@@ -401,6 +400,15 @@ function bip38Tests() {
                 assert.equal(encryptedPrivKey, '6PYSqLAHxW8CT2sBYVjaZZKJ6yes2itBcvk5WHmsNysTkzM8Z62DZntKYc');
             });
         });
+
+        it('Decrypt PrivKey', function () {
+            var encryptedPrivKey = '6PYUjuUte84KiL2kFzuCNTven4WkdRFXmeMGGCVzDkpR1AcTBhLn2jMdoo';
+            var decrypted = bip38.decryptPrivKey(encryptedPrivKey, testing_password);
+
+            assert.equal(decrypted, 'Kzkuno5MDgVcs841HW5HWnSFmZ4xBEjzxNN2FnTv6k7cWMkzkvrc');
+        });
+
+
     });
 }
 
