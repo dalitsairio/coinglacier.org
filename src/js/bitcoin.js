@@ -133,33 +133,37 @@ function createCredentials(bip44external, addressIndex) {
 
     var privateKey = bip32.keyPair.toWIF();
 
-    switch (bip32.keyPair.network) {
+    return getCredentialsFromPrivKeyByObjects(privateKey, bip32, bip32.keyPair.network);
+}
+
+function getCredentialsFromPrivKeyByObjects(privateKey, ecPair, network){
+    switch (network) {
         case bitcoinjs.networks.bitcoin:
         case bitcoinjs.networks.testnet:
 
-            credentials = {privateKey: privateKey, address: bip32.getAddress()};
+            credentials = {privateKey: privateKey, address: ecPair.getAddress()};
             break;
         case bitcoinjs.networks.bitcoin.p2wpkhInP2sh:
         case bitcoinjs.networks.testnet.p2wpkhInP2sh:
 
-            var pubKey = bip32.getPublicKeyBuffer();
+            var pubKey = ecPair.getPublicKeyBuffer();
             var redeemScript = bitcoinjs.script.witnessPubKeyHash.output.encode(bitcoinjs.crypto.hash160(pubKey));
             var scriptPubKey = bitcoinjs.script.scriptHash.output.encode(bitcoinjs.crypto.hash160(redeemScript));
 
             credentials = {
                 privateKey: privateKey,
-                address: bitcoinjs.address.fromOutputScript(scriptPubKey, bip32.keyPair.network)
+                address: bitcoinjs.address.fromOutputScript(scriptPubKey, network)
             };
             break;
         case bitcoinjs.networks.bitcoin.p2wpkh:
         case bitcoinjs.networks.testnet.p2wpkh:
 
-            var pubKey = bip32.getPublicKeyBuffer();
+            var pubKey = ecPair.getPublicKeyBuffer();
             var scriptPubKey = bitcoinjs.script.witnessPubKeyHash.output.encode(bitcoinjs.crypto.hash160(pubKey));
 
             credentials = {
                 privateKey: privateKey,
-                address: bitcoinjs.address.fromOutputScript(scriptPubKey, bip32.keyPair.network)
+                address: bitcoinjs.address.fromOutputScript(scriptPubKey, network)
             };
             break;
         default:
@@ -167,6 +171,14 @@ function createCredentials(bip44external, addressIndex) {
     }
 
     return credentials;
+}
+
+function getCredentialsFromPrivKey(privateKey, networkId){
+
+    var network = getNetworkByID(networkId);
+    var ecPair = bitcoinjs.ECPair.fromWIF(privateKey, network);
+
+    return getCredentialsFromPrivKeyByObjects(privateKey, ecPair, network);
 }
 
 function getNetworkByID(networkID) {
@@ -295,5 +307,6 @@ module.exports = {
     initiateHDWallet,
     createAccount,
     createCredentials,
+    getCredentialsFromPrivKey,
     networks: bitcoinjs.networks
 };

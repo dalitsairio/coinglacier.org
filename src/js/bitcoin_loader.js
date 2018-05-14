@@ -197,6 +197,7 @@ function asyncCreateCredentials(networkID, accountIndex, addressIndex, password,
                     };
 
                     worker.postMessage(JSON.stringify({
+                        mode: 'encrypt',
                         privateKey: credentials.privateKey,
                         password: password
                     }));
@@ -208,6 +209,39 @@ function asyncCreateCredentials(networkID, accountIndex, addressIndex, password,
     
 }
 
+function decryptPrivKey(encryptedPrivKey, password, success, failure){
+    addToQueue(function (workerID) {
+
+        workerpool[workerID].state = workerState.busy;
+        var worker = workerpool[workerID].worker;
+
+        worker.onmessage = function (e) {
+
+            if(e.data === 'error'){
+                failure();
+            }else{
+                success(e.data);
+            }
+        };
+
+        worker.postMessage(JSON.stringify({
+            mode: 'decrypt',
+            privateKey: encryptedPrivKey,
+            password: password
+        }));
+    });
+}
+
+function getCredentialsFromEncryptedPrivKey(encryptedPrivKey, password, networkId, success, failure){
+
+    var cb = function(privKey){
+        var credentials = bitcoin.getCredentialsFromPrivKey(privKey, networkId);
+
+        success(credentials);
+    }
+
+    decryptPrivKey(encryptedPrivKey, password, cb, failure);
+}
 
 // //////////////////////////////////////////////////
 // Unit Tests
