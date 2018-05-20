@@ -1,4 +1,4 @@
-@import "vendors/bootstrap/bootstrap.scss";
+@import 'vendors/bootstrap/bootstrap';
 @import 'helpers/variables';
 @import 'base/typography';
 @import 'themes/mainnet';
@@ -9,3 +9,5 @@
 @import 'components/navigation';
 @import 'components/options';
 @import 'components/wallet';
+@import 'components/passwordBox';
+@import 'components/privKeyDecryptionParams';

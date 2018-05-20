@@ -12,9 +12,33 @@ h2 {
 #mainmenu {
 	font-weight: bold;
 
-    .active a {
-        color: darken($mainnet-primary-color, 20);
-        text-shadow: 0px 0px 3px #000;
+    li {
+        a {
+            color: $mainnet-primary-color;
+        }
+
+        &.active {
+            a {
+                color: lighten($mainnet-primary-color, 20);
+                text-shadow: 0px 0px 3px #000;
+            }
+        }
+
+        a {
+            @include hover {
+                color: darken($mainnet-primary-color, 15)
+            }
+        }
+
+        #menu-decrypt-dropdown {
+            .dropdown-item {
+                color: $mainnet-primary-color;
+
+                &:hover, &:focus, &.active, &:active{
+                    color:black;
+                }
+            }
+        }
     }
 
     #service-name {
@@ -58,8 +82,8 @@ h2 {
     }
 }
 
-#hidePass {
-    font-size: smaller;
+.hide-pass {
+    font-size: 0.65rem;
     text-transform: uppercase;
 }
 
@@ -133,7 +157,12 @@ h2 {
     }
 }
 
-footer {
+input#privkey-dec-key{
+    font-size: 0.8rem;
+    font-family: monospace;
+}
+
+footer, .testnet footer {
 	color: white;
 
 	h1 {
@@ -195,8 +224,32 @@ footer {
     }
 
     #mainmenu {
-        .active a {
-            color: darken($testnet-primary-color, 20);
+        li {
+            a {
+                color: $testnet-primary-color;
+            }
+
+            &.active {
+                a {
+                    color: lighten($testnet-primary-color, 20);
+                }
+            }
+
+            a {
+                @include hover {
+                    color: darken($testnet-primary-color, 15)
+                }
+            }
+
+            #menu-decrypt-dropdown {
+                .dropdown-item {
+                    color: $testnet-primary-color;
+
+                    &:hover, &:focus, &.active, &:active{
+                        color:black;
+                    }
+                }
+            }
         }
     }
 

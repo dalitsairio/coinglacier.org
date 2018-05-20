@@ -1,7 +1,8 @@
 const bitcoinjs = require('./bitcoinjs-lib_patched').bitcoinjs;
 const bip39 = require('bip39');
 const mEntropy = require('more-entropy');
-var randomBytes = require('randombytes');
+const randomBytes = require('randombytes');
+const createHash = require('create-hash');
 
 const bip39_bitSize = 128; // = 12 words  // https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki#generating-the-mnemonic
 const bip39_byteSize = bip39_bitSize / 8;
@@ -17,6 +18,12 @@ var moreEntropyGen = new mEntropy.Generator({
 // https://github.com/keybase/more-entropy/blob/v0.0.4/lib/generator.js#L173
 if (typeof window !== "undefined" && window !== null) {
     window.Generator = null;
+}
+
+function hash256 (buffer) {
+    return createHash('sha256').update(
+        createHash('sha256').update(buffer).digest()
+    ).digest()
 }
 
 function getEntropy(useImprovedEntropy, cb){
@@ -137,14 +144,14 @@ function createCredentials(bip44external, addressIndex) {
 }
 
 function getCredentialsFromPrivKeyByObjects(privateKey, ecPair, network){
-    switch (network) {
-        case bitcoinjs.networks.bitcoin:
-        case bitcoinjs.networks.testnet:
+    switch (network.id) {
+        case bitcoinjs.networks.bitcoin.id:
+        case bitcoinjs.networks.testnet.id:
 
             credentials = {privateKey: privateKey, address: ecPair.getAddress()};
             break;
-        case bitcoinjs.networks.bitcoin.p2wpkhInP2sh:
-        case bitcoinjs.networks.testnet.p2wpkhInP2sh:
+        case bitcoinjs.networks.bitcoin.p2wpkhInP2sh.id:
+        case bitcoinjs.networks.testnet.p2wpkhInP2sh.id:
 
             var pubKey = ecPair.getPublicKeyBuffer();
             var redeemScript = bitcoinjs.script.witnessPubKeyHash.output.encode(bitcoinjs.crypto.hash160(pubKey));
@@ -155,8 +162,8 @@ function getCredentialsFromPrivKeyByObjects(privateKey, ecPair, network){
                 address: bitcoinjs.address.fromOutputScript(scriptPubKey, network)
             };
             break;
-        case bitcoinjs.networks.bitcoin.p2wpkh:
-        case bitcoinjs.networks.testnet.p2wpkh:
+        case bitcoinjs.networks.bitcoin.p2wpkh.id:
+        case bitcoinjs.networks.testnet.p2wpkh.id:
 
             var pubKey = ecPair.getPublicKeyBuffer();
             var scriptPubKey = bitcoinjs.script.witnessPubKeyHash.output.encode(bitcoinjs.crypto.hash160(pubKey));
@@ -179,6 +186,52 @@ function getCredentialsFromPrivKey(privateKey, networkId){
     var ecPair = bitcoinjs.ECPair.fromWIF(privateKey, network);
 
     return getCredentialsFromPrivKeyByObjects(privateKey, ecPair, network);
+}
+
+// todo   this should actually be part of the BIP38 library
+// todo   but testnet/segwit/bech32 support is not implemented yet (May '18)
+// is solely used for BIP38 decryption, to find out what addresstype the encrypted privKey originally was created for.
+// guesses on what address type should be returned
+function getCredentialsFromPrivKeyAndSalt(privateKey, salt, testnet){
+
+    let possibleMainnetNetworks = [
+        bitcoinjs.networks.bitcoin.p2wpkhInP2sh,
+        bitcoinjs.networks.bitcoin.p2wpkh,
+        bitcoinjs.networks.bitcoin,
+    ];
+
+    let possibleTestnetNetworks = [
+        bitcoinjs.networks.testnet.p2wpkhInP2sh,
+        bitcoinjs.networks.testnet.p2wpkh,
+        bitcoinjs.networks.testnet
+    ];
+
+    let possibleNetworks = testnet ? possibleTestnetNetworks : possibleMainnetNetworks;
+
+    try {
+        for (let x = 0; x < 3; x++) {
+
+            let ecPair = bitcoinjs.ECPair.fromWIF(privateKey, possibleNetworks[x]);
+            let credentials = getCredentialsFromPrivKeyByObjects(privateKey, ecPair, possibleNetworks[x]);
+            let checksum = hash256(credentials.address).slice(0, 4);
+
+            let checksumCorrect = Buffer.compare(Buffer.from(salt), Buffer.from(checksum)) === 0;
+
+            if (checksumCorrect) {
+                return credentials;
+            }
+        }
+    }catch (e) {
+        console.error('Error in BIP38 Password Decryption');
+        console.error(e.message);
+        if(testnet) {
+            console.error('Trying to decrypt a testnet key in the mainnet mode?');
+        }else{
+            console.error('Trying to decrypt a mainnet key in the testnet mode?');
+        }
+    }
+
+    return false;
 }
 
 function getNetworkByID(networkID) {
@@ -308,5 +361,6 @@ module.exports = {
     createAccount,
     createCredentials,
     getCredentialsFromPrivKey,
+    getCredentialsFromPrivKeyAndSalt,
     networks: bitcoinjs.networks
 };

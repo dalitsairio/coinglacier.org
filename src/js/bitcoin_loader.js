@@ -198,6 +198,7 @@ function asyncCreateCredentials(networkID, accountIndex, addressIndex, password,
 
                     worker.postMessage(JSON.stringify({
                         mode: 'encrypt',
+                        address: credentials.address,
                         privateKey: credentials.privateKey,
                         password: password
                     }));
@@ -209,7 +210,7 @@ function asyncCreateCredentials(networkID, accountIndex, addressIndex, password,
     
 }
 
-function decryptPrivKey(encryptedPrivKey, password, success, failure){
+function runPrivateKeyDecryption(encryptedPrivKey, password, success, failure){
     addToQueue(function (workerID) {
 
         workerpool[workerID].state = workerState.busy;
@@ -217,10 +218,12 @@ function decryptPrivKey(encryptedPrivKey, password, success, failure){
 
         worker.onmessage = function (e) {
 
+            workerpool[workerID].state = workerState.available;
+
             if(e.data === 'error'){
                 failure();
             }else{
-                success(e.data);
+                success(JSON.parse(e.data));
             }
         };
 
@@ -232,15 +235,35 @@ function decryptPrivKey(encryptedPrivKey, password, success, failure){
     });
 }
 
-function getCredentialsFromEncryptedPrivKey(encryptedPrivKey, password, networkId, success, failure){
+function getCredentialsFromEncryptedPrivKey(encryptedPrivKey, password, testnet, success, failure){
 
-    var cb = function(privKey){
-        var credentials = bitcoin.getCredentialsFromPrivKey(privKey, networkId);
+    var cb = function(result){
 
-        success(credentials);
+        let credentials = getCredentialsFromBIP38Result(result, testnet);
+
+        if(credentials) {
+            success(credentials);
+        }else{
+
+            // check whether user is in wrong network mode (mainnet/testnet)
+            if(getCredentialsFromBIP38Result(result, !testnet)){
+                // todo link user to the other network mode
+                console.log('there is a result on the other network');
+            }else{
+                failure();
+            }
+        }
     }
 
-    decryptPrivKey(encryptedPrivKey, password, cb, failure);
+    runPrivateKeyDecryption(encryptedPrivKey, password, cb, failure);
+}
+
+function getCredentialsFromBIP38Result(result, testnet) {
+    let decrypted = testnet ? result.testnet : result.mainnet;
+    let privKey = decrypted.privateKey;
+    let salt = Uint8Array.from(decrypted.salt.data);
+
+    return bitcoin.getCredentialsFromPrivKeyAndSalt(privKey, salt, testnet);
 }
 
 // //////////////////////////////////////////////////

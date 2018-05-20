@@ -251,25 +251,73 @@ Git Repo: https://github.com/dalitsairio/coinglacier.org.git
                         <li id="menu-paper-wallet" class="nav-item">
                             <a class="nav-link" href="javascript:void(0);">Paper Wallet</a>
                         </li>
-                        <li id="menu-paper-walletx" class="nav-item">
-                            <a class="nav-link" href="javascript:void(0);">Entry 3</a>
-                        </li>
-                        <li id="menu-paper-walletxx" class="nav-item">
-                            <a class="nav-link" href="javascript:void(0);">Entry 4</a>
+                        <li id="menu-decrypt" class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="javascript:void(0);">Decrypt</a>
+                            <div id="menu-decrypt-dropdown" class="dropdown-menu bg-dark">
+                                <a id="menu-decrypt-mnemonic" class="dropdown-item" href="javascript:void(0);">Mnemonic</a>
+                                <a id="menu-decrypt-privkey" class="dropdown-item" href="javascript:void(0);">Private Key</a>
+                            </div>
                         </li>
                     </ul>
                 </div>
             </nav>
         </header>
 
-        <div id="options" class="form page-element single-wallet paper-wallet">
+        <div id="options" class="form page-element single-wallet paper-wallet decrypt-mnemonic decrypt-privkey">
             <div class="row">
                 <div class="col-xl-5">
                     <div class="row">
+                        <div class="col-xl-7 col-md-6">
+                            <div id="checkmark-options" class= "page-element single-wallet paper-wallet decrypt-mnemonic decrypt-privkey">
+
+                                <h6>Features</h6>
+
+                                <!-- show xpub -->
+                                <div id="show-xpub" class="page-element paper-wallet decrypt-mnemonic">
+                                    <div class="form-check">
+                                        <label id="showXPUBlabel" class="form-check-label" for="showXPUB" data-trigger="hover" data-placement="bottom"
+                                               title="Benefit & Drawback" data-content="<div id='make-fat-hack'><p>Ext. pubKeys allow you to check the balances of
+                                                    all your addresses [per account] in one go.</p>
+                                                    <p>However, when using this feature, <span class='popover-highlight'>
+                                                    you must be particularly careful not to leak any of your private keys,
+                                                    even if you don't have any money on the respective address (anymore)</span>,
+                                                    since an attacker could find all of your private keys [of an account] given only one leaked private key.</p>
+                                                    <p>A measure to reduce the risk is to use multiple accounts. If an attacker gets hold of one private key,
+                                                    he will only be able to retrieve all the private keys from the same account.</p></div>">
+                                            <input id="showXPUB" type="checkbox">&nbsp;Show Extended Public Key
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- number the addresses consecutively -->
+                                <div id="address-numbering" class="page-element paper-wallet decrypt-mnemonic">
+                                    <div class="form-check">
+                                        <label id="address-numbering-label" class="form-check-label" for="number-addresses" data-trigger="hover" data-placement="bottom"
+                                               title="Purely Informative Feature" data-content="<div class='normal-popover'>
+                                                    This option merely adds a consecutive numbering to your addresses, without introducing any technical implications.</div>">
+                                            <input id="number-addresses" type="checkbox" checked>&nbsp;Number Addresses Consecutively
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- use links in QR Codes such as bitcoin:1BitcoinEaterAddressDontSendf59kuE?message=trash -->
+                                <div id="qrcode-links" class="page-element single-wallet paper-wallet decrypt-mnemonic decrypt-privkey">
+                                    <div class="form-check">
+                                        <label id="qrcode-links-label" class="form-check-label" for="qrcode-links-check" data-trigger="hover" data-placement="bottom"
+                                               title="Directly open Addresses in Wallet" data-content="<div class='normal-popover'>
+                                                    Use <i>bitcoin:</i> links to enable Bitcoin wallets to automatically prepare payments.
+                                                    This feature is applied to both the plaintext addresses and the corresponding QR codes.</div>">
+                                            <input id="qrcode-links-check" type="checkbox" checked>&nbsp;Use Bitcoin Links for Addresses
+                                        </label>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
                         <div class="col-xl-5 col-md-6">
 
                             <!-- address type -->
-                            <div id="address-type" class="page-element single-wallet paper-wallet">
+                            <div id="address-type" class="page-element single-wallet paper-wallet decrypt-mnemonic">
                                 <h6>Address Type</h6>
                                 <div class="form-check">
                                     <input name="address-types" id="non-segwit" class="form-check-input" type="radio">
@@ -292,53 +340,6 @@ Git Repo: https://github.com/dalitsairio/coinglacier.org.git
                             </div>
 
                         </div>
-                        <div class="col-xl-7 col-md-6">
-                            <div id="checkmark-options" class= "page-element single-wallet paper-wallet">
-
-                                <h6>Features</h6>
-
-                                <!-- show xpub -->
-                                <div id="show-xpub" class="page-element paper-wallet">
-                                    <div class="form-check">
-                                        <label id="showXPUBlabel" class="form-check-label" for="showXPUB" data-trigger="hover" data-placement="bottom"
-                                               title="Benefit & Drawback" data-content="<div id='make-fat-hack'><p>Ext. pubKeys allow you to check the balances of
-                                                    all your addresses [per account] in one go.</p>
-                                                    <p>However, when using this feature, <span class='popover-highlight'>
-                                                    you must be particularly careful not to leak any of your private keys,
-                                                    even if you don't have any money on the respective address (anymore)</span>,
-                                                    since an attacker could find all of your private keys [of an account] given only one leaked private key.</p>
-                                                    <p>A measure to reduce the risk is to use multiple accounts. If an attacker gets hold of one private key,
-                                                    he will only be able to retrieve all the private keys from the same account.</p></div>">
-                                            <input id="showXPUB" type="checkbox">&nbsp;Show Extended Public Key
-                                        </label>
-                                    </div>
-                                </div>
-
-                                <!-- number the addresses consecutively -->
-                                <div id="address-numbering" class="page-element paper-wallet">
-                                    <div class="form-check">
-                                        <label id="address-numbering-label" class="form-check-label" for="number-addresses" data-trigger="hover" data-placement="bottom"
-                                               title="Purely Informative Feature" data-content="<div class='normal-popover'>
-                                                    This option merely adds a consecutive numbering to your addresses, without introducing any technical implications.</div>">
-                                            <input id="number-addresses" type="checkbox" checked>&nbsp;Number Addresses Consecutively
-                                        </label>
-                                    </div>
-                                </div>
-
-                                <!-- use links in QR Codes such as bitcoin:1BitcoinEaterAddressDontSendf59kuE?message=trash -->
-                                <div id="qrcode-links" class="page-element single-wallet paper-wallet">
-                                    <div class="form-check">
-                                        <label id="qrcode-links-label" class="form-check-label" for="qrcode-links-check" data-trigger="hover" data-placement="bottom"
-                                               title="Directly open Addresses in Wallet" data-content="<div class='normal-popover'>
-                                                    Use <i>bitcoin:</i> links to enable Bitcoin wallets to automatically prepare payments.
-                                                    This feature is applied to both the plaintext addresses and the corresponding QR codes.</div>">
-                                            <input id="qrcode-links-check" type="checkbox" checked>&nbsp;Use Bitcoin Links for Addresses
-                                        </label>
-                                    </div>
-                                </div>
-
-                            </div>
-                        </div>
                     </div>
                 </div>
                 <div class="col-xl-7">
@@ -346,7 +347,7 @@ Git Repo: https://github.com/dalitsairio/coinglacier.org.git
                         <div class="col-md-6">
 
                             <!-- amount of accounts and addresses -->
-                            <div class="page-element paper-wallet" class="form-control">
+                            <div class="page-element paper-wallet decrypt-mnemonic" class="form-control">
                                 <h6 id="options-accounts-title" style="display: none;">Accounts</h6>
                                 <h6 id="options-addresses-amount-title">Amount of Addresses</h6>
                                 <div id="account-row-template" class="account-row">
@@ -367,7 +368,7 @@ Git Repo: https://github.com/dalitsairio/coinglacier.org.git
                             <div id="wallet-encryption" class= "page-element paper-wallet">
                                 <h6>Encrypt with Password</h6>
                                 <div class="form-inline">
-                                    <div id="password-input-group" class="input-group"
+                                    <div id="password-input-group" class="input-group password-box"
                                          data-trigger="hover" data-placement="bottom" title="Never forget your password!"
                                          data-content="<div class='normal-popover'>Both the mnemonic and the resulting private keys get encrypted
                                                (using standards BIP39 resp. BIP38). <span class='popover-highlight'>If you lose your password,
@@ -376,7 +377,7 @@ Git Repo: https://github.com/dalitsairio/coinglacier.org.git
                                                depending on how many addresses you need and what device you are on.</div>"
                                          aria-label="Hide Password" aria-describedby="hidePass">
                                         <div class="input-group-append">
-                                            <span class="input-group-text text-center" id="hidePass">Hide</span>
+                                            <span id="hidePass" class="hide-pass input-group-text text-center">Hide</span>
                                         </div>
                                         <input id="password" data-toggle="Not Encrypted" class="form-control form-control-sm" type="text" placeholder="Not Encrypted">
                                     </div>
@@ -395,6 +396,38 @@ Git Repo: https://github.com/dalitsairio/coinglacier.org.git
             <button id="new-mnemonic" type="button" class="btn btn-dark btn-sm page-element paper-wallet">New Mnemonic</button>
             <button id="print-button" type="button" class="btn btn-dark btn-sm">Print</button>
             <div style="clear: both;"></div>
+        </div>
+
+        <div id="privkey-dec-params" class="page-element decrypt-privkey">
+            <form class="needs-validation">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="spacer">
+                            <h6>Encrypted Private Key</h6>
+                            <input id="privkey-dec-key" class="form-control" type="text" placeholder="Enter encrypted private key">
+                            <div class="invalid-tooltip">
+                                Invalid BIP38 encrypted private key!
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="spacer">
+                            <h6>Password</h6>
+                            <div id="priv-key-decryption-pw-group" class="form-inline password-box">
+                                <div class="input-group">
+                                    <div class="input-group-append">
+                                        <span id="privkey-dec-hidePass" class="hide-pass input-group-text text-center">Hide</span>
+                                    </div>
+                                    <input id="privkey-dec-password" data-toggle="Not Encrypted" class="form-control form-control-sm" type="text" placeholder="Enter Password">
+                                    <div class="invalid-tooltip">
+                                        Please enter the correct password!
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
         </div>
 
         <!-- THE WALLET: mnemonics, xpubs, addresses, private keys and QR codes-->

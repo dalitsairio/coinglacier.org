@@ -1,18 +1,31 @@
-var bip38 = require('bip38');
+var bip38 = require('./bip38_patched');
 var wif = require('wif');
 
 // privKey must be in WIF format
-function encryptPrivKey(privKey, password) {
+function encryptPrivKey(privKey, password, targetAddress) {
 
     var decoded = wif.decode(privKey);
-    return bip38.encrypt(decoded.privateKey, decoded.compressed, password);
+
+    return bip38.encrypt(targetAddress, decoded.privateKey, decoded.compressed, password);
 }
 
 // privKey must be a string beginning with a 6
 function decryptPrivKey(privKey_encrypted, password) {
 
     var decryptedKey = bip38.decrypt(privKey_encrypted, password);
-    return wif.encode(0x80, decryptedKey.privateKey, decryptedKey.compressed);
+
+
+    var result = {
+        mainnet: {
+            privateKey: wif.encode(0x80, decryptedKey.privateKey, decryptedKey.compressed),
+            salt: decryptedKey.salt
+        },
+        testnet: {
+            privateKey: wif.encode(0xEF, decryptedKey.privateKey, decryptedKey.compressed),
+            salt: decryptedKey.salt
+        }
+    }
+    return result;
 }
 
 module.exports = {

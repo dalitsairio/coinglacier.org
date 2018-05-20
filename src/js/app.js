@@ -1,5 +1,6 @@
 const QRCode = require('qrcode');
 const bip21 = require('bip21');
+const bip38 = require('bip38');
 
 // //////////////////////////////////////////////////
 // Constants and Variables
@@ -9,7 +10,7 @@ const bip21 = require('bip21');
 var networkId;
 var currentPage;
 var password;
-var accountsForm;
+var accounts;
 var mnemonic;
 var showXPUB;
 var useBitcoinLink;
@@ -36,6 +37,8 @@ GET.pages = {};
 GET.pages.keyword = 'page';
 GET.pages.singleWallet = 'single-wallet';
 GET.pages.paperWallet = 'paper-wallet';
+GET.pages.decryptMnemonic = 'decrypt-mnemonic';
+GET.pages.decryptPrivKey = 'decrypt-private-key';
 // GET network
 GET.network = {};
 GET.network.keyword = 'network';
@@ -77,11 +80,15 @@ DOM.menu = $('#mainmenu');
 DOM.menuEntry = {};
 DOM.menuEntry.singleWallet = $('#menu-single-wallet');
 DOM.menuEntry.paperWallet = $('#menu-paper-wallet');
+DOM.menuEntry.decryptMnemonic = $('#menu-decrypt-mnemonic');
+DOM.menuEntry.decryptPrivKey = $('#menu-decrypt-privkey');
 
 DOM.pageElements = {};
 DOM.pageElements.all = $('.page-element');
 DOM.pageElements.singleWallet = $('.single-wallet');
 DOM.pageElements.paperWallet = $('.paper-wallet');
+DOM.pageElements.decryptMnemonic = $('.decrypt-mnemonic');
+DOM.pageElements.decryptPrivKey = $('.decrypt-privkey');
 
 DOM.options = {};
 DOM.options.addressTypes = {};
@@ -111,6 +118,12 @@ DOM.popovers.showXPUB = $('#showXPUBlabel');
 DOM.popovers.encryption = $('#password-input-group');
 DOM.popovers.numberAddresses = $('#address-numbering-label');
 DOM.popovers.qrcodeLinks = $('#qrcode-links-label');
+
+// Decrypt private key page
+DOM.decPriv = {};
+DOM.decPriv.privKey = $('#privkey-dec-key');
+DOM.decPriv.pass = $('#privkey-dec-password');
+DOM.decPriv.hidePass = $('#privkey-dec-hidePass');
 
 // Wallet
 DOM.wallet = {};
@@ -150,6 +163,7 @@ pages.singleWallet.pageElementsDOM = DOM.pageElements.singleWallet;
 pages.singleWallet.menuEntryDOM = DOM.menuEntry.singleWallet;
 pages.singleWallet.getParam = GET.pages.singleWallet;
 // set default values
+pages.singleWallet.showWalletOnStartup = true;
 pages.singleWallet.addressesPerAccount = 1;
 pages.singleWallet.allowAccounts = false;
 pages.singleWallet.showXPUB = false;
@@ -162,12 +176,39 @@ pages.paperWallet.pageElementsDOM = DOM.pageElements.paperWallet;
 pages.paperWallet.menuEntryDOM = DOM.menuEntry.paperWallet;
 pages.paperWallet.getParam = GET.pages.paperWallet;
 // set default values
+pages.paperWallet.showWalletOnStartup = true;
 pages.paperWallet.addressesPerAccount = 3;
 pages.paperWallet.allowAccounts = true;
 pages.paperWallet.showXPUB = false;
 pages.paperWallet.numberAddresses = true;
 pages.paperWallet.useBitcoinLink = true;
 pages.paperWallet.defaultPassword = '';
+
+pages.decryptMnemonic = {};
+pages.decryptMnemonic.pageElementsDOM = DOM.pageElements.decryptMnemonic;
+pages.decryptMnemonic.menuEntryDOM = DOM.menuEntry.decryptMnemonic;
+pages.decryptMnemonic.getParam = GET.pages.decryptMnemonic;
+// set default values
+pages.decryptMnemonic.showWalletOnStartup = false;
+pages.decryptMnemonic.addressesPerAccount = 3;
+pages.decryptMnemonic.allowAccounts = true;
+pages.decryptMnemonic.showXPUB = false;
+pages.decryptMnemonic.numberAddresses = true;
+pages.decryptMnemonic.useBitcoinLink = true;
+pages.decryptMnemonic.defaultPassword = '';
+
+pages.decryptPrivKey = {};
+pages.decryptPrivKey.pageElementsDOM = DOM.pageElements.decryptPrivKey;
+pages.decryptPrivKey.menuEntryDOM = DOM.menuEntry.decryptPrivKey;
+pages.decryptPrivKey.getParam = GET.pages.decryptPrivKey;
+// set default values
+pages.decryptPrivKey.showWalletOnStartup = false;
+pages.decryptPrivKey.addressesPerAccount = 1;
+pages.decryptPrivKey.allowAccounts = false;
+pages.decryptPrivKey.showXPUB = false;
+pages.decryptPrivKey.numberAddresses = false;
+pages.decryptPrivKey.useBitcoinLink = true;
+pages.decryptPrivKey.defaultPassword = '';
 
 
 // //////////////////////////////////////////////////
@@ -195,6 +236,13 @@ DOM.menuEntry.singleWallet.click(function () {
 DOM.menuEntry.paperWallet.click(function () {
     changePage(pages.paperWallet);
 });
+DOM.menuEntry.decryptMnemonic.click(function () {
+    changePage(pages.decryptMnemonic);
+});
+DOM.menuEntry.decryptPrivKey.click(function () {
+    changePage(pages.decryptPrivKey);
+});
+
 
 // Options
 // Address Types
@@ -204,7 +252,7 @@ DOM.options.addressTypes.bech32.click(changeToBech32);
 // Show XPUB
 DOM.options.showXPUB.change(optionShowXPUBchanged);
 // Encryption
-DOM.options.encryption.hidePass.click(togglePasswordVisibility);
+DOM.options.encryption.hidePass.click(toggleEncPwVisibility);
 DOM.options.encryption.pass.change(changePassword);
 // Address Numbering
 DOM.options.numberAddresses.change(toggleAddressNumbering);
@@ -215,6 +263,11 @@ DOM.options.qrcodeLink.change(toggleQRcodeLink);
 DOM.actions.newAddress.click(createWallet);
 DOM.actions.newMnemonic.click(createWallet);
 DOM.actions.print.click(print);
+
+// Decrypt private key page
+DOM.decPriv.privKey.change(encrypedPrivkeyChanged);
+DOM.decPriv.pass.change(privKeyDecPasswordChanged);
+DOM.decPriv.hidePass.click(togglePrivKeyDecPwVisibility);
 
 // Footer
 DOM.footer.status.onlineCheck.click(toggleOnlineCheck);
@@ -244,6 +297,13 @@ function init() {
             break;
         case GET.pages.singleWallet:
             initiatePage(pages.singleWallet);
+            break;
+        case GET.pages.decryptMnemonic:
+            initiatePage(pages.decryptMnemonic);
+            break;
+        case GET.pages.decryptPrivKey:
+            initiatePage(pages.decryptPrivKey);
+            break;
         default:
             initiatePage(currentPage);
             break;
@@ -283,9 +343,7 @@ function createWallet(){
         interruptWorkers();
     }
 
-    initiateWallet(function () {
-        loadWallet();
-    });
+    initiateWallet(loadWallet);
 }
 
 function checkStatusOnline(){
@@ -349,6 +407,7 @@ function initiatePage(newPage) {
 
 function changePage(newPage) {
     interruptWorkers();
+    resetDecryptPrivKeyPage();
     initiatePage(newPage);
     loadWallet();
 }
@@ -517,9 +576,9 @@ function disableAccounts() {
     DOM.options.accounts.titleAddresses.hide();
 
     if (isAccountsFormEmpty()) {
-        initAccountsForm();
+        initAccounts();
     }else {
-        accountsForm.splice(1, accountsForm.length - 1); // remove all entries but the first
+        accounts.splice(1, accounts.length - 1); // remove all entries but the first
     }
 
     showAccountsOptions();
@@ -527,14 +586,14 @@ function disableAccounts() {
     $('.account-row.not-template button.account-insertion').hide();
 }
 
-function initAccountsForm() {
-    accountsForm = [];
-    accountsForm.push(currentPage.addressesPerAccount);
+function initAccounts() {
+    accounts = [];
+    accounts.push(currentPage.addressesPerAccount);
 }
 
 function addAccount(prev) {
 
-    accountsForm.splice(prev + 1, 0, currentPage.addressesPerAccount);
+    accounts.splice(prev + 1, 0, currentPage.addressesPerAccount);
 
     // reload the view
     showAccountsOptions();
@@ -542,7 +601,7 @@ function addAccount(prev) {
 
 function removeAccount(position) {
     // remove the element from array
-    accountsForm.splice(position, 1);
+    accounts.splice(position, 1);
 
     // reload the view
     showAccountsOptions();
@@ -550,19 +609,19 @@ function removeAccount(position) {
 
 function setAddressesPerAccount(index, amount) {
     if (amount > 0) {
-        accountsForm[index] = amount;
+        accounts[index] = amount;
     }
 }
 
 function showAccountsOptions(reset) {
     if (isAccountsFormEmpty() || reset) {
-        initAccountsForm();
+        initAccounts();
     }
 
-    // remove all accountsForm to add them again
+    // remove all accounts to add them again
     $('.account-row.not-template').remove();
 
-    for (var index = accountsForm.length - 1; index >= 0; index--) {
+    for (var index = accounts.length - 1; index >= 0; index--) {
 
         var accountDiv = DOM.options.accounts.accountTemplate.clone();
         accountDiv.prop('id', 'account-row-' + index);
@@ -570,7 +629,7 @@ function showAccountsOptions(reset) {
 
         accountDiv.find('.account-number').text('# ' + (index + 1));
         accountDiv.find('input').prop('id', 'addresses-amount-' + index);
-        accountDiv.find('input').val(accountsForm[index]);
+        accountDiv.find('input').val(accounts[index]);
         accountDiv.find('label').prop('for', 'addresses-amount-' + index);
 
         if (currentPage.showXPUB) {
@@ -578,7 +637,7 @@ function showAccountsOptions(reset) {
             accountDiv.find('button').show();
         }
 
-        if (accountsForm.length <= 1) {
+        if (accounts.length <= 1) {
             accountDiv.find('button.account-remove').prop('disabled', true);
         }
 
@@ -604,16 +663,20 @@ function showAccountsOptions(reset) {
 }
 
 function isAccountsFormEmpty() {
-    return typeof accountsForm === 'undefined' || accountsForm.length === 0;
+    return typeof accounts === 'undefined' || accounts.length === 0;
 }
 
-function togglePasswordVisibility() {
-    if (DOM.options.encryption.pass.prop('type') === 'text') {
-        DOM.options.encryption.pass.prop('type', 'password');
-        DOM.options.encryption.hidePass.html('Show');
+function toggleEncPwVisibility() {
+    togglePasswordVisibility(DOM.options.encryption.pass, DOM.options.encryption.hidePass);
+};
+
+function togglePasswordVisibility(domTextfield, domButton) {
+    if (domTextfield.prop('type') === 'text') {
+        domTextfield.prop('type', 'password');
+        domButton.html('Show');
     } else {
-        DOM.options.encryption.pass.prop('type', 'text');
-        DOM.options.encryption.hidePass.html('Hide');
+        domTextfield.prop('type', 'text');
+        domButton.html('Hide');
     }
 };
 
@@ -631,6 +694,84 @@ function changePassword() {
     interruptWorkers();
     password = DOM.options.encryption.pass.val();
     createWallet();
+};
+
+
+// //////////////////////////////////////////////////
+// Private Key Decryption
+// //////////////////////////////////////////////////
+
+function decryptPrivKey(encryptedPrivKey){
+
+    let isTestnet = networkId >= 10;
+
+    getCredentialsFromEncryptedPrivKey(encryptedPrivKey, password, isTestnet, function (credentials) {
+        fillCredentialsHTML(0, 0, credentials.address, credentials.privateKey);
+    }, function () {
+        DOM.decPriv.pass.addClass('is-invalid');
+    });
+}
+
+function encrypedPrivkeyChanged(){
+
+    resetPrivKeyValidityClasses();
+
+    var encryptedPrivKey = DOM.decPriv.privKey.val();
+
+    if(bip38.verify(encryptedPrivKey)){
+        DOM.decPriv.privKey.addClass('is-valid');
+
+        if(password !== ''){
+            createWalletHTML();
+            $('.wallet-account').show();
+            decryptPrivKey(encryptedPrivKey);
+        }
+    }else{
+        DOM.decPriv.privKey.addClass('is-invalid');
+    }
+
+}
+
+function privKeyDecPasswordChanged(){
+
+    resetPrivKeyDecPwValidityClasses();
+
+    password = DOM.decPriv.pass.val();
+
+    if(password == ''){
+        DOM.decPriv.pass.addClass('is-invalid');
+    }else{
+        DOM.decPriv.pass.addClass('is-valid');
+
+        var encryptedPrivKey = DOM.decPriv.privKey.val();
+        if(bip38.verify(encryptedPrivKey)){
+            createWalletHTML();
+            $('.wallet-account').show();
+            decryptPrivKey(encryptedPrivKey);
+        }
+    }
+}
+
+function resetDecryptPrivKeyPage(){
+    DOM.decPriv.privKey.val('');
+    DOM.decPriv.pass.val('');
+    resetPrivKeyValidityClasses();
+    resetPrivKeyDecPwValidityClasses();
+    password = '';
+}
+
+function resetPrivKeyValidityClasses(){
+    DOM.decPriv.privKey.removeClass('is-valid');
+    DOM.decPriv.privKey.removeClass('is-invalid');
+}
+
+function resetPrivKeyDecPwValidityClasses(){
+    DOM.decPriv.pass.removeClass('is-valid');
+    DOM.decPriv.pass.removeClass('is-invalid');
+}
+
+function togglePrivKeyDecPwVisibility() {
+    togglePasswordVisibility(DOM.decPriv.pass, DOM.decPriv.hidePass);
 };
 
 
@@ -746,10 +887,16 @@ function initiateWallet(cb){
 function loadWallet() {
 
     if (isAccountsFormEmpty()) {
-        initAccountsForm();
+        initAccounts();
     }
 
     createWalletHTML();
+
+    if(currentPage.showWalletOnStartup){
+        $('.wallet-account').show();
+    }else {
+        $('.wallet-account').hide();
+    }
 
     if(currentPage.allowAccounts && showXPUB){
         $('div.xpub-wrapper').show();
@@ -757,27 +904,28 @@ function loadWallet() {
         $('div.xpub-wrapper').hide();
     }
 
-    if(accountsForm.length > 1){
+    if(accounts.length > 1){
         $('.account-title').show();
     }else{
         $('.account-title').hide();
     }
 
-    fillWalletHTML();
-
+    if(currentPage.showWalletOnStartup) {
+        fillWalletHTML();
+    }
 }
 
-function createWalletHTML(accountIndex){
+function createWalletHTML(){
 
     DOM.wallet.template.hide();
     DOM.wallet.container.html(DOM.wallet.templateMnemonicWrapper.clone());
 
-    if(!password){
-        $('.mnemonic-title').html('Mnemonic');
-        $('.privkey-title').html('Private Key');
-    }else{
+    if(password && currentPage !== pages.decryptMnemonic && currentPage !== pages.decryptPrivKey){
         $('.mnemonic-title').html('Mnemonic [encrypted]');
         $('.privkey-title').html('Private Key [encrypted]');
+    }else{
+        $('.mnemonic-title').html('Mnemonic');
+        $('.privkey-title').html('Private Key');
     }
 
     DOM.wallet.container.find('.mnemonic').html(mnemonic);
@@ -789,84 +937,87 @@ function createWalletHTML(accountIndex){
         }
     });
 
+    var perAccount = function (accountIndex){
 
-    foreachCredential(
+        $('div#account-' + accountIndex).html('');
 
-        // per account
-        function (accountIndex){
-
-            $('div#account-' + accountIndex).html('');
-
-            var accountCopy = DOM.wallet.templateAccount.clone();
-            accountCopy.prop('id', 'account-' + accountIndex);
-            if(accountIndex == 0){
-                accountCopy.addClass('first-account');
-            }
-            accountCopy.find('.account-title').html('Account ' + (accountIndex + 1));
-            accountCopy.find('.xpub').prop('id', 'xpub-' + accountIndex);
-            accountCopy.find('.canvas-xpub').prop('id', 'canvas-xpub-' + accountIndex);
-            accountCopy.find('div.credentials').remove();
-
-            DOM.wallet.container.append(accountCopy);
-        },
-
-        // per address
-        function (accountIndex, addressIndex) {
-
-            var credentialsCopy = DOM.wallet.templateCredentials.clone();
-            credentialsCopy.prop('id', 'credentials-' + accountIndex + '-' + addressIndex);
-            credentialsCopy.find('.address').prop('id', 'address-' + accountIndex + '-' + addressIndex);
-            credentialsCopy.find('.canvas-address').prop('id', 'canvas-address-' + accountIndex + '-' + addressIndex);
-            credentialsCopy.find('.privkey').prop('id', 'privkey-' + accountIndex + '-' + addressIndex);
-            credentialsCopy.find('.canvas-privkey').prop('id', 'canvas-privkey-' + accountIndex + '-' + addressIndex);
-
-            if(currentPage.numberAddresses){
-                credentialsCopy.find('.address-title').append(' ' + (addressIndex + 1));
-            }
-
-            var walletAccount = $('div#account-' + accountIndex);
-            walletAccount.append(credentialsCopy);
+        var accountCopy = DOM.wallet.templateAccount.clone();
+        accountCopy.prop('id', 'account-' + accountIndex);
+        if(accountIndex == 0){
+            accountCopy.addClass('first-account');
         }
-    );
+        accountCopy.find('.account-title').html('Account ' + (accountIndex + 1));
+        accountCopy.find('.xpub').prop('id', 'xpub-' + accountIndex);
+        accountCopy.find('.canvas-xpub').prop('id', 'canvas-xpub-' + accountIndex);
+        accountCopy.find('div.credentials').remove();
+
+        DOM.wallet.container.append(accountCopy);
+    };
+
+    var perAddress = function (accountIndex, addressIndex) {
+
+        var credentialsCopy = DOM.wallet.templateCredentials.clone();
+        credentialsCopy.prop('id', 'credentials-' + accountIndex + '-' + addressIndex);
+        credentialsCopy.find('.address').prop('id', 'address-' + accountIndex + '-' + addressIndex);
+        credentialsCopy.find('.canvas-address').prop('id', 'canvas-address-' + accountIndex + '-' + addressIndex);
+        credentialsCopy.find('.privkey').prop('id', 'privkey-' + accountIndex + '-' + addressIndex);
+        credentialsCopy.find('.canvas-privkey').prop('id', 'canvas-privkey-' + accountIndex + '-' + addressIndex);
+
+        if(currentPage.numberAddresses){
+            credentialsCopy.find('.address-title').append(' ' + (addressIndex + 1));
+        }
+
+        var walletAccount = $('div#account-' + accountIndex);
+        walletAccount.append(credentialsCopy);
+    };
+
+    foreachCredential(perAccount, perAddress);
 }
 
 function fillWalletHTML(){
 
-    foreachCredential(
-        function (accountIndex) {
-            createAccount(networkId, accountIndex, function (account) {
-                $('#xpub-' + accountIndex).html(account.xpub);
+    var perAccount = function (accountIndex) {
+        createAccount(networkId, accountIndex, function (account) {
+            fillAccountHTML(accountIndex, account.xpub);
+        });
+    };
 
-                var xpubCanvas = $('#canvas-xpub-' + accountIndex).get(0);
-                QRCode.toCanvas(xpubCanvas, account.xpub, function (error) {
-                    if (error) {
-                        console.error(error);
-                    }
-                });
-            });
-        },
-        function (accountIndex, addressIndex) {
+    var perAddress = function (accountIndex, addressIndex) {
 
-            asyncCreateCredentials(networkId, accountIndex, addressIndex, password, function (credentials) {
-                removeCredentialsLoadingGui(accountIndex, addressIndex);
-                fillCredentials(accountIndex, addressIndex, credentials.address, credentials.privateKey);
-            });
-        }
-    );
+        asyncCreateCredentials(networkId, accountIndex, addressIndex, password, function (credentials) {
+            fillCredentialsHTML(accountIndex, addressIndex, credentials.address, credentials.privateKey);
+        });
+    };
+
+    foreachCredential(perAccount, perAddress);
 }
 
 function foreachCredential(callbackPerAccount, callbackPerAddress){
     // loop through accounts
-    for(var accountIndex = 0; accountIndex < accountsForm.length; accountIndex++) {
+    for(var accountIndex = 0; accountIndex < accounts.length; accountIndex++) {
         callbackPerAccount(accountIndex);
         // loop through addresses
-        for (var addressIndex = 0; addressIndex < accountsForm[accountIndex]; addressIndex++) {
+        for (var addressIndex = 0; addressIndex < accounts[accountIndex]; addressIndex++) {
             callbackPerAddress(accountIndex, addressIndex);
         }
     }
 }
 
-function fillCredentials(accIndex, addIndex, address, privKey){
+function fillAccountHTML(accountIndex, xpub){
+    $('#xpub-' + accountIndex).html(xpub);
+
+    var xpubCanvas = $('#canvas-xpub-' + accountIndex).get(0);
+    QRCode.toCanvas(xpubCanvas, xpub, function (error) {
+        if (error) {
+            console.error(error);
+        }
+    });
+}
+
+function fillCredentialsHTML(accIndex, addIndex, address, privKey){
+
+    // remove loading spinners
+    removeCredentialsLoadingGui(accIndex, addIndex);
 
     var addressLink = useBitcoinLink ? createBitcoinLink(address, accIndex, addIndex) : false;
 

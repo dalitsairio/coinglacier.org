@@ -6,13 +6,13 @@ onmessage = function(e) {
 
     switch(input.mode) {
         case 'encrypt':
-            self.postMessage(bip38.encryptPrivKey(input.privateKey, input.password));
+            self.postMessage(bip38.encryptPrivKey(input.privateKey, input.password, input.address));
             break;
         case 'decrypt':
             var response;
 
             try{
-                response = bip38.decryptPrivKey(input.privateKey, input.password);
+                response = JSON.stringify(bip38.decryptPrivKey(input.privateKey, input.password));
             } catch (e) {
                 console.log('%c' + 'Error while trying to decrypt private key: ' + e.message, 'color: #FF0000;');
                 response = 'error';

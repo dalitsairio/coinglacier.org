@@ -1,0 +1,20 @@
+#privkey-dec-params{
+  background: #fff;
+  padding-top: 0.2rem;
+
+  .row{
+    .spacer {
+      padding: 1rem 1.4rem 0 1.4rem;
+    }
+  }
+
+  input#privkey-dec-key{
+    max-width: 31rem;
+  }
+}
+
+@media print {
+  #privkey-dec-params {
+    display: none;
+  }
+}
