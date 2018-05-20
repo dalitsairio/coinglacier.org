@@ -35,13 +35,14 @@ const packageFile = 'package.json';
 // JavaScript Task
 // //////////////////////////////////////////////////
 
-gulp.task('create-bundle', function () {
-
-    gulp.src(['src/js/bitcoin_loader.js', 'src/js/app.js'], { sourcemaps: true })
+gulp.task('concat-app-and-loader', function () {
+    return gulp.src(['src/js/bitcoin_loader.js', 'src/js/app.js'], { sourcemaps: true })
         .pipe(concat(concatFile))
         .pipe(sourcemaps.write())
         .pipe(gulp.dest('./src/js'));
+});
 
+gulp.task('bundle', function () {
     var b = browserify({
         entries: ['./src/js/' + concatFile],
         debug: true,
@@ -55,8 +56,9 @@ gulp.task('create-bundle', function () {
         .pipe(sourcemaps.init({loadMaps: true}))
         .pipe(sourcemaps.write('../maps/'))
         .pipe(gulp.dest('./src/js'));
-
 });
+
+gulp.task('create-bundle',  gulp.series('concat-app-and-loader', 'bundle'));
 
 gulp.task('prepare-worker-code', function () {
     return gulp.src(['src/js/' + encWorkerBundleFile])
@@ -184,7 +186,7 @@ gulp.task('watch', function () {
         '!src/js/encryptionWorker.js',
         '!src/js/' + encWorkerBundleFile,
         'test/**/*.js'
-    ], gulp.parallel('javascript'));//
+    ], gulp.parallel('javascript'));
 });
 
 gulp.task('watch-worker', function () {
