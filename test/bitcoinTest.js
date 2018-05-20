@@ -379,36 +379,177 @@ function bip38Tests() {
     this.timeout(50000); // all tests may take up to 50 seconds
     this.slow(25000); // a test is considered slow if it takes more than 25 seconds to complete
 
-        it('Encrypted PrivKey', function () {
-            // load testing mnemonic
-            bitcoin.initiateHDWallet(testing_mnemonic, false, false, function (mnemonic, bip32RootKey) {
-                var account = bitcoin.createAccount(bip32RootKey, MAINNET_BECH32, 0);
-                var credentials = bitcoin.createCredentials(account.external, 0);
-                var encryptedPrivKey = bip38.encryptPrivKey(credentials.privateKey, testing_password);
+        describe('Mainnet', function () {
 
-                assert.equal(encryptedPrivKey, '6PYUjuUte84KiL2kFzuCNTven4WkdRFXmeMGGCVzDkpR1AcTBhLn2jMdoo');
+            it('Encrpyt Privkey and Mnemonic', function () {
+                // load testing mnemonic
+                bitcoin.initiateHDWallet(testing_mnemonic, testing_password, false, function (mnemonic, bip32RootKey) {
+                    var account = bitcoin.createAccount(bip32RootKey, MAINNET_NONSEGWIT, 0);
+                    var credentials = bitcoin.createCredentials(account.external, 0);
+                    var encryptedPrivKey = bip38.encryptPrivKey(credentials.privateKey, testing_password, credentials.address);
+
+                    assert.equal(encryptedPrivKey, '6PYW2432QXPUg4PQRUCBNicekqdicAeAX1gjaPa3qLr736HnqXq59Lxxp9');
+                });
+            });
+
+            it('Encrypt Non-Segwit PrivKey', function () {
+                // load testing mnemonic
+                bitcoin.initiateHDWallet(testing_mnemonic, false, false, function (mnemonic, bip32RootKey) {
+                    var account = bitcoin.createAccount(bip32RootKey, MAINNET_NONSEGWIT, 0);
+                    var credentials = bitcoin.createCredentials(account.external, 0);
+                    var encryptedPrivKey = bip38.encryptPrivKey(credentials.privateKey, testing_password, credentials.address);
+
+                    assert.equal(encryptedPrivKey, '6PYKxTcTV5sADexbXMKZQE5MbwYTorHmv79BaycQQv8kJSMTdxSC7z9iAq');
+                });
+            });
+
+            it('Decrypt Non-Segwit PrivKey', function () {
+                var encryptedPrivKey = '6PYW2432QXPUg4PQRUCBNicekqdicAeAX1gjaPa3qLr736HnqXq59Lxxp9';
+                var result = bip38.decryptPrivKey(encryptedPrivKey, testing_password);
+                var decrypted = result.mainnet;
+
+                var credentials = bitcoin.getCredentialsFromPrivKeyAndSalt(decrypted.privateKey, decrypted.salt);
+
+                assert.deepEqual(credentials, {
+                    address: '1HMQsNfFrLkx9kfeBxpSq65LY3cgamGQnu',
+                    privateKey: 'L4g7NjUmXosFyEWUFGqNHvAPD3jXsXDXfohLvY4jqKCn8tJVbh3h'
+                });
+            });
+
+            it('Encrypt Segwit PrivKey', function () {
+                // load testing mnemonic
+                bitcoin.initiateHDWallet(testing_mnemonic, false, false, function (mnemonic, bip32RootKey) {
+                    var account = bitcoin.createAccount(bip32RootKey, MAINNET_SEGWIT, 0);
+                    var credentials = bitcoin.createCredentials(account.external, 0);
+                    var encryptedPrivKey = bip38.encryptPrivKey(credentials.privateKey, testing_password, credentials.address);
+
+                    assert.equal(encryptedPrivKey, '6PYPe7vMDwxV4op89scq8rmFwBFeePcWXPRaPSGLbdn5MKbdaX6GnLHrtA');
+                });
+            });
+
+            it('Decrypt Segwit PrivKey', function () {
+                var encryptedPrivKey = '6PYPe7vMDwxV4op89scq8rmFwBFeePcWXPRaPSGLbdn5MKbdaX6GnLHrtA';
+                var result = bip38.decryptPrivKey(encryptedPrivKey, testing_password);
+                var decrypted = result.mainnet;
+
+                var credentials = bitcoin.getCredentialsFromPrivKeyAndSalt(decrypted.privateKey, decrypted.salt);
+
+                assert.deepEqual(credentials, {
+                    address: '31uAoP3hMQ2rehKnfEFTMJC4tADveRzx6K',
+                    privateKey: 'KxxQTCfkZgBBQYRBJTJr41avZJdQ1fHb7gc1Q1poGvSBdJtUeaR7'
+                });
+            });
+
+            it('Encrypt Bech32 PrivKey', function () {
+                // load testing mnemonic
+                bitcoin.initiateHDWallet(testing_mnemonic, false, false, function (mnemonic, bip32RootKey) {
+                    var account = bitcoin.createAccount(bip32RootKey, MAINNET_BECH32, 0);
+                    var credentials = bitcoin.createCredentials(account.external, 0);
+                    var encryptedPrivKey = bip38.encryptPrivKey(credentials.privateKey, testing_password, credentials.address);
+
+                    assert.equal(encryptedPrivKey, '6PYVPoKcHSKQT1ZGvjPQzwsKAM3vLfwNXZdFMZ3vUq7szz72GDwtyRtori');
+                });
+            });
+
+            it('Decrypt Bech32 PrivKey', function () {
+                var encryptedPrivKey = '6PYVPoKcHSKQT1ZGvjPQzwsKAM3vLfwNXZdFMZ3vUq7szz72GDwtyRtori';
+                var result = bip38.decryptPrivKey(encryptedPrivKey, testing_password);
+                var decrypted = result.mainnet;
+
+                var credentials = bitcoin.getCredentialsFromPrivKeyAndSalt(decrypted.privateKey, decrypted.salt);
+
+                assert.deepEqual(credentials, {
+                    address: 'bc1qk6rjegtxrvp7ty2tzd4uj88n33vnc3vqn90ps9',
+                    privateKey: 'Kzkuno5MDgVcs841HW5HWnSFmZ4xBEjzxNN2FnTv6k7cWMkzkvrc'
+                });
             });
         });
 
-        it('Encrpyted Privkey and Mnemonic', function () {
-            // load testing mnemonic
-            bitcoin.initiateHDWallet(testing_mnemonic, testing_password, false, function (mnemonic, bip32RootKey) {
-                var account = bitcoin.createAccount(bip32RootKey, MAINNET_BECH32, 0);
-                var credentials = bitcoin.createCredentials(account.external, 0);
-                var encryptedPrivKey = bip38.encryptPrivKey(credentials.privateKey, testing_password);
+        describe('Testnet', function () {
 
-                assert.equal(encryptedPrivKey, '6PYSqLAHxW8CT2sBYVjaZZKJ6yes2itBcvk5WHmsNysTkzM8Z62DZntKYc');
+            it('Encrpyt Privkey and Mnemonic', function () {
+                // load testing mnemonic
+                bitcoin.initiateHDWallet(testing_mnemonic, testing_password, false, function (mnemonic, bip32RootKey) {
+                    var account = bitcoin.createAccount(bip32RootKey, TESTNET_NONSEGWIT, 0);
+                    var credentials = bitcoin.createCredentials(account.external, 0);
+                    var encryptedPrivKey = bip38.encryptPrivKey(credentials.privateKey, testing_password, credentials.address);
+
+                    assert.equal(encryptedPrivKey, '6PYSUdTaGFR5geTNFBALJyDcGr59ySSCPbGaa1TCP9djEFb8MehyjfoV1R');
+                });
+            });
+
+            it('Encrypt Non-Segwit PrivKey', function () {
+                // load testing mnemonic
+                bitcoin.initiateHDWallet(testing_mnemonic, false, false, function (mnemonic, bip32RootKey) {
+                    var account = bitcoin.createAccount(bip32RootKey, TESTNET_NONSEGWIT, 0);
+                    var credentials = bitcoin.createCredentials(account.external, 0);
+                    var encryptedPrivKey = bip38.encryptPrivKey(credentials.privateKey, testing_password, credentials.address);
+
+                    assert.equal(encryptedPrivKey, '6PYShLJQxTbgRXSMyBTwQJyac6xdzCtEdZG4VnZLa6JYVtwGR5McqrAiq9');
+                });
+            });
+
+            it('Decrypt Non-Segwit PrivKey', function () {
+                var encryptedPrivKey = '6PYSUdTaGFR5geTNFBALJyDcGr59ySSCPbGaa1TCP9djEFb8MehyjfoV1R';
+                var result = bip38.decryptPrivKey(encryptedPrivKey, testing_password);
+                var decrypted = result.testnet;
+
+                var credentials = bitcoin.getCredentialsFromPrivKeyAndSalt(decrypted.privateKey, decrypted.salt, true);
+
+                assert.deepEqual(credentials, {
+                    address: 'n3VaxebYQ8BYVh1EoCKUaFKEsz3WytSEzV',
+                    privateKey: 'cSwsK2UDrt7WYbn2WHdfsEzrjRUWsS5onhd58Pm2B43PnkpCDRTS'
+                });
+            });
+
+            it('Encrypt Segwit PrivKey', function () {
+                // load testing mnemonic
+                bitcoin.initiateHDWallet(testing_mnemonic, false, false, function (mnemonic, bip32RootKey) {
+                    var account = bitcoin.createAccount(bip32RootKey, TESTNET_SEGWIT, 0);
+                    var credentials = bitcoin.createCredentials(account.external, 0);
+                    var encryptedPrivKey = bip38.encryptPrivKey(credentials.privateKey, testing_password, credentials.address);
+
+                    assert.equal(encryptedPrivKey, '6PYTcVFnQv31t1ZBV7dGGSUbicxcu1C5fMJRUeTkZzAbnQgoRALAzBThr2');
+                });
+            });
+
+            it('Decrypt Segwit PrivKey', function () {
+                var encryptedPrivKey = '6PYTcVFnQv31t1ZBV7dGGSUbicxcu1C5fMJRUeTkZzAbnQgoRALAzBThr2';
+                var result = bip38.decryptPrivKey(encryptedPrivKey, testing_password);
+                var decrypted = result.testnet;
+
+                var credentials = bitcoin.getCredentialsFromPrivKeyAndSalt(decrypted.privateKey, decrypted.salt, true);
+
+                assert.deepEqual(credentials, {
+                    address: '2N7oVd4Xq9TfpCWaVHhFNCPQbi4buiLdpyi',
+                    privateKey: 'cRsGmgKfnAueMA2DJzT29dvMx4cLJ4gMbTK8CRahP4orPeD15caX'
+                });
+            });
+
+            it('Encrypt Bech32 PrivKey', function () {
+                // load testing mnemonic
+                bitcoin.initiateHDWallet(testing_mnemonic, false, false, function (mnemonic, bip32RootKey) {
+                    var account = bitcoin.createAccount(bip32RootKey, TESTNET_BECH32, 0);
+                    var credentials = bitcoin.createCredentials(account.external, 0);
+                    var encryptedPrivKey = bip38.encryptPrivKey(credentials.privateKey, testing_password, credentials.address);
+
+                    assert.equal(encryptedPrivKey, '6PYQPgWyGk2BfURMJ8uiESrcNPWvm2JuB95ouys71YsKXEL4SwQQTjTM35');
+                });
+            });
+
+            it('Decrypt Bech32 PrivKey', function () {
+                var encryptedPrivKey = '6PYQPgWyGk2BfURMJ8uiESrcNPWvm2JuB95ouys71YsKXEL4SwQQTjTM35';
+                var result = bip38.decryptPrivKey(encryptedPrivKey, testing_password);
+                var decrypted = result.testnet;
+
+                var credentials = bitcoin.getCredentialsFromPrivKeyAndSalt(decrypted.privateKey, decrypted.salt, true);
+
+                assert.deepEqual(credentials, {
+                    address: 'tb1qc45lcycj4upms5v0hzdnhnyq4s09xe7jnsdhtz',
+                    privateKey: 'cSoNGp1yv5yJFsUNKJck5TRufjVZ6aCRUu8tQB6X9o8eNa4ZVP1R'
+                });
             });
         });
-
-        it('Decrypt PrivKey', function () {
-            var encryptedPrivKey = '6PYUjuUte84KiL2kFzuCNTven4WkdRFXmeMGGCVzDkpR1AcTBhLn2jMdoo';
-            var decrypted = bip38.decryptPrivKey(encryptedPrivKey, testing_password);
-
-            assert.equal(decrypted, 'Kzkuno5MDgVcs841HW5HWnSFmZ4xBEjzxNN2FnTv6k7cWMkzkvrc');
-        });
-
-
     });
 }
 
