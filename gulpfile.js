@@ -19,9 +19,10 @@ const hashsum = require('gulp-hashsum');
 const clean = require('gulp-clean');
 const bump = require('gulp-bump');
 const sass = require('gulp-sass');
-var concat = require('gulp-concat');
-var uglify = require('gulp-uglify');
-var replace = require('gulp-replace');
+const concat = require('gulp-concat');
+const uglify = require('gulp-uglify');
+const replace = require('gulp-replace');
+const autoprefixer = require('gulp-autoprefixer');
 
 const domain = 'coinglacier.org';
 const mainFile = domain + '.html'; // 'coinglacier.org.html'
@@ -116,6 +117,7 @@ gulp.task('javascript', gulp.series('create-webworker', 'create-main'));
 gulp.task('sass', function () {
     return gulp.src('src/scss/coinglacier.org.scss')
         .pipe(sourcemaps.init({loadMaps: true}))
+        .pipe(autoprefixer())
         .pipe(sass().on('error', sass.logError))
         .pipe(sourcemaps.write('../maps/'))
         .pipe(gulp.dest('src/css'))
