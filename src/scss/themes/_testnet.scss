@@ -3,6 +3,13 @@
         "primary": $testnet-primary-color
     );
 
+    // Navigation: Submenu items' background when active
+    .dropdown-item{
+        &.active, &:active{
+            background: $testnet-primary-color;
+        }
+    }
+
     #options {
         background: lighten($testnet-primary-color, 30);
     }
