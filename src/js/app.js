@@ -80,6 +80,7 @@ DOM.menu = $('#mainmenu');
 DOM.menuEntry = {};
 DOM.menuEntry.singleWallet = $('#menu-single-wallet');
 DOM.menuEntry.paperWallet = $('#menu-paper-wallet');
+DOM.menuEntry.decrypt = $('#menu-decrypt');
 DOM.menuEntry.decryptMnemonic = $('#menu-decrypt-mnemonic');
 DOM.menuEntry.decryptPrivKey = $('#menu-decrypt-privkey');
 
@@ -160,6 +161,7 @@ DOM.footer.encTestButton = $('footer #run-enc-tests-button');
 var pages = {};
 pages.singleWallet = {};
 pages.singleWallet.pageElementsDOM = DOM.pageElements.singleWallet;
+pages.singleWallet.parentMenuEntryDOM = false;
 pages.singleWallet.menuEntryDOM = DOM.menuEntry.singleWallet;
 pages.singleWallet.getParam = GET.pages.singleWallet;
 // set default values
@@ -173,6 +175,7 @@ pages.singleWallet.defaultPassword = '';
 
 pages.paperWallet = {};
 pages.paperWallet.pageElementsDOM = DOM.pageElements.paperWallet;
+pages.paperWallet.parentMenuEntryDOM = false;
 pages.paperWallet.menuEntryDOM = DOM.menuEntry.paperWallet;
 pages.paperWallet.getParam = GET.pages.paperWallet;
 // set default values
@@ -186,6 +189,7 @@ pages.paperWallet.defaultPassword = '';
 
 pages.decryptMnemonic = {};
 pages.decryptMnemonic.pageElementsDOM = DOM.pageElements.decryptMnemonic;
+pages.decryptMnemonic.parentMenuEntryDOM = DOM.menuEntry.decrypt;
 pages.decryptMnemonic.menuEntryDOM = DOM.menuEntry.decryptMnemonic;
 pages.decryptMnemonic.getParam = GET.pages.decryptMnemonic;
 // set default values
@@ -199,6 +203,7 @@ pages.decryptMnemonic.defaultPassword = '';
 
 pages.decryptPrivKey = {};
 pages.decryptPrivKey.pageElementsDOM = DOM.pageElements.decryptPrivKey;
+pages.decryptPrivKey.parentMenuEntryDOM = DOM.menuEntry.decrypt;
 pages.decryptPrivKey.menuEntryDOM = DOM.menuEntry.decryptPrivKey;
 pages.decryptPrivKey.getParam = GET.pages.decryptPrivKey;
 // set default values
@@ -416,6 +421,10 @@ function changePage(newPage) {
 function switchMenuLink() {
     DOM.menu.find('.' + classes.activeMenuItem).removeClass(classes.activeMenuItem);
     currentPage.menuEntryDOM.addClass(classes.activeMenuItem);
+
+    if(currentPage.parentMenuEntryDOM){
+        currentPage.parentMenuEntryDOM.addClass(classes.activeMenuItem);
+    }
 }
 
 // change page function
