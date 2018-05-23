@@ -27,6 +27,7 @@ workerState.available = 0;
 workerState.busy = 1;
 
 var cache;
+var bip38cache; // only used for decryption, encryption is stored in "cache"
 var mnemonic;
 var bip32RootKey;
 var workerpool;
@@ -242,24 +243,34 @@ function runPrivateKeyDecryption(encryptedPrivKey, password, success, failure){
 
 function getCredentialsFromEncryptedPrivKey(encryptedPrivKey, password, testnet, success, otherNetwork, failure){
 
-    var cb = function(result){
+    bip38cache = cache || [];
+    bip38cache[encryptedPrivKey] = bip38cache[encryptedPrivKey] || [];
 
-        let credentials = getCredentialsFromBIP38Result(result, testnet);
+    if(bip38cache[encryptedPrivKey][password]){
+        success(bip38cache[encryptedPrivKey][password]);
+    }else {
 
-        if(credentials) {
-            success(credentials);
-        }else{
+        var cb = function (result) {
 
-            // check whether user is in wrong network mode (mainnet/testnet)
-            if(getCredentialsFromBIP38Result(result, !testnet)){
-                otherNetwork();
-            }else{
-                failure();
+            let credentials = getCredentialsFromBIP38Result(result, testnet);
+
+            if (credentials) {
+                success(credentials);
+
+                // cache the result
+                bip38cache[encryptedPrivKey][password] = credentials;
+            } else {
+                // check whether user is in wrong network mode (mainnet/testnet)
+                if (getCredentialsFromBIP38Result(result, !testnet)) {
+                    otherNetwork();
+                } else {
+                    failure();
+                }
             }
         }
-    }
 
-    runPrivateKeyDecryption(encryptedPrivKey, password, cb, failure);
+        runPrivateKeyDecryption(encryptedPrivKey, password, cb, failure);
+    }
 }
 
 function getCredentialsFromBIP38Result(result, testnet) {
