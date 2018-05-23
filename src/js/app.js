@@ -10,6 +10,7 @@ const bip38 = require('bip38');
 var networkId;
 var currentPage;
 var password;
+var bip38decryptionPassword;
 var accounts;
 var mnemonic;
 var showXPUB;
@@ -721,14 +722,14 @@ function changePassword() {
 
 
 // //////////////////////////////////////////////////
-// Private Key Decryption
+// BIP38 Private Key Decryption
 // //////////////////////////////////////////////////
 
 function decryptPrivKey(encryptedPrivKey){
 
     let isTestnet = networkId >= 10;
 
-    getCredentialsFromEncryptedPrivKey(encryptedPrivKey, password, isTestnet, function (credentials) {
+    getCredentialsFromEncryptedPrivKey(encryptedPrivKey, bip38decryptionPassword, isTestnet, function (credentials) {
         fillCredentialsHTML(0, 0, credentials.address, credentials.privateKey);
     }, function () {
         DOM.decPriv.wrongNetwork.show();
@@ -761,9 +762,9 @@ function privKeyDecPasswordChanged(){
 
     resetPrivKeyDecPwValidityClasses();
 
-    password = DOM.decPriv.pass.val();
+    bip38decryptionPassword = DOM.decPriv.pass.val();
 
-    if(password == ''){
+    if(bip38decryptionPassword == ''){
         DOM.decPriv.pass.addClass('is-invalid');
         $('.wallet-account').hide();
     }else{
@@ -776,7 +777,7 @@ function initPasswordDecryption(){
 
     let encryptedPrivKey = DOM.decPriv.privKey.val();
 
-    if(bip38.verify(encryptedPrivKey) && password !== '') {
+    if(bip38.verify(encryptedPrivKey) && bip38decryptionPassword !== '') {
         DOM.decPriv.wrongNetwork.hide();
         createWalletHTML();
         $('.wallet-account').show();
@@ -788,7 +789,7 @@ function resetDecryptPrivKeyPage(leavePrivKey){
     DOM.decPriv.pass.val('');
     DOM.decPriv.wrongNetwork.hide();
     resetPrivKeyDecPwValidityClasses();
-    password = '';
+    bip38decryptionPassword = '';
 
     if(!leavePrivKey){
         DOM.decPriv.privKey.val('');
@@ -821,7 +822,7 @@ function privKeyDecCheckTestnet(){
 function checkOtherNetwork(initNetwork){
     let pass = DOM.decPriv.pass.val();
     initNetwork();
-    DOM.decPriv.pass.val(pass)
+    DOM.decPriv.pass.val(pass);
     privKeyDecPasswordChanged();
 }
 
