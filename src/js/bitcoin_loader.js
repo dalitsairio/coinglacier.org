@@ -211,6 +211,11 @@ function asyncCreateCredentials(networkID, accountIndex, addressIndex, password,
 }
 
 function runPrivateKeyDecryption(encryptedPrivKey, password, success, failure){
+
+    // reset workers if there are still some working
+    // (user changed password or encrypted private key, while previous encryption was still ongoing)
+    interruptWorkers();
+
     addToQueue(function (workerID) {
 
         workerpool[workerID].state = workerState.busy;
@@ -235,7 +240,7 @@ function runPrivateKeyDecryption(encryptedPrivKey, password, success, failure){
     });
 }
 
-function getCredentialsFromEncryptedPrivKey(encryptedPrivKey, password, testnet, success, failure){
+function getCredentialsFromEncryptedPrivKey(encryptedPrivKey, password, testnet, success, otherNetwork, failure){
 
     var cb = function(result){
 
@@ -247,8 +252,7 @@ function getCredentialsFromEncryptedPrivKey(encryptedPrivKey, password, testnet,
 
             // check whether user is in wrong network mode (mainnet/testnet)
             if(getCredentialsFromBIP38Result(result, !testnet)){
-                // todo link user to the other network mode
-                console.log('there is a result on the other network');
+                otherNetwork();
             }else{
                 failure();
             }

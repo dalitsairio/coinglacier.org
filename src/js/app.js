@@ -84,6 +84,11 @@ DOM.menuEntry.decrypt = $('#menu-decrypt');
 DOM.menuEntry.decryptMnemonic = $('#menu-decrypt-mnemonic');
 DOM.menuEntry.decryptPrivKey = $('#menu-decrypt-privkey');
 
+DOM.networkElements = {};
+DOM.networkElements.all = $('.network-element');
+DOM.networkElements.mainnet = $('.network-mainnet');
+DOM.networkElements.testnet = $('.network-testnet');
+
 DOM.pageElements = {};
 DOM.pageElements.all = $('.page-element');
 DOM.pageElements.singleWallet = $('.single-wallet');
@@ -125,6 +130,9 @@ DOM.decPriv = {};
 DOM.decPriv.privKey = $('#privkey-dec-key');
 DOM.decPriv.pass = $('#privkey-dec-password');
 DOM.decPriv.hidePass = $('#privkey-dec-hidePass');
+DOM.decPriv.wrongNetwork = $('#privkey-dec-wrong-network');
+DOM.decPriv.checkTestnet = $('button#check-testnet');
+DOM.decPriv.checkMainnet = $('button#check-mainnet');
 
 // Wallet
 DOM.wallet = {};
@@ -273,6 +281,8 @@ DOM.actions.print.click(print);
 DOM.decPriv.privKey.change(encrypedPrivkeyChanged);
 DOM.decPriv.pass.change(privKeyDecPasswordChanged);
 DOM.decPriv.hidePass.click(togglePrivKeyDecPwVisibility);
+DOM.decPriv.checkTestnet.click(privKeyDecCheckTestnet);
+DOM.decPriv.checkMainnet.click(privKeyDecCheckMainnet);
 
 // Footer
 DOM.footer.status.onlineCheck.click(toggleOnlineCheck);
@@ -717,7 +727,12 @@ function decryptPrivKey(encryptedPrivKey){
     getCredentialsFromEncryptedPrivKey(encryptedPrivKey, password, isTestnet, function (credentials) {
         fillCredentialsHTML(0, 0, credentials.address, credentials.privateKey);
     }, function () {
+        DOM.decPriv.wrongNetwork.show();
         DOM.decPriv.pass.addClass('is-invalid');
+        $('.wallet-account').hide();
+    }, function () {
+        DOM.decPriv.pass.addClass('is-invalid');
+        $('.wallet-account').hide();
     });
 }
 
@@ -730,13 +745,10 @@ function encrypedPrivkeyChanged(){
     if(bip38.verify(encryptedPrivKey)){
         DOM.decPriv.privKey.addClass('is-valid');
 
-        if(password !== ''){
-            createWalletHTML();
-            $('.wallet-account').show();
-            decryptPrivKey(encryptedPrivKey);
-        }
+        initPasswordDecryption(encryptedPrivKey);
     }else{
         DOM.decPriv.privKey.addClass('is-invalid');
+        $('.wallet-account').hide();
     }
 
 }
@@ -749,24 +761,34 @@ function privKeyDecPasswordChanged(){
 
     if(password == ''){
         DOM.decPriv.pass.addClass('is-invalid');
+        $('.wallet-account').hide();
     }else{
         DOM.decPriv.pass.addClass('is-valid');
 
         var encryptedPrivKey = DOM.decPriv.privKey.val();
-        if(bip38.verify(encryptedPrivKey)){
-            createWalletHTML();
-            $('.wallet-account').show();
-            decryptPrivKey(encryptedPrivKey);
-        }
+        initPasswordDecryption(encryptedPrivKey);
     }
 }
 
-function resetDecryptPrivKeyPage(){
-    DOM.decPriv.privKey.val('');
+function initPasswordDecryption(encryptedPrivKey){
+    if(bip38.verify(encryptedPrivKey) && password !== '') {
+        DOM.decPriv.wrongNetwork.hide();
+        createWalletHTML();
+        $('.wallet-account').show();
+        decryptPrivKey(encryptedPrivKey);
+    }
+}
+
+function resetDecryptPrivKeyPage(leavePrivKey){
     DOM.decPriv.pass.val('');
-    resetPrivKeyValidityClasses();
+    DOM.decPriv.wrongNetwork.hide();
     resetPrivKeyDecPwValidityClasses();
     password = '';
+
+    if(!leavePrivKey){
+        DOM.decPriv.privKey.val('');
+        resetPrivKeyValidityClasses();
+    }
 }
 
 function resetPrivKeyValidityClasses(){
@@ -783,6 +805,20 @@ function togglePrivKeyDecPwVisibility() {
     togglePasswordVisibility(DOM.decPriv.pass, DOM.decPriv.hidePass);
 };
 
+function privKeyDecCheckMainnet(){
+    checkOtherNetwork(initMainnet);
+}
+
+function privKeyDecCheckTestnet(){
+    checkOtherNetwork(initTestnet);
+}
+
+function checkOtherNetwork(initNetwork){
+    let pass = DOM.decPriv.pass.val();
+    initNetwork();
+    DOM.decPriv.pass.val(pass)
+    privKeyDecPasswordChanged();
+}
 
 // //////////////////////////////////////////////////
 // Footer
@@ -843,35 +879,51 @@ function reloadAndRunAllTests(){
 
 function setNetwork() {
 
-    var addressType = getURLparameter(GET.addressTypes.keyword) || defaultAddressType.getParam;
+    DOM.networkElements.all.hide();
+
+    let addressType = getURLparameter(GET.addressTypes.keyword) || defaultAddressType.getParam;
 
     switch (getURLparameter(GET.network.keyword)) {
         case GET.network.testnet:
-            switch (addressType) {
-                case GET.addressTypes.nonSegwit:
-                    networkId = TESTNET_NONSEGWIT;
-                    break;
-                case GET.addressTypes.segwit:
-                    networkId = TESTNET_SEGWIT;
-                    break;
-                case GET.addressTypes.bech32:
-                    networkId = TESTNET_BECH32;
-                    break;
-            }
+            setNetworkTestnet(addressType);
             break;
         case GET.network.mainnet:
         default:
-            switch (addressType) {
-                case GET.addressTypes.nonSegwit:
-                    networkId = MAINNET_NONSEGWIT;
-                    break;
-                case GET.addressTypes.segwit:
-                    networkId = MAINNET_SEGWIT;
-                    break;
-                case GET.addressTypes.bech32:
-                    networkId = MAINNET_BECH32;
-                    break;
-            }
+            setNetworkMainnet(addressType);
+            break;
+    }
+
+    resetDecryptPrivKeyPage(true);
+}
+
+function setNetworkMainnet(addressType){
+    DOM.networkElements.mainnet.show();
+
+    switch (addressType) {
+        case GET.addressTypes.nonSegwit:
+            networkId = MAINNET_NONSEGWIT;
+            break;
+        case GET.addressTypes.segwit:
+            networkId = MAINNET_SEGWIT;
+            break;
+        case GET.addressTypes.bech32:
+            networkId = MAINNET_BECH32;
+            break;
+    }
+}
+
+function setNetworkTestnet(addressType){
+    DOM.networkElements.testnet.show();
+
+    switch (addressType) {
+        case GET.addressTypes.nonSegwit:
+            networkId = TESTNET_NONSEGWIT;
+            break;
+        case GET.addressTypes.segwit:
+            networkId = TESTNET_SEGWIT;
+            break;
+        case GET.addressTypes.bech32:
+            networkId = TESTNET_BECH32;
             break;
     }
 }
