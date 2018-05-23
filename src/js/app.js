@@ -706,7 +706,11 @@ function toggleAddressNumbering() {
 
 function toggleQRcodeLink() {
     useBitcoinLink = DOM.options.qrcodeLink.prop('checked');
-    loadWallet();
+    if(currentPage === pages.decryptPrivKey) {
+        initPasswordDecryption();
+    } else {
+        loadWallet();
+    }
 };
 
 function changePassword() {
@@ -740,12 +744,12 @@ function encrypedPrivkeyChanged(){
 
     resetPrivKeyValidityClasses();
 
-    var encryptedPrivKey = DOM.decPriv.privKey.val();
+    let encryptedPrivKey = DOM.decPriv.privKey.val();
 
     if(bip38.verify(encryptedPrivKey)){
         DOM.decPriv.privKey.addClass('is-valid');
 
-        initPasswordDecryption(encryptedPrivKey);
+        initPasswordDecryption();
     }else{
         DOM.decPriv.privKey.addClass('is-invalid');
         $('.wallet-account').hide();
@@ -764,13 +768,14 @@ function privKeyDecPasswordChanged(){
         $('.wallet-account').hide();
     }else{
         DOM.decPriv.pass.addClass('is-valid');
-
-        var encryptedPrivKey = DOM.decPriv.privKey.val();
-        initPasswordDecryption(encryptedPrivKey);
+        initPasswordDecryption();
     }
 }
 
-function initPasswordDecryption(encryptedPrivKey){
+function initPasswordDecryption(){
+
+    let encryptedPrivKey = DOM.decPriv.privKey.val();
+
     if(bip38.verify(encryptedPrivKey) && password !== '') {
         DOM.decPriv.wrongNetwork.hide();
         createWalletHTML();
