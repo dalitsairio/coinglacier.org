@@ -16,8 +16,6 @@ var mnemonic;
 var showXPUB;
 var useBitcoinLink;
 var useImprovedEntropy;
-var shownStatus;
-
 
 // identical to the id's set in bitcoinjs-lib_patched.js
 const MAINNET_NONSEGWIT = 0;
@@ -26,10 +24,6 @@ const MAINNET_BECH32 = 2;
 const TESTNET_NONSEGWIT = 10;
 const TESTNET_SEGWIT = 11;
 const TESTNET_BECH32 = 12;
-
-const STATUS_ONLINE = 0;
-const STATUS_CRYPTO = 1;
-const STATUS_UNITTESTS = 2;
 
 // GET parameters
 var GET = {};
@@ -146,21 +140,23 @@ DOM.wallet.templateCredentials = $('div#wallet-template .credentials');
 
 // Footer
 DOM.footer = {};
-DOM.footer.status = {};
-DOM.footer.status.onlineCheck = $('footer #status-online');
-DOM.footer.status.browserOnline = $('footer #browser-online');
-DOM.footer.status.browserOffline = $('footer #browser-offline');
-DOM.footer.status.crypto = $('footer #status-crypto');
-DOM.footer.status.cryptoSupported= $('footer #crypto-supported');
-DOM.footer.status.cryptoNotSupported= $('footer #crypto-not-supported');
-DOM.footer.status.unittests = $('footer #status-unittests');
-DOM.footer.onlineWrapper = $('footer #online-check-wrapper');
-DOM.footer.cryptoWrapper = $('footer #crypto-check-wrapper');
-DOM.footer.mochaWrapper = $('footer #mocha-wrapper');
-DOM.footer.mochaTitle = $('footer #mocha-title');
-DOM.footer.failedDescription = $('footer #mocha-failed-description');
-DOM.footer.encryptionDialog = $('footer #encryption-tests-dialog');
-DOM.footer.encTestButton = $('footer #run-enc-tests-button');
+DOM.footer.securityChecks = {};
+DOM.footer.securityChecks.online = $('footer #status-online');
+DOM.footer.securityChecks.browserOnline = $('footer #browser-online');
+DOM.footer.securityChecks.browserOffline = $('footer #browser-offline');
+DOM.footer.securityChecks.crypto = $('footer #status-crypto');
+DOM.footer.securityChecks.cryptoSupported= $('footer #crypto-supported');
+DOM.footer.securityChecks.cryptoNotSupported= $('footer #crypto-not-supported');
+DOM.footer.securityChecks.unittests = $('footer #status-unittests');
+DOM.footer.securityChecks.windows = {};
+DOM.footer.securityChecks.windows.online = $('footer #online-check-wrapper');
+DOM.footer.securityChecks.windows.crypto = $('footer #crypto-check-wrapper');
+DOM.footer.securityChecks.windows.mocha = $('footer #mocha-wrapper');
+DOM.footer.securityChecks.mocha = {};
+DOM.footer.securityChecks.mocha.title = $('footer #mocha-title');
+DOM.footer.securityChecks.mocha.failedDescription = $('footer #mocha-failed-description');
+DOM.footer.securityChecks.mocha.encryptionDialog = $('footer #encryption-tests-dialog');
+DOM.footer.securityChecks.mocha.encTestButton = $('footer #run-enc-tests-button');
 
 
 // //////////////////////////////////////////////////
@@ -235,6 +231,15 @@ const defaultAddressType = {
 };
 currentPage = pages.singleWallet;
 
+
+// //////////////////////////////////////////////////
+// Global Objects
+// //////////////////////////////////////////////////
+
+const SECURITY_CHECKS = new SecurityChecks();
+const SECURITY_CHECKS_WINDOWS = new SecurityCheckWindows();
+
+
 // //////////////////////////////////////////////////
 // Events
 // //////////////////////////////////////////////////
@@ -286,10 +291,10 @@ DOM.decPriv.checkTestnet.click(privKeyDecCheckTestnet);
 DOM.decPriv.checkMainnet.click(privKeyDecCheckMainnet);
 
 // Footer
-DOM.footer.status.onlineCheck.click(toggleOnlineCheck);
-DOM.footer.status.crypto.click(toggleCryptoCheck);
-DOM.footer.status.unittests.click(toggleUnitTests);
-DOM.footer.encTestButton.click(reloadAndRunAllTests);
+DOM.footer.securityChecks.online.click(SECURITY_CHECKS_WINDOWS.toggleOnline);
+DOM.footer.securityChecks.crypto.click(SECURITY_CHECKS_WINDOWS.toggleCrypto);
+DOM.footer.securityChecks.unittests.click(SECURITY_CHECKS_WINDOWS.toggleUnitTests);
+DOM.footer.securityChecks.mocha.encTestButton.click(SECURITY_CHECKS.reloadAndRunAllTests);
 
 // //////////////////////////////////////////////////
 // Page Loading
@@ -297,7 +302,34 @@ DOM.footer.encTestButton.click(reloadAndRunAllTests);
 
 function init() {
 
-    // set mainnet or testnet
+    initNetwork();
+    initPage();
+
+    showAccountsOptions();
+    initPopovers();
+
+    password = currentPage.defaultPassword;
+    showXPUB = currentPage.showXPUB;
+    useBitcoinLink = currentPage.useBitcoinLink;
+
+    createWallet();
+
+    // check whether browser is online or not
+    SECURITY_CHECKS.online();
+    // check whether window.crypto.getRandomValues is supported
+    SECURITY_CHECKS.crypto();
+
+    // run unit tests
+    let runAllTests = getURLparameter(GET.allUnitTests.keyword) == GET.allUnitTests.yes;
+    if(runAllTests){
+        removeParamFromURL(GET.allUnitTests.keyword);
+        DOM.footer.securityChecks.mocha.encryptionDialog.hide();
+    }
+    runUnitTests(runAllTests, SECURITY_CHECKS.onUnittestsSuccesful, SECURITY_CHECKS.onUnittestsFailed);
+}
+
+// set mainnet or testnet
+function initNetwork() {
     switch (getURLparameter(GET.network.keyword)) {
         case GET.network.testnet:
             initTestnet();
@@ -305,7 +337,10 @@ function init() {
         default:
             initMainnet();
     }
+}
 
+// set mainnet or testnet
+function initPage() {
     // set correct page
     switch (getURLparameter(GET.pages.keyword)) {
         case GET.pages.paperWallet:
@@ -324,33 +359,13 @@ function init() {
             initiatePage(currentPage);
             break;
     }
+}
 
-    showAccountsOptions();
-
-    // initialize popovers
-    for (var x in DOM.popovers) {
+// set mainnet or testnet
+function initPopovers() {
+    for (let x in DOM.popovers) {
         DOM.popovers[x].popover({html: true});
     }
-
-    password = currentPage.defaultPassword;
-    showXPUB = currentPage.showXPUB;
-    useBitcoinLink = currentPage.useBitcoinLink;
-    shownStatus = null;
-
-    createWallet();
-
-    // check whether browser is online or not
-    checkStatusOnline();
-    // check whether window.crypto.getRandomValues is supported
-    checkCrypto();
-
-    // run unit tests
-    var runAllTests = getURLparameter(GET.allUnitTests.keyword) == GET.allUnitTests.yes;
-    if(runAllTests){
-        removeParamFromURL(GET.allUnitTests.keyword);
-        DOM.footer.encryptionDialog.hide();
-    }
-    runUnitTests(runAllTests, onUnittestsSuccesful, onUnittestsFailed);
 }
 
 function createWallet(){
@@ -361,49 +376,6 @@ function createWallet(){
 
     initiateWallet(loadWallet);
 }
-
-function checkStatusOnline(){
-    if(navigator.onLine){
-        onStatusFailed(DOM.footer.status.onlineCheck);
-        DOM.footer.status.browserOnline.show();
-    }else{
-        onStatusSuccessful(DOM.footer.status.onlineCheck)
-        DOM.footer.status.browserOffline.show();
-    }
-}
-
-function checkCrypto(){
-    if(window.crypto && window.crypto.getRandomValues){
-        onStatusSuccessful(DOM.footer.status.crypto)
-        DOM.footer.status.cryptoSupported.show();
-    }else{
-        onStatusFailed(DOM.footer.status.crypto);
-        DOM.footer.status.cryptoNotSupported.show();
-    }
-}
-
-function onUnittestsSuccesful(){
-    DOM.footer.mochaTitle.html('Unit tests successful');
-    DOM.footer.mochaTitle.addClass('success');
-    onStatusSuccessful(DOM.footer.status.unittests);
-}
-
-function onUnittestsFailed(){
-    DOM.footer.mochaTitle.html('Unit tests failed!');
-    DOM.footer.mochaTitle.addClass('failed');
-    DOM.footer.failedDescription.show();
-    onStatusFailed(DOM.footer.status.unittests);
-}
-
-function onStatusSuccessful(domElement){
-    domElement.html('&#10004;'); // &#10004; = ✔
-}
-
-function onStatusFailed(domElement){
-    domElement.html('&#9888;'); // &#9888; = ⚠
-    domElement.addClass('warning');
-}
-
 
 // //////////////////////////////////////////////////
 // Page Management
@@ -826,58 +798,90 @@ function checkOtherNetwork(initNetwork){
     privKeyDecPasswordChanged();
 }
 
+
 // //////////////////////////////////////////////////
 // Footer
 // //////////////////////////////////////////////////
 
-function toggleOnlineCheck(){
+function SecurityChecks() {
 
-    hideAllStatusWindows();
+    const onSuccess = (domElement) => domElement.html('&#10004;'); // &#10004; = ✔
+    const onFailed = (domElement) => {
+        domElement.html('&#9888;'); // &#9888; = ⚠
+        domElement.addClass('warning');
+    }
 
-    if(shownStatus !== STATUS_ONLINE){
-        DOM.footer.onlineWrapper.show();
-        shownStatus = STATUS_ONLINE;
-    }else{
-        shownStatus = null;
+    this.online = () => {
+        if (navigator.onLine) {
+            onFailed(DOM.footer.securityChecks.online);
+            DOM.footer.securityChecks.browserOnline.show();
+        } else {
+            onSuccess(DOM.footer.securityChecks.online)
+            DOM.footer.securityChecks.browserOffline.show();
+        }
+    }
+
+    this.crypto = () => {
+        if (window.crypto && window.crypto.getRandomValues) {
+            onSuccess(DOM.footer.securityChecks.crypto)
+            DOM.footer.securityChecks.cryptoSupported.show();
+        } else {
+            onFailed(DOM.footer.securityChecks.crypto);
+            DOM.footer.securityChecks.cryptoNotSupported.show();
+        }
+    }
+
+    this.onUnittestsSuccesful = () => {
+        DOM.footer.securityChecks.mocha.title.html('Unit tests successful');
+        DOM.footer.securityChecks.mocha.title.addClass('success');
+        onSuccess(DOM.footer.securityChecks.unittests);
+    }
+
+    this.onUnittestsFailed = () => {
+        DOM.footer.securityChecks.mocha.title.html('Unit tests failed!');
+        DOM.footer.securityChecks.mocha.title.addClass('failed');
+        DOM.footer.securityChecks.mocha.failedDescription.show();
+        onFailed(DOM.footer.securityChecks.unittests);
+    }
+
+    this.reloadAndRunAllTests = () => {
+        addParamToURL({key: GET.allUnitTests.keyword, value: GET.allUnitTests.yes});
+
+        // looks ridiculous but this is actually a page reload
+        window.location.href = window.location.href;
     }
 }
 
-function toggleCryptoCheck(){
+function SecurityCheckWindows() {
 
-    hideAllStatusWindows();
+    const ONLINE = {id: 0, window: DOM.footer.securityChecks.windows.online};
+    const CRYPTO = {id: 1, window: DOM.footer.securityChecks.windows.crypto};
+    const UNITTESTS = {id: 2, window: DOM.footer.securityChecks.windows.mocha};
 
-    if(shownStatus !== STATUS_CRYPTO){
-        DOM.footer.cryptoWrapper.show();
-        shownStatus = STATUS_CRYPTO;
-    }else{
-        shownStatus = null;
-    }
-}
+    let shownWindow = null;
 
-function toggleUnitTests(){
+    const hideAllWindows = function () {
+        for(let window in DOM.footer.securityChecks.windows){
+            DOM.footer.securityChecks.windows[window].hide();
+        }
+    };
 
-    hideAllStatusWindows();
+    const toggleWindow = function(obj){
+        hideAllWindows();
 
-    if(shownStatus !== STATUS_UNITTESTS){
-        DOM.footer.mochaWrapper.show();
-        shownStatus = STATUS_UNITTESTS;
-    }else{
-        shownStatus = null;
-    }
-}
+        if (shownWindow !== obj.id) {
+            obj.window.show();
+            shownWindow = obj.id;
+        } else {
+            shownWindow = null;
+        }
+    };
 
-function hideAllStatusWindows(){
-    DOM.footer.onlineWrapper.hide();
-    DOM.footer.cryptoWrapper.hide();
-    DOM.footer.mochaWrapper.hide();
-}
+    this.toggleOnline = () => toggleWindow(ONLINE);
+    this.toggleCrypto = () => toggleWindow(CRYPTO);
+    this.toggleUnitTests = () => toggleWindow(UNITTESTS);
+};
 
-function reloadAndRunAllTests(){
-    addParamToURL({key: GET.allUnitTests.keyword, value: GET.allUnitTests.yes});
-
-    // looks ridiculous but this is actually a page reload
-    window.location.href = window.location.href;
-}
 
 // //////////////////////////////////////////////////
 // Bitcoin Stuff
