@@ -245,9 +245,10 @@ function getCredentialsFromEncryptedPrivKey(encryptedPrivKey, password, testnet,
 
     bip38cache = cache || [];
     bip38cache[encryptedPrivKey] = bip38cache[encryptedPrivKey] || [];
+    bip38cache[encryptedPrivKey][password] = bip38cache[encryptedPrivKey][password] || [];
 
-    if(bip38cache[encryptedPrivKey][password]){
-        success(bip38cache[encryptedPrivKey][password]);
+    if(bip38cache[encryptedPrivKey][password][testnet]){
+        success(bip38cache[encryptedPrivKey][password][testnet]);
     }else {
 
         var cb = function (result) {
@@ -258,7 +259,7 @@ function getCredentialsFromEncryptedPrivKey(encryptedPrivKey, password, testnet,
                 success(credentials);
 
                 // cache the result
-                bip38cache[encryptedPrivKey][password] = credentials;
+                bip38cache[encryptedPrivKey][password][testnet] = credentials;
             } else {
                 // check whether user is in wrong network mode (mainnet/testnet)
                 if (getCredentialsFromBIP38Result(result, !testnet)) {
