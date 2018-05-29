@@ -10,7 +10,6 @@ const bip38 = require('bip38');
 var networkId;
 var currentPage;
 var password;
-var bip38decryptionPassword;
 var accounts;
 var mnemonic;
 var showXPUB;
@@ -236,6 +235,7 @@ currentPage = pages.singleWallet;
 // Global Objects
 // //////////////////////////////////////////////////
 
+const PRIVKEY_DECRYPTION = new PrivkeyDecryption();
 const SECURITY_CHECKS = new SecurityChecks();
 const SECURITY_CHECKS_WINDOWS = new SecurityCheckWindows();
 
@@ -284,11 +284,11 @@ DOM.actions.newMnemonic.click(createWallet);
 DOM.actions.print.click(print);
 
 // Decrypt private key page
-DOM.decPriv.privKey.change(encrypedPrivkeyChanged);
-DOM.decPriv.pass.change(privKeyDecPasswordChanged);
-DOM.decPriv.hidePass.click(togglePrivKeyDecPwVisibility);
-DOM.decPriv.checkTestnet.click(privKeyDecCheckTestnet);
-DOM.decPriv.checkMainnet.click(privKeyDecCheckMainnet);
+DOM.decPriv.privKey.change(PRIVKEY_DECRYPTION.encrypedPrivkeyChanged);
+DOM.decPriv.pass.change(PRIVKEY_DECRYPTION.passwordChanged);
+DOM.decPriv.hidePass.click(PRIVKEY_DECRYPTION.togglePwVisibility);
+DOM.decPriv.checkTestnet.click(PRIVKEY_DECRYPTION.checkTestnet);
+DOM.decPriv.checkMainnet.click(PRIVKEY_DECRYPTION.checkMainnet);
 
 // Footer
 DOM.footer.securityChecks.online.click(SECURITY_CHECKS_WINDOWS.toggleOnline);
@@ -395,7 +395,7 @@ function initiatePage(newPage) {
 
 function changePage(newPage) {
     interruptWorkers();
-    resetDecryptPrivKeyPage();
+    PRIVKEY_DECRYPTION.resetPage();
     initiatePage(newPage);
     loadWallet();
 }
@@ -697,105 +697,96 @@ function changePassword() {
 // BIP38 Private Key Decryption
 // //////////////////////////////////////////////////
 
-function decryptPrivKey(encryptedPrivKey){
+function PrivkeyDecryption() {
 
-    let isTestnet = networkId >= 10;
+    let password;
 
-    getCredentialsFromEncryptedPrivKey(encryptedPrivKey, bip38decryptionPassword, isTestnet, function (credentials) {
-        fillCredentialsHTML(0, 0, credentials.address, credentials.privateKey);
-    }, function () {
-        DOM.decPriv.wrongNetwork.show();
-        DOM.decPriv.pass.addClass('is-invalid');
-        $('.wallet-account').hide();
-    }, function () {
-        DOM.decPriv.pass.addClass('is-invalid');
-        $('.wallet-account').hide();
-    });
-}
+    const initDecryption = () => {
+        let encryptedPrivKey = DOM.decPriv.privKey.val();
 
-function encrypedPrivkeyChanged(){
-
-    resetPrivKeyValidityClasses();
-
-    let encryptedPrivKey = DOM.decPriv.privKey.val();
-
-    if(bip38.verify(encryptedPrivKey)){
-        DOM.decPriv.privKey.addClass('is-valid');
-
-        initPasswordDecryption();
-    }else{
-        DOM.decPriv.privKey.addClass('is-invalid');
-        $('.wallet-account').hide();
+        if (bip38.verify(encryptedPrivKey) && password !== '') {
+            DOM.decPriv.wrongNetwork.hide();
+            createWalletHTML();
+            $('.wallet-account').show();
+            decryptPrivKey(encryptedPrivKey);
+        }
     }
 
-}
+    const decryptPrivKey = (encryptedPrivKey) => {
 
-function privKeyDecPasswordChanged(){
+        let isTestnet = networkId >= 10;
 
-    resetPrivKeyDecPwValidityClasses();
-
-    bip38decryptionPassword = DOM.decPriv.pass.val();
-
-    if(bip38decryptionPassword == ''){
-        DOM.decPriv.pass.addClass('is-invalid');
-        $('.wallet-account').hide();
-    }else{
-        DOM.decPriv.pass.addClass('is-valid');
-        initPasswordDecryption();
+        getCredentialsFromEncryptedPrivKey(encryptedPrivKey, password, isTestnet, function (credentials) {
+            fillCredentialsHTML(0, 0, credentials.address, credentials.privateKey);
+        }, function () {
+            DOM.decPriv.wrongNetwork.show();
+            DOM.decPriv.pass.addClass('is-invalid');
+            $('.wallet-account').hide();
+        }, function () {
+            DOM.decPriv.pass.addClass('is-invalid');
+            $('.wallet-account').hide();
+        });
     }
-}
 
-function initPasswordDecryption(){
-
-    let encryptedPrivKey = DOM.decPriv.privKey.val();
-
-    if(bip38.verify(encryptedPrivKey) && bip38decryptionPassword !== '') {
-        DOM.decPriv.wrongNetwork.hide();
-        createWalletHTML();
-        $('.wallet-account').show();
-        decryptPrivKey(encryptedPrivKey);
+    const resetPrivKeyValidityClasses = () => {
+        DOM.decPriv.privKey.removeClass('is-valid');
+        DOM.decPriv.privKey.removeClass('is-invalid');
     }
-}
 
-function resetDecryptPrivKeyPage(leavePrivKey){
-    DOM.decPriv.pass.val('');
-    DOM.decPriv.wrongNetwork.hide();
-    resetPrivKeyDecPwValidityClasses();
-    bip38decryptionPassword = '';
+    const resetPasswordValidityClasses = () => {
+        DOM.decPriv.pass.removeClass('is-valid');
+        DOM.decPriv.pass.removeClass('is-invalid');
+    }
 
-    if(!leavePrivKey){
-        DOM.decPriv.privKey.val('');
+    const checkOtherNetwork = (initNetwork) => {
+        let pass = DOM.decPriv.pass.val();
+        initNetwork();
+        DOM.decPriv.pass.val(pass);
+        this.passwordChanged();
+    }
+
+    this.encrypedPrivkeyChanged = () => {
         resetPrivKeyValidityClasses();
+        let encryptedPrivKey = DOM.decPriv.privKey.val();
+
+        if (bip38.verify(encryptedPrivKey)) {
+            DOM.decPriv.privKey.addClass('is-valid');
+
+            initDecryption();
+        } else {
+            DOM.decPriv.privKey.addClass('is-invalid');
+            $('.wallet-account').hide();
+        }
     }
-}
 
-function resetPrivKeyValidityClasses(){
-    DOM.decPriv.privKey.removeClass('is-valid');
-    DOM.decPriv.privKey.removeClass('is-invalid');
-}
+    this.passwordChanged = () => {
+        resetPasswordValidityClasses();
+        password = DOM.decPriv.pass.val();
 
-function resetPrivKeyDecPwValidityClasses(){
-    DOM.decPriv.pass.removeClass('is-valid');
-    DOM.decPriv.pass.removeClass('is-invalid');
-}
+        if (password == '') {
+            DOM.decPriv.pass.addClass('is-invalid');
+            $('.wallet-account').hide();
+        } else {
+            DOM.decPriv.pass.addClass('is-valid');
+            initDecryption();
+        }
+    }
 
-function togglePrivKeyDecPwVisibility() {
-    togglePasswordVisibility(DOM.decPriv.pass, DOM.decPriv.hidePass);
-};
+    this.resetPage = (leavePrivKey) => {
+        DOM.decPriv.pass.val('');
+        DOM.decPriv.wrongNetwork.hide();
+        resetPasswordValidityClasses();
+        password = '';
 
-function privKeyDecCheckMainnet(){
-    checkOtherNetwork(initMainnet);
-}
+        if (!leavePrivKey) {
+            DOM.decPriv.privKey.val('');
+            resetPrivKeyValidityClasses();
+        }
+    }
 
-function privKeyDecCheckTestnet(){
-    checkOtherNetwork(initTestnet);
-}
-
-function checkOtherNetwork(initNetwork){
-    let pass = DOM.decPriv.pass.val();
-    initNetwork();
-    DOM.decPriv.pass.val(pass);
-    privKeyDecPasswordChanged();
+    this.togglePwVisibility = () => togglePasswordVisibility(DOM.decPriv.pass, DOM.decPriv.hidePass);
+    this.checkMainnet = () => checkOtherNetwork(initMainnet);
+    this.checkTestnet = () => checkOtherNetwork(initTestnet);
 }
 
 
@@ -903,7 +894,7 @@ function setNetwork() {
             break;
     }
 
-    resetDecryptPrivKeyPage(true);
+    PRIVKEY_DECRYPTION.resetPage(true);
 }
 
 function setNetworkMainnet(addressType){
