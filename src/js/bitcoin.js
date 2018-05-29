@@ -144,11 +144,12 @@ function createCredentials(bip44external, addressIndex) {
 }
 
 function getCredentialsFromPrivKeyByObjects(privateKey, ecPair, network){
+
     switch (network.id) {
         case bitcoinjs.networks.bitcoin.id:
         case bitcoinjs.networks.testnet.id:
 
-            credentials = {privateKey: privateKey, address: ecPair.getAddress()};
+            return { privateKey: privateKey, address: ecPair.getAddress() };
             break;
         case bitcoinjs.networks.bitcoin.p2wpkhInP2sh.id:
         case bitcoinjs.networks.testnet.p2wpkhInP2sh.id:
@@ -157,7 +158,7 @@ function getCredentialsFromPrivKeyByObjects(privateKey, ecPair, network){
             var redeemScript = bitcoinjs.script.witnessPubKeyHash.output.encode(bitcoinjs.crypto.hash160(pubKey));
             var scriptPubKey = bitcoinjs.script.scriptHash.output.encode(bitcoinjs.crypto.hash160(redeemScript));
 
-            credentials = {
+            return {
                 privateKey: privateKey,
                 address: bitcoinjs.address.fromOutputScript(scriptPubKey, network)
             };
@@ -168,7 +169,7 @@ function getCredentialsFromPrivKeyByObjects(privateKey, ecPair, network){
             var pubKey = ecPair.getPublicKeyBuffer();
             var scriptPubKey = bitcoinjs.script.witnessPubKeyHash.output.encode(bitcoinjs.crypto.hash160(pubKey));
 
-            credentials = {
+            return {
                 privateKey: privateKey,
                 address: bitcoinjs.address.fromOutputScript(scriptPubKey, network)
             };
@@ -176,8 +177,6 @@ function getCredentialsFromPrivKeyByObjects(privateKey, ecPair, network){
         default:
             throw ("given network is not a valid network");
     }
-
-    return credentials;
 }
 
 function getCredentialsFromPrivKey(privateKey, networkId){

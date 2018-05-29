@@ -23,6 +23,7 @@ const concat = require('gulp-concat');
 const uglify = require('gulp-uglify');
 const replace = require('gulp-replace');
 const autoprefixer = require('gulp-autoprefixer');
+const iife = require("gulp-iife");
 
 const domain = 'coinglacier.org';
 const mainFile = domain + '.html'; // 'coinglacier.org.html'
@@ -55,6 +56,14 @@ gulp.task('bundle', function () {
         .pipe(source('bundle.js'))
         .pipe(buffer())
         .pipe(sourcemaps.init({loadMaps: true}))
+        .pipe(iife({
+            useStrict: true,
+            trimCode: false,
+            prependSemicolon: false,
+            bindThis: false,
+            params: ["window", "document", "$", "undefined"],
+            args: ["window", "document", "jQuery"]
+        }))
         .pipe(sourcemaps.write('../maps/'))
         .pipe(gulp.dest('./src/js'));
 });
