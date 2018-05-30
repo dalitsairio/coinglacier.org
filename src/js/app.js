@@ -235,9 +235,12 @@ currentPage = pages.singleWallet;
 // Global Objects
 // //////////////////////////////////////////////////
 
-const PRIVKEY_DECRYPTION = new PrivkeyDecryption();
-const SECURITY_CHECKS = new SecurityChecks();
-const SECURITY_CHECKS_WINDOWS = new SecurityCheckWindows();
+const privkeyDecryption = new PrivkeyDecryption();
+const securityChecks = new SecurityChecks();
+const securityChecksWindows = new SecurityCheckWindows();
+const init = new Init();
+const pageManagement = new PageManagement();
+const switchNetwork = new SwitchNetwork();
 
 
 // //////////////////////////////////////////////////
@@ -245,22 +248,14 @@ const SECURITY_CHECKS_WINDOWS = new SecurityCheckWindows();
 // //////////////////////////////////////////////////
 
 // Mainnet/Testnet Link
-DOM.network.testnet.click(switchToTestnet);
-DOM.network.mainnet.click(switchToMainnet);
+DOM.network.testnet.click(switchNetwork.toTestnet);
+DOM.network.mainnet.click(switchNetwork.toMainnet);
 
 // Menu
-DOM.menuEntry.singleWallet.click(function () {
-    changePage(pages.singleWallet);
-});
-DOM.menuEntry.paperWallet.click(function () {
-    changePage(pages.paperWallet);
-});
-DOM.menuEntry.decryptMnemonic.click(function () {
-    changePage(pages.decryptMnemonic);
-});
-DOM.menuEntry.decryptPrivKey.click(function () {
-    changePage(pages.decryptPrivKey);
-});
+DOM.menuEntry.singleWallet.click(() => pageManagement.changePage(pages.singleWallet));
+DOM.menuEntry.paperWallet.click(() => pageManagement.changePage(pages.paperWallet));
+DOM.menuEntry.decryptMnemonic.click(() => pageManagement.changePage(pages.decryptMnemonic));
+DOM.menuEntry.decryptPrivKey.click(() => pageManagement.changePage(pages.decryptPrivKey));
 
 
 // Options
@@ -279,142 +274,181 @@ DOM.options.numberAddresses.change(toggleAddressNumbering);
 DOM.options.qrcodeLink.change(toggleQRcodeLink);
 
 // Actions
-DOM.actions.newAddress.click(createWallet);
-DOM.actions.newMnemonic.click(createWallet);
+DOM.actions.newAddress.click(init.wallet);
+DOM.actions.newMnemonic.click(init.wallet);
 DOM.actions.print.click(print);
 
 // Decrypt private key page
-DOM.decPriv.privKey.change(PRIVKEY_DECRYPTION.encrypedPrivkeyChanged);
-DOM.decPriv.pass.change(PRIVKEY_DECRYPTION.passwordChanged);
-DOM.decPriv.hidePass.click(PRIVKEY_DECRYPTION.togglePwVisibility);
-DOM.decPriv.checkTestnet.click(PRIVKEY_DECRYPTION.checkTestnet);
-DOM.decPriv.checkMainnet.click(PRIVKEY_DECRYPTION.checkMainnet);
+DOM.decPriv.privKey.change(privkeyDecryption.encrypedPrivkeyChanged);
+DOM.decPriv.pass.change(privkeyDecryption.passwordChanged);
+DOM.decPriv.hidePass.click(privkeyDecryption.togglePwVisibility);
+DOM.decPriv.checkTestnet.click(privkeyDecryption.checkTestnet);
+DOM.decPriv.checkMainnet.click(privkeyDecryption.checkMainnet);
 
 // Footer
-DOM.footer.securityChecks.online.click(SECURITY_CHECKS_WINDOWS.toggleOnline);
-DOM.footer.securityChecks.crypto.click(SECURITY_CHECKS_WINDOWS.toggleCrypto);
-DOM.footer.securityChecks.unittests.click(SECURITY_CHECKS_WINDOWS.toggleUnitTests);
-DOM.footer.securityChecks.mocha.encTestButton.click(SECURITY_CHECKS.reloadAndRunAllTests);
+DOM.footer.securityChecks.online.click(securityChecksWindows.toggleOnline);
+DOM.footer.securityChecks.crypto.click(securityChecksWindows.toggleCrypto);
+DOM.footer.securityChecks.unittests.click(securityChecksWindows.toggleUnitTests);
+DOM.footer.securityChecks.mocha.encTestButton.click(securityChecks.reloadAndRunAllTests);
 
 // //////////////////////////////////////////////////
 // Page Loading
 // //////////////////////////////////////////////////
 
-function init() {
+function Init() {
 
-    initNetwork();
-    initPage();
-
-    showAccountsOptions();
-    initPopovers();
-
-    password = currentPage.defaultPassword;
-    showXPUB = currentPage.showXPUB;
-    useBitcoinLink = currentPage.useBitcoinLink;
-
-    createWallet();
-
-    // check whether browser is online or not
-    SECURITY_CHECKS.online();
-    // check whether window.crypto.getRandomValues is supported
-    SECURITY_CHECKS.crypto();
-
-    // run unit tests
-    let runAllTests = getURLparameter(GET.allUnitTests.keyword) == GET.allUnitTests.yes;
-    if(runAllTests){
-        removeParamFromURL(GET.allUnitTests.keyword);
-        DOM.footer.securityChecks.mocha.encryptionDialog.hide();
-    }
-    runUnitTests(runAllTests, SECURITY_CHECKS.onUnittestsSuccesful, SECURITY_CHECKS.onUnittestsFailed);
-}
-
-// set mainnet or testnet
-function initNetwork() {
-    switch (getURLparameter(GET.network.keyword)) {
-        case GET.network.testnet:
-            initTestnet();
-            break;
-        default:
-            initMainnet();
-    }
-}
-
-// set mainnet or testnet
-function initPage() {
-    // set correct page
-    switch (getURLparameter(GET.pages.keyword)) {
-        case GET.pages.paperWallet:
-            initiatePage(pages.paperWallet);
-            break;
-        case GET.pages.singleWallet:
-            initiatePage(pages.singleWallet);
-            break;
-        case GET.pages.decryptMnemonic:
-            initiatePage(pages.decryptMnemonic);
-            break;
-        case GET.pages.decryptPrivKey:
-            initiatePage(pages.decryptPrivKey);
-            break;
-        default:
-            initiatePage(currentPage);
-            break;
-    }
-}
-
-// set mainnet or testnet
-function initPopovers() {
-    for (let x in DOM.popovers) {
-        DOM.popovers[x].popover({html: true});
-    }
-}
-
-function createWallet(){
-
-    if(password) {
-        interruptWorkers();
+    const setDefaults = () => {
+        password = currentPage.defaultPassword;
+        showXPUB = currentPage.showXPUB;
+        useBitcoinLink = currentPage.useBitcoinLink;
     }
 
-    initiateWallet(loadWallet);
+    // set mainnet or testnet
+    const network = () => {
+        switch (getURLparameter(GET.network.keyword)) {
+            case GET.network.testnet:
+                this.testnet();
+                break;
+            default:
+                this.mainnet();
+                break;
+        }
+    }
+
+    // set mainnet or testnet
+    const page = () => {
+        // set correct page
+        switch (getURLparameter(GET.pages.keyword)) {
+            case GET.pages.paperWallet:
+                pageManagement.initPage(pages.paperWallet);
+                break;
+            case GET.pages.singleWallet:
+                pageManagement.initPage(pages.singleWallet);
+                break;
+            case GET.pages.decryptMnemonic:
+                pageManagement.initPage(pages.decryptMnemonic);
+                break;
+            case GET.pages.decryptPrivKey:
+                pageManagement.initPage(pages.decryptPrivKey);
+                break;
+            default:
+                pageManagement.initPage(currentPage);
+                break;
+        }
+    }
+
+    const popovers = () => {
+        for (let x in DOM.popovers) {
+            DOM.popovers[x].popover({html: true});
+        }
+    }
+
+    this.app = () => {
+
+        network();
+        page();
+        popovers();
+        setDefaults();
+
+        this.wallet();
+
+        // Run the security checks shown in the footer of the page
+        securityChecks.runAll();
+    }
+
+
+    this.wallet = () => {
+
+        if (password) {
+            interruptWorkers();
+        }
+
+        initiateWallet(loadWallet);
+    }
+
+    this.mainnet = () => {
+
+        useImprovedEntropy = true;
+
+        // remove GET parameter 'network'
+        removeParamFromURL(GET.network.keyword);
+
+        // design the page
+        DOM.network.mainnet.hide();
+        DOM.network.testnet.show();
+        DOM.network.testnetWarning.hide();
+        DOM.body.removeClass(classes.testnet);
+        DOM.menu.removeClass(classes.testnet);
+
+        // set correct Bitcoin network and reload the wallet
+        setNetwork();
+    }
+
+    this.testnet = () => {
+
+        // todo: this is not the right way to do this:
+        // useImprovedEntropy = false;
+        // todo: even though this extra layer of entropy is not needed
+        // todo: on testnet, simply turning it off is wrong,
+        // todo: since the user can afterwards change to the mainnet
+        // todo: and then misses out on this extra protection
+        useImprovedEntropy = true;
+
+        // set GET parameter 'network' to 'testnet'
+        addParamToURL({key: GET.network.keyword, value: GET.network.testnet});
+
+        // design the page
+        DOM.network.testnet.hide();
+        DOM.network.mainnet.show();
+        DOM.network.testnetWarning.show();
+        DOM.body.addClass(classes.testnet);
+        DOM.menu.addClass(classes.testnet);
+
+        // set correct Bitcoin network and reload the wallet
+        setNetwork();
+    }
 }
 
 // //////////////////////////////////////////////////
 // Page Management
 // //////////////////////////////////////////////////
 
-function initiatePage(newPage) {
-    currentPage = newPage;
+function PageManagement() {
 
-    setupPageOptions();
-    changePageElements();
-    switchMenuLink();
-    switchURLparam({key: GET.pages.keyword, value: currentPage.getParam});
-
-    // reload the page
-    showAccountsOptions(true);
-}
-
-function changePage(newPage) {
-    interruptWorkers();
-    PRIVKEY_DECRYPTION.resetPage();
-    initiatePage(newPage);
-    loadWallet();
-}
-
-// set new menu link to active
-function switchMenuLink() {
-    DOM.menu.find('.' + classes.activeMenuItem).removeClass(classes.activeMenuItem);
-    currentPage.menuEntryDOM.addClass(classes.activeMenuItem);
-
-    if(currentPage.parentMenuEntryDOM){
-        currentPage.parentMenuEntryDOM.addClass(classes.activeMenuItem);
+    const changePageElements = () => {
+        // only show elements that are getting activated with this call
+        DOM.pageElements.all.hide();
+        currentPage.pageElementsDOM.show();
     }
-}
 
-// change page function
-function changePageElements() {
-    // only show elements that are getting activated with this call
-    DOM.pageElements.all.hide();
-    currentPage.pageElementsDOM.show();
+    // set new menu link to active
+    const setMenuLinkActive = () => {
+        DOM.menu.find('.' + classes.activeMenuItem).removeClass(classes.activeMenuItem);
+        currentPage.menuEntryDOM.addClass(classes.activeMenuItem);
+
+        if (currentPage.parentMenuEntryDOM) {
+            currentPage.parentMenuEntryDOM.addClass(classes.activeMenuItem);
+        }
+    }
+
+    this.initPage = (newPage) => {
+        currentPage = newPage;
+
+        setupPageOptions();
+        changePageElements();
+        setMenuLinkActive();
+        switchURLparam({key: GET.pages.keyword, value: currentPage.getParam});
+
+        // reload the page
+        showAccountsOptions(true);
+    }
+
+    this.changePage = (newPage) => {
+        interruptWorkers();
+        privkeyDecryption.resetPage();
+        this.initPage(newPage);
+        loadWallet();
+    }
 }
 
 
@@ -422,56 +456,16 @@ function changePageElements() {
 // Switch beetween mainnet and testnet
 // //////////////////////////////////////////////////
 
-function initMainnet() {
+function SwitchNetwork() {
 
-    useImprovedEntropy = true;
+    const switchToNetwork = (initNetwork) => {
+        interruptWorkers();
+        initNetwork();
+        loadWallet();
+    }
 
-    // remove GET parameter 'network'
-    removeParamFromURL(GET.network.keyword);
-
-    // design the page
-    DOM.network.mainnet.hide();
-    DOM.network.testnet.show();
-    DOM.network.testnetWarning.hide();
-    DOM.body.removeClass(classes.testnet);
-    DOM.menu.removeClass(classes.testnet);
-
-    // set correct Bitcoin network and reload the wallet
-    setNetwork();
-}
-function switchToMainnet() {
-    interruptWorkers();
-    initMainnet();
-    loadWallet();
-}
-
-function initTestnet() {
-
-    // todo: this is not the right way to do this:
-    // useImprovedEntropy = false;
-    // todo: even though this extra layer of entropy is not needed
-    // todo: on testnet, simply turning it off is wrong,
-    // todo: since the user can afterwards change to the mainnet
-    // todo: and then misses out on this extra protection
-    useImprovedEntropy = true;
-
-    // set GET parameter 'network' to 'testnet'
-    addParamToURL({key: GET.network.keyword, value: GET.network.testnet});
-
-    // design the page
-    DOM.network.testnet.hide();
-    DOM.network.mainnet.show();
-    DOM.network.testnetWarning.show();
-    DOM.body.addClass(classes.testnet);
-    DOM.menu.addClass(classes.testnet);
-
-    // set correct Bitcoin network and reload the wallet
-    setNetwork();
-}
-function switchToTestnet() {
-    interruptWorkers();
-    initTestnet();
-    loadWallet();
+    this.toMainnet = () => switchToNetwork(init.mainnet);
+    this.toTestnet = () => switchToNetwork(init.testnet);
 }
 
 
@@ -689,7 +683,7 @@ function toggleQRcodeLink() {
 function changePassword() {
     interruptWorkers();
     password = DOM.options.encryption.pass.val();
-    createWallet();
+    init.wallet();
 };
 
 
@@ -785,8 +779,8 @@ function PrivkeyDecryption() {
     }
 
     this.togglePwVisibility = () => togglePasswordVisibility(DOM.decPriv.pass, DOM.decPriv.hidePass);
-    this.checkMainnet = () => checkOtherNetwork(initMainnet);
-    this.checkTestnet = () => checkOtherNetwork(initTestnet);
+    this.checkMainnet = () => checkOtherNetwork(init.mainnet);
+    this.checkTestnet = () => checkOtherNetwork(init.testnet);
 }
 
 
@@ -800,6 +794,34 @@ function SecurityChecks() {
     const onFailed = (domElement) => {
         domElement.html('&#9888;'); // &#9888; = ⚠
         domElement.addClass('warning');
+    }
+
+    const onUnittestsSuccesful = () => {
+        DOM.footer.securityChecks.mocha.title.html('Unit tests successful');
+        DOM.footer.securityChecks.mocha.title.addClass('success');
+        onSuccess(DOM.footer.securityChecks.unittests);
+    }
+
+    const onUnittestsFailed = () => {
+        DOM.footer.securityChecks.mocha.title.html('Unit tests failed!');
+        DOM.footer.securityChecks.mocha.title.addClass('failed');
+        DOM.footer.securityChecks.mocha.failedDescription.show();
+        onFailed(DOM.footer.securityChecks.unittests);
+    }
+
+    this.runAll = () => {
+
+        // check whether browser is online or not
+        this.online();
+        // check whether window.crypto.getRandomValues is supported
+        this.crypto();
+
+        // run unit tests
+        let runAllTests = getURLparameter(GET.allUnitTests.keyword) == GET.allUnitTests.yes;
+        if(runAllTests){
+            removeParamFromURL(GET.allUnitTests.keyword);
+        }
+        this.unittests(runAllTests);
     }
 
     this.online = () => {
@@ -822,17 +844,11 @@ function SecurityChecks() {
         }
     }
 
-    this.onUnittestsSuccesful = () => {
-        DOM.footer.securityChecks.mocha.title.html('Unit tests successful');
-        DOM.footer.securityChecks.mocha.title.addClass('success');
-        onSuccess(DOM.footer.securityChecks.unittests);
-    }
-
-    this.onUnittestsFailed = () => {
-        DOM.footer.securityChecks.mocha.title.html('Unit tests failed!');
-        DOM.footer.securityChecks.mocha.title.addClass('failed');
-        DOM.footer.securityChecks.mocha.failedDescription.show();
-        onFailed(DOM.footer.securityChecks.unittests);
+    this.unittests = (allTests) => {
+        if(allTests){
+            DOM.footer.securityChecks.mocha.encryptionDialog.hide();
+        }
+        runUnitTests(allTests, onUnittestsSuccesful, onUnittestsFailed);
     }
 
     this.reloadAndRunAllTests = () => {
@@ -894,7 +910,7 @@ function setNetwork() {
             break;
     }
 
-    PRIVKEY_DECRYPTION.resetPage(true);
+    privkeyDecryption.resetPage(true);
 }
 
 function setNetworkMainnet(addressType){
@@ -1214,4 +1230,4 @@ function print(){
 }
 
 
-init();
+init.app();
