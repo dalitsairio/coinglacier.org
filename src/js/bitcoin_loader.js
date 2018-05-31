@@ -259,10 +259,7 @@ function BitcoinLoader() {
             success(bip38cache[encryptedPrivKey][password][testnet]);
         } else {
             let cb = (result) => {
-
-                let credentials = getCredentialsFromBIP38Result(result, testnet);
-
-                processDecryptionFeedback(credentials, success, otherNetwork, failure);
+                let credentials = processPrivKeyDecryptionResult(result, testnet, success, otherNetwork, failure);
                 // cache the result
                 bip38cache[encryptedPrivKey][password][testnet] = credentials;
             }
@@ -271,9 +268,13 @@ function BitcoinLoader() {
         }
     }
 
-    const processDecryptionFeedback = (credentials, success, otherNetwork, failure) => {
+    const processPrivKeyDecryptionResult = (result, testnet, success, otherNetwork, failure) => {
+
+        let credentials = getCredentialsFromBIP38Result(result, testnet);
+
         if (credentials) {
             success(credentials);
+            return credentials;
         } else {
             // check whether user is in wrong network mode (mainnet/testnet)
             if (getCredentialsFromBIP38Result(result, !testnet)) {
