@@ -7,14 +7,12 @@ const bip38 = require('bip38');
 // //////////////////////////////////////////////////
 
 // bitcoin network
-var networkId;
-var currentPage;
-var password;
-var accounts;
-var mnemonic;
-var showXPUB;
-var useBitcoinLink;
-var useImprovedEntropy;
+let networkId;
+let currentPage;
+let password;
+let accounts;
+let useBitcoinLink;
+let useImprovedEntropy;
 
 // identical to the id's set in bitcoinjs-lib_patched.js
 const MAINNET_NONSEGWIT = 0;
@@ -25,7 +23,7 @@ const TESTNET_SEGWIT = 11;
 const TESTNET_BECH32 = 12;
 
 // GET parameters
-var GET = {};
+let GET = {};
 // GET pages
 GET.pages = {};
 GET.pages.keyword = 'page';
@@ -50,7 +48,7 @@ GET.allUnitTests.keyword = 'run-all-tests';
 GET.allUnitTests.yes = 'true';
 
 // CSS classes
-var classes = {};
+let classes = {};
 classes.activeMenuItem = 'active';
 classes.testnet = 'testnet';
 
@@ -59,7 +57,7 @@ classes.testnet = 'testnet';
 // Document Object Model
 // //////////////////////////////////////////////////
 
-var DOM = {};
+let DOM = {};
 
 DOM.body = $('body');
 DOM.root = $('div#root-container');
@@ -162,7 +160,7 @@ DOM.footer.securityChecks.mocha.encTestButton = $('footer #run-enc-tests-button'
 // Pages / Page Options
 // //////////////////////////////////////////////////
 
-var pages = {};
+let pages = {};
 pages.singleWallet = {};
 pages.singleWallet.pageElementsDOM = DOM.pageElements.singleWallet;
 pages.singleWallet.parentMenuEntryDOM = false;
@@ -176,6 +174,7 @@ pages.singleWallet.showXPUB = false;
 pages.singleWallet.numberAddresses = false;
 pages.singleWallet.useBitcoinLink = true;
 pages.singleWallet.defaultPassword = '';
+pages.singleWallet.showEncryptedTag = true;
 
 pages.paperWallet = {};
 pages.paperWallet.pageElementsDOM = DOM.pageElements.paperWallet;
@@ -190,6 +189,7 @@ pages.paperWallet.showXPUB = false;
 pages.paperWallet.numberAddresses = true;
 pages.paperWallet.useBitcoinLink = true;
 pages.paperWallet.defaultPassword = '';
+pages.paperWallet.showEncryptedTag = true;
 
 pages.decryptMnemonic = {};
 pages.decryptMnemonic.pageElementsDOM = DOM.pageElements.decryptMnemonic;
@@ -204,6 +204,7 @@ pages.decryptMnemonic.showXPUB = false;
 pages.decryptMnemonic.numberAddresses = true;
 pages.decryptMnemonic.useBitcoinLink = true;
 pages.decryptMnemonic.defaultPassword = '';
+pages.decryptMnemonic.showEncryptedTag = false;
 
 pages.decryptPrivKey = {};
 pages.decryptPrivKey.pageElementsDOM = DOM.pageElements.decryptPrivKey;
@@ -218,6 +219,7 @@ pages.decryptPrivKey.showXPUB = false;
 pages.decryptPrivKey.numberAddresses = false;
 pages.decryptPrivKey.useBitcoinLink = true;
 pages.decryptPrivKey.defaultPassword = '';
+pages.decryptPrivKey.showEncryptedTag = false;
 
 
 // //////////////////////////////////////////////////
@@ -241,6 +243,9 @@ const securityChecksWindows = new SecurityCheckWindows();
 const init = new Init();
 const pageManagement = new PageManagement();
 const switchNetwork = new SwitchNetwork();
+const options = new Options();
+const wallet = new Wallet();
+const bitcoinLoader = new BitcoinLoader();
 
 
 // //////////////////////////////////////////////////
@@ -260,18 +265,18 @@ DOM.menuEntry.decryptPrivKey.click(() => pageManagement.changePage(pages.decrypt
 
 // Options
 // Address Types
-DOM.options.addressTypes.nonSegwit.click(changeToNonSegwit);
-DOM.options.addressTypes.segwit.click(changeToSegwit);
-DOM.options.addressTypes.bech32.click(changeToBech32);
+DOM.options.addressTypes.nonSegwit.click(options.addressTypes.changeToNonSegwit);
+DOM.options.addressTypes.segwit.click(options.addressTypes.changeToSegwit);
+DOM.options.addressTypes.bech32.click(options.addressTypes.changeToBech32);
 // Show XPUB
-DOM.options.showXPUB.change(optionShowXPUBchanged);
+DOM.options.showXPUB.change(options.showXPUBchanged);
 // Encryption
-DOM.options.encryption.hidePass.click(toggleEncPwVisibility);
-DOM.options.encryption.pass.change(changePassword);
+DOM.options.encryption.hidePass.click(options.togglePwVisibility);
+DOM.options.encryption.pass.change(options.changePassword);
 // Address Numbering
-DOM.options.numberAddresses.change(toggleAddressNumbering);
+DOM.options.numberAddresses.change(options.toggleAddressNumbering);
 // Bitcoin link in QR code
-DOM.options.qrcodeLink.change(toggleQRcodeLink);
+DOM.options.qrcodeLink.change(options.toggleQRcodeLink);
 
 // Actions
 DOM.actions.newAddress.click(init.wallet);
@@ -297,9 +302,81 @@ DOM.footer.securityChecks.mocha.encTestButton.click(securityChecks.reloadAndRunA
 
 function Init() {
 
+    this.app = () => {
+
+        network();
+        page();
+        popovers();
+        setDefaults();
+        options.addressTypes.initForm();
+
+        this.accounts();
+        this.wallet();
+
+        // Run the security checks shown in the footer of the page
+        securityChecks.runAll();
+    }
+
+
+    this.wallet = () => {
+
+        if (password) {
+            bitcoinLoader.interruptWorkers();
+        }
+
+        wallet.init();
+    }
+
+    this.mainnet = () => {
+
+        useImprovedEntropy = true;
+
+        // remove GET parameter 'network'
+        removeParamFromURL(GET.network.keyword);
+
+        // design the page
+        DOM.network.mainnet.hide();
+        DOM.network.testnet.show();
+        DOM.network.testnetWarning.hide();
+        DOM.body.removeClass(classes.testnet);
+        DOM.menu.removeClass(classes.testnet);
+
+        // set correct Bitcoin network and reload the wallet
+        wallet.setNetwork();
+    }
+
+    this.testnet = () => {
+
+        // todo: this is not the right way to do this:
+        // useImprovedEntropy = false;
+        // todo: even though this extra layer of entropy is not needed
+        // todo: on testnet, simply turning it off is wrong,
+        // todo: since the user can afterwards change to the mainnet
+        // todo: and then misses out on this extra protection
+        useImprovedEntropy = true;
+
+        // set GET parameter 'network' to 'testnet'
+        addParamToURL({key: GET.network.keyword, value: GET.network.testnet});
+
+        // design the page
+        DOM.network.testnet.hide();
+        DOM.network.mainnet.show();
+        DOM.network.testnetWarning.show();
+        DOM.body.addClass(classes.testnet);
+        DOM.menu.addClass(classes.testnet);
+
+        // set correct Bitcoin network and reload the wallet
+        wallet.setNetwork();
+    }
+
+    this.accounts = () => {
+        accounts = [];
+        accounts.push(currentPage.addressesPerAccount);
+    }
+
     const setDefaults = () => {
         password = currentPage.defaultPassword;
-        showXPUB = currentPage.showXPUB;
+        options.showXPUB = currentPage.showXPUB;
         useBitcoinLink = currentPage.useBitcoinLink;
     }
 
@@ -315,7 +392,6 @@ function Init() {
         }
     }
 
-    // set mainnet or testnet
     const page = () => {
         // set correct page
         switch (getURLparameter(GET.pages.keyword)) {
@@ -342,71 +418,6 @@ function Init() {
             DOM.popovers[x].popover({html: true});
         }
     }
-
-    this.app = () => {
-
-        network();
-        page();
-        popovers();
-        setDefaults();
-
-        this.wallet();
-
-        // Run the security checks shown in the footer of the page
-        securityChecks.runAll();
-    }
-
-
-    this.wallet = () => {
-
-        if (password) {
-            interruptWorkers();
-        }
-
-        initiateWallet(loadWallet);
-    }
-
-    this.mainnet = () => {
-
-        useImprovedEntropy = true;
-
-        // remove GET parameter 'network'
-        removeParamFromURL(GET.network.keyword);
-
-        // design the page
-        DOM.network.mainnet.hide();
-        DOM.network.testnet.show();
-        DOM.network.testnetWarning.hide();
-        DOM.body.removeClass(classes.testnet);
-        DOM.menu.removeClass(classes.testnet);
-
-        // set correct Bitcoin network and reload the wallet
-        setNetwork();
-    }
-
-    this.testnet = () => {
-
-        // todo: this is not the right way to do this:
-        // useImprovedEntropy = false;
-        // todo: even though this extra layer of entropy is not needed
-        // todo: on testnet, simply turning it off is wrong,
-        // todo: since the user can afterwards change to the mainnet
-        // todo: and then misses out on this extra protection
-        useImprovedEntropy = true;
-
-        // set GET parameter 'network' to 'testnet'
-        addParamToURL({key: GET.network.keyword, value: GET.network.testnet});
-
-        // design the page
-        DOM.network.testnet.hide();
-        DOM.network.mainnet.show();
-        DOM.network.testnetWarning.show();
-        DOM.body.addClass(classes.testnet);
-        DOM.menu.addClass(classes.testnet);
-
-        // set correct Bitcoin network and reload the wallet
-        setNetwork();
-    }
 }
 
 // //////////////////////////////////////////////////
@@ -414,6 +425,25 @@ function Init() {
 // //////////////////////////////////////////////////
 
 function PageManagement() {
+
+    this.initPage = (newPage) => {
+        currentPage = newPage;
+
+        options.setupPageOptions();
+        changePageElements();
+        setMenuLinkActive();
+        switchURLparam({key: GET.pages.keyword, value: currentPage.getParam});
+
+        // reload the page
+        options.showAccountsOptions(true);
+    }
+
+    this.changePage = (newPage) => {
+        bitcoinLoader.interruptWorkers();
+        privkeyDecryption.resetPage();
+        this.initPage(newPage);
+        wallet.load();
+    }
 
     const changePageElements = () => {
         // only show elements that are getting activated with this call
@@ -430,25 +460,6 @@ function PageManagement() {
             currentPage.parentMenuEntryDOM.addClass(classes.activeMenuItem);
         }
     }
-
-    this.initPage = (newPage) => {
-        currentPage = newPage;
-
-        setupPageOptions();
-        changePageElements();
-        setMenuLinkActive();
-        switchURLparam({key: GET.pages.keyword, value: currentPage.getParam});
-
-        // reload the page
-        showAccountsOptions(true);
-    }
-
-    this.changePage = (newPage) => {
-        interruptWorkers();
-        privkeyDecryption.resetPage();
-        this.initPage(newPage);
-        loadWallet();
-    }
 }
 
 
@@ -458,14 +469,14 @@ function PageManagement() {
 
 function SwitchNetwork() {
 
-    const switchToNetwork = (initNetwork) => {
-        interruptWorkers();
-        initNetwork();
-        loadWallet();
-    }
-
     this.toMainnet = () => switchToNetwork(init.mainnet);
     this.toTestnet = () => switchToNetwork(init.testnet);
+
+    const switchToNetwork = (initNetwork) => {
+        bitcoinLoader.interruptWorkers();
+        initNetwork();
+        wallet.load();
+    }
 }
 
 
@@ -473,143 +484,111 @@ function SwitchNetwork() {
 // Options Container
 // //////////////////////////////////////////////////
 
-// set checkboxes from GET params
-if (getURLparameter(GET.addressTypes.keyword)) {
+function AddressTypes() {
 
-    DOM.options.addressTypes.all.prop('checked', false);
+    this.initForm = () => {
+        // set checkboxes from GET params
+        if (getURLparameter(GET.addressTypes.keyword)) {
 
-    switch (getURLparameter(GET.addressTypes.keyword)) {
-        case GET.addressTypes.nonSegwit:
-            DOM.options.addressTypes.nonSegwit.prop('checked', true);
-            break;
-        case GET.addressTypes.segwit:
-            DOM.options.addressTypes.segwit.prop('checked', true);
-            break;
-        case GET.addressTypes.bech32:
-            DOM.options.addressTypes.bech32.prop('checked', true);
-            break;
-        default:
-            defaultAddressType.optionsDOM.prop('checked', true);
-            break;
-    }
-}
+            DOM.options.addressTypes.all.prop('checked', false);
 
-function changeToNonSegwit() {
-    changeAddressType(GET.addressTypes.nonSegwit);
-}
-
-function changeToSegwit() {
-    changeAddressType(GET.addressTypes.segwit);
-}
-
-function changeToBech32() {
-    changeAddressType(GET.addressTypes.bech32);
-}
-
-function changeAddressType(newType) {
-    interruptWorkers();
-    switchURLparam({key: GET.addressTypes.keyword, value: newType});
-    recalculateWallet();
-}
-
-
-// option show extended public key
-function optionShowXPUBchanged() {
-    currentPage.showXPUB = DOM.options.showXPUB.prop('checked');
-    if (currentPage.showXPUB) {
-        enableAccounts();
-        showXPUB = true;
-    } else {
-        disableAccounts();
-        showXPUB = false;
-    }
-    loadWallet();
-}
-
-function setupPageOptions() {
-    switch (currentPage) {
-        case pages.singleWallet:
-            disableAccounts();
-            break;
-        case pages.paperWallet:
-            if (DOM.options.showXPUB.prop('checked')) {
-                enableAccounts();
-            }else {
-                disableAccounts();
+            switch (getURLparameter(GET.addressTypes.keyword)) {
+                case GET.addressTypes.nonSegwit:
+                    DOM.options.addressTypes.nonSegwit.prop('checked', true);
+                    break;
+                case GET.addressTypes.segwit:
+                    DOM.options.addressTypes.segwit.prop('checked', true);
+                    break;
+                case GET.addressTypes.bech32:
+                    DOM.options.addressTypes.bech32.prop('checked', true);
+                    break;
+                default:
+                    defaultAddressType.optionsDOM.prop('checked', true);
+                    break;
             }
-            currentPage.numberAddresses = DOM.options.numberAddresses.prop('checked');
-            break;
+        }
     }
 
-    password = currentPage.defaultPassword;
-    DOM.options.encryption.pass.val(currentPage.defaultPassword);
-}
+    this.changeToNonSegwit = () => changeAddressType(GET.addressTypes.nonSegwit);
+    this.changeToSegwit = () => changeAddressType(GET.addressTypes.segwit);
+    this.changeToBech32 = () => changeAddressType(GET.addressTypes.bech32);
 
-function enableAccounts() {
-
-    // set correct options title
-    DOM.options.accounts.titleAccounts.hide();
-    DOM.options.accounts.titleAddresses.show();
-
-    $('.account-row.not-template span.title').show();
-    $('.account-row.not-template button.account-insertion').show();
-}
-
-function disableAccounts() {
-
-    // set correct options title
-    DOM.options.accounts.titleAccounts.show();
-    DOM.options.accounts.titleAddresses.hide();
-
-    if (isAccountsFormEmpty()) {
-        initAccounts();
-    }else {
-        accounts.splice(1, accounts.length - 1); // remove all entries but the first
-    }
-
-    showAccountsOptions();
-    $('.account-row.not-template span.title').hide();
-    $('.account-row.not-template button.account-insertion').hide();
-}
-
-function initAccounts() {
-    accounts = [];
-    accounts.push(currentPage.addressesPerAccount);
-}
-
-function addAccount(prev) {
-
-    accounts.splice(prev + 1, 0, currentPage.addressesPerAccount);
-
-    // reload the view
-    showAccountsOptions();
-}
-
-function removeAccount(position) {
-    // remove the element from array
-    accounts.splice(position, 1);
-
-    // reload the view
-    showAccountsOptions();
-}
-
-function setAddressesPerAccount(index, amount) {
-    if (amount > 0) {
-        accounts[index] = amount;
+    const changeAddressType = (newType) => {
+        bitcoinLoader.interruptWorkers();
+        switchURLparam({key: GET.addressTypes.keyword, value: newType});
+        wallet.recalculate();
     }
 }
 
-function showAccountsOptions(reset) {
-    if (isAccountsFormEmpty() || reset) {
-        initAccounts();
+function Options() {
+
+    this.addressTypes = new AddressTypes();
+    this.showXPUB = null;
+
+    this.setupPageOptions = () => {
+        switch (currentPage) {
+            case pages.singleWallet:
+            case pages.decryptPrivKey:
+                disableAccounts();
+                break;
+            case pages.paperWallet:
+            case pages.decryptMnemonic:
+                readXPUBform();
+                handleAccounts();
+                currentPage.numberAddresses = DOM.options.numberAddresses.prop('checked');
+                break;
+        }
+
+        password = currentPage.defaultPassword;
+        DOM.options.encryption.pass.val(currentPage.defaultPassword);
     }
 
-    // remove all accounts to add them again
-    $('.account-row.not-template').remove();
+    // checkbox show extended public key changed
+    this.showXPUBchanged = () => {
+        readXPUBform();
+        handleAccounts();
+        wallet.load();
+    }
 
-    for (var index = accounts.length - 1; index >= 0; index--) {
+    this.showAccountsOptions = (reset) => {
+        if (this.isAccountsFormEmpty() || reset) {
+            init.accounts();
+        }
 
-        var accountDiv = DOM.options.accounts.accountTemplate.clone();
+        // remove all accounts to add them again
+        $('.account-row.not-template').remove();
+
+        // create all accounts, but backwards => last account first onto the first account
+        for (let index = accounts.length - 1; index >= 0; index--) {
+            showAccountOptions(index);
+        }
+    }
+
+    this.toggleAddressNumbering = () => {
+        currentPage.numberAddresses = DOM.options.numberAddresses.prop('checked');
+        wallet.load();
+    };
+
+    this.toggleQRcodeLink = () => {
+        useBitcoinLink = DOM.options.qrcodeLink.prop('checked');
+        if (currentPage === pages.decryptPrivKey) {
+            initPasswordDecryption();
+        } else {
+            wallet.load();
+        }
+    };
+
+    this.changePassword = () => {
+        bitcoinLoader.interruptWorkers();
+        password = DOM.options.encryption.pass.val();
+        init.wallet();
+    };
+
+    this.isAccountsFormEmpty = () => typeof accounts === 'undefined' || accounts.length === 0;
+    this.togglePwVisibility = () => togglePasswordVisibility(DOM.options.encryption.pass, DOM.options.encryption.hidePass);
+
+    const showAccountOptions = (index) => {
+        let accountDiv = DOM.options.accounts.accountTemplate.clone();
         accountDiv.prop('id', 'account-row-' + index);
         accountDiv.addClass('not-template');
 
@@ -618,7 +597,7 @@ function showAccountsOptions(reset) {
         accountDiv.find('input').val(accounts[index]);
         accountDiv.find('label').prop('for', 'addresses-amount-' + index);
 
-        if (currentPage.showXPUB) {
+        if (options.showXPUB) {
             accountDiv.find('.account-number').show();
             accountDiv.find('button').show();
         }
@@ -631,30 +610,73 @@ function showAccountsOptions(reset) {
         (function (accIndex, accDiv) {
             accountDiv.find('button.account-add').click(function () {
                 addAccount(accIndex, currentPage.addressesPerAccount);
-                loadWallet();
+                wallet.load();
             });
             accountDiv.find('button.account-remove').click(function () {
                 removeAccount(accIndex);
-                loadWallet();
+                wallet.load();
             });
             accountDiv.find('input#addresses-amount-' + accIndex).change(function () {
                 setAddressesPerAccount(accIndex, parseInt(accDiv.find('input#addresses-amount-' + accIndex).val()));
-                loadWallet();
+                wallet.load();
             });
         })(index, accountDiv); // pass as argument to anonymous function - this will introduce a new scope
 
 
         DOM.options.accounts.accountTemplate.after(accountDiv);
     }
-}
 
-function isAccountsFormEmpty() {
-    return typeof accounts === 'undefined' || accounts.length === 0;
-}
+    const readXPUBform = () => this.showXPUB = DOM.options.showXPUB.prop('checked');
+    const handleAccounts = () => this.showXPUB ? enableAccounts() : disableAccounts();
 
-function toggleEncPwVisibility() {
-    togglePasswordVisibility(DOM.options.encryption.pass, DOM.options.encryption.hidePass);
-};
+    const enableAccounts = () => {
+
+        // set correct options title
+        DOM.options.accounts.titleAccounts.hide();
+        DOM.options.accounts.titleAddresses.show();
+
+        $('.account-row.not-template span.title').show();
+        $('.account-row.not-template button.account-insertion').show();
+    }
+
+    const disableAccounts = () => {
+
+        // set correct options title
+        DOM.options.accounts.titleAccounts.show();
+        DOM.options.accounts.titleAddresses.hide();
+
+        if (this.isAccountsFormEmpty()) {
+            init.accounts();
+        } else {
+            accounts.splice(1, accounts.length - 1); // remove all entries but the first
+        }
+
+        this.showAccountsOptions();
+        $('.account-row.not-template span.title').hide();
+        $('.account-row.not-template button.account-insertion').hide();
+    }
+
+    const addAccount = (prev) => {
+        accounts.splice(prev + 1, 0, currentPage.addressesPerAccount);
+
+        // reload the view
+        this.showAccountsOptions();
+    }
+
+    const removeAccount = (position) => {
+        // remove the element from array
+        accounts.splice(position, 1);
+
+        // reload the view
+        this.showAccountsOptions();
+    }
+
+    const setAddressesPerAccount = (index, amount) => {
+        if (amount > 0) {
+            accounts[index] = amount;
+        }
+    }
+}
 
 function togglePasswordVisibility(domTextfield, domButton) {
     if (domTextfield.prop('type') === 'text') {
@@ -666,27 +688,6 @@ function togglePasswordVisibility(domTextfield, domButton) {
     }
 };
 
-function toggleAddressNumbering() {
-    currentPage.numberAddresses = DOM.options.numberAddresses.prop('checked');
-    loadWallet();
-};
-
-function toggleQRcodeLink() {
-    useBitcoinLink = DOM.options.qrcodeLink.prop('checked');
-    if(currentPage === pages.decryptPrivKey) {
-        initPasswordDecryption();
-    } else {
-        loadWallet();
-    }
-};
-
-function changePassword() {
-    interruptWorkers();
-    password = DOM.options.encryption.pass.val();
-    init.wallet();
-};
-
-
 // //////////////////////////////////////////////////
 // BIP38 Private Key Decryption
 // //////////////////////////////////////////////////
@@ -694,50 +695,6 @@ function changePassword() {
 function PrivkeyDecryption() {
 
     let password;
-
-    const initDecryption = () => {
-        let encryptedPrivKey = DOM.decPriv.privKey.val();
-
-        if (bip38.verify(encryptedPrivKey) && password !== '') {
-            DOM.decPriv.wrongNetwork.hide();
-            createWalletHTML();
-            $('.wallet-account').show();
-            decryptPrivKey(encryptedPrivKey);
-        }
-    }
-
-    const decryptPrivKey = (encryptedPrivKey) => {
-
-        let isTestnet = networkId >= 10;
-
-        getCredentialsFromEncryptedPrivKey(encryptedPrivKey, password, isTestnet, function (credentials) {
-            fillCredentialsHTML(0, 0, credentials.address, credentials.privateKey);
-        }, function () {
-            DOM.decPriv.wrongNetwork.show();
-            DOM.decPriv.pass.addClass('is-invalid');
-            $('.wallet-account').hide();
-        }, function () {
-            DOM.decPriv.pass.addClass('is-invalid');
-            $('.wallet-account').hide();
-        });
-    }
-
-    const resetPrivKeyValidityClasses = () => {
-        DOM.decPriv.privKey.removeClass('is-valid');
-        DOM.decPriv.privKey.removeClass('is-invalid');
-    }
-
-    const resetPasswordValidityClasses = () => {
-        DOM.decPriv.pass.removeClass('is-valid');
-        DOM.decPriv.pass.removeClass('is-invalid');
-    }
-
-    const checkOtherNetwork = (initNetwork) => {
-        let pass = DOM.decPriv.pass.val();
-        initNetwork();
-        DOM.decPriv.pass.val(pass);
-        this.passwordChanged();
-    }
 
     this.encrypedPrivkeyChanged = () => {
         resetPrivKeyValidityClasses();
@@ -781,6 +738,51 @@ function PrivkeyDecryption() {
     this.togglePwVisibility = () => togglePasswordVisibility(DOM.decPriv.pass, DOM.decPriv.hidePass);
     this.checkMainnet = () => checkOtherNetwork(init.mainnet);
     this.checkTestnet = () => checkOtherNetwork(init.testnet);
+
+
+    const initDecryption = () => {
+        let encryptedPrivKey = DOM.decPriv.privKey.val();
+
+        if (bip38.verify(encryptedPrivKey) && password !== '') {
+            DOM.decPriv.wrongNetwork.hide();
+            wallet.createHTML();
+            $('.wallet-account').show();
+            decryptPrivKey(encryptedPrivKey);
+        }
+    }
+
+    const decryptPrivKey = (encryptedPrivKey) => {
+
+        let isTestnet = networkId >= 10;
+
+        bitcoinLoader.getCredentialsFromEncryptedPrivKey(encryptedPrivKey, password, isTestnet, function (credentials) {
+            fillCredentialsHTML(0, 0, credentials.address, credentials.privateKey);
+        }, function () {
+            DOM.decPriv.wrongNetwork.show();
+            DOM.decPriv.pass.addClass('is-invalid');
+            $('.wallet-account').hide();
+        }, function () {
+            DOM.decPriv.pass.addClass('is-invalid');
+            $('.wallet-account').hide();
+        });
+    }
+
+    const resetPrivKeyValidityClasses = () => {
+        DOM.decPriv.privKey.removeClass('is-valid');
+        DOM.decPriv.privKey.removeClass('is-invalid');
+    }
+
+    const resetPasswordValidityClasses = () => {
+        DOM.decPriv.pass.removeClass('is-valid');
+        DOM.decPriv.pass.removeClass('is-invalid');
+    }
+
+    const checkOtherNetwork = (initNetwork) => {
+        let pass = DOM.decPriv.pass.val();
+        initNetwork();
+        DOM.decPriv.pass.val(pass);
+        this.passwordChanged();
+    }
 }
 
 
@@ -789,25 +791,6 @@ function PrivkeyDecryption() {
 // //////////////////////////////////////////////////
 
 function SecurityChecks() {
-
-    const onSuccess = (domElement) => domElement.html('&#10004;'); // &#10004; = ✔
-    const onFailed = (domElement) => {
-        domElement.html('&#9888;'); // &#9888; = ⚠
-        domElement.addClass('warning');
-    }
-
-    const onUnittestsSuccesful = () => {
-        DOM.footer.securityChecks.mocha.title.html('Unit tests successful');
-        DOM.footer.securityChecks.mocha.title.addClass('success');
-        onSuccess(DOM.footer.securityChecks.unittests);
-    }
-
-    const onUnittestsFailed = () => {
-        DOM.footer.securityChecks.mocha.title.html('Unit tests failed!');
-        DOM.footer.securityChecks.mocha.title.addClass('failed');
-        DOM.footer.securityChecks.mocha.failedDescription.show();
-        onFailed(DOM.footer.securityChecks.unittests);
-    }
 
     this.runAll = () => {
 
@@ -848,7 +831,7 @@ function SecurityChecks() {
         if(allTests){
             DOM.footer.securityChecks.mocha.encryptionDialog.hide();
         }
-        runUnitTests(allTests, onUnittestsSuccesful, onUnittestsFailed);
+        bitcoinLoader.runUnitTests(allTests, onUnittestsSuccesful, onUnittestsFailed);
     }
 
     this.reloadAndRunAllTests = () => {
@@ -856,6 +839,25 @@ function SecurityChecks() {
 
         // looks ridiculous but this is actually a page reload
         window.location.href = window.location.href;
+    }
+
+    const onSuccess = (domElement) => domElement.html('&#10004;'); // &#10004; = ✔
+    const onFailed = (domElement) => {
+        domElement.html('&#9888;'); // &#9888; = ⚠
+        domElement.addClass('warning');
+    }
+
+    const onUnittestsSuccesful = () => {
+        DOM.footer.securityChecks.mocha.title.html('Unit tests successful');
+        DOM.footer.securityChecks.mocha.title.addClass('success');
+        onSuccess(DOM.footer.securityChecks.unittests);
+    }
+
+    const onUnittestsFailed = () => {
+        DOM.footer.securityChecks.mocha.title.html('Unit tests failed!');
+        DOM.footer.securityChecks.mocha.title.addClass('failed');
+        DOM.footer.securityChecks.mocha.failedDescription.show();
+        onFailed(DOM.footer.securityChecks.unittests);
     }
 }
 
@@ -866,6 +868,10 @@ function SecurityCheckWindows() {
     const UNITTESTS = {id: 2, window: DOM.footer.securityChecks.windows.mocha};
 
     let shownWindow = null;
+
+    this.toggleOnline = () => toggleWindow(ONLINE);
+    this.toggleCrypto = () => toggleWindow(CRYPTO);
+    this.toggleUnitTests = () => toggleWindow(UNITTESTS);
 
     const hideAllWindows = function () {
         for(let window in DOM.footer.securityChecks.windows){
@@ -883,10 +889,6 @@ function SecurityCheckWindows() {
             shownWindow = null;
         }
     };
-
-    this.toggleOnline = () => toggleWindow(ONLINE);
-    this.toggleCrypto = () => toggleWindow(CRYPTO);
-    this.toggleUnitTests = () => toggleWindow(UNITTESTS);
 };
 
 
@@ -894,134 +896,131 @@ function SecurityCheckWindows() {
 // Bitcoin Stuff
 // //////////////////////////////////////////////////
 
-function setNetwork() {
+function Wallet() {
 
-    DOM.networkElements.all.hide();
+    let self = this;
 
-    let addressType = getURLparameter(GET.addressTypes.keyword) || defaultAddressType.getParam;
+    this.init = () => {
+        bitcoinLoader.initiateHDWallet(false, password, useImprovedEntropy, function (result) {
+            DOM.pageLoader.hide();
+            DOM.root.show();
 
-    switch (getURLparameter(GET.network.keyword)) {
-        case GET.network.testnet:
-            setNetworkTestnet(addressType);
-            break;
-        case GET.network.mainnet:
-        default:
-            setNetworkMainnet(addressType);
-            break;
+            self.load();
+        });
     }
 
-    privkeyDecryption.resetPage(true);
-}
+    this.load = () => {
 
-function setNetworkMainnet(addressType){
-    DOM.networkElements.mainnet.show();
-
-    switch (addressType) {
-        case GET.addressTypes.nonSegwit:
-            networkId = MAINNET_NONSEGWIT;
-            break;
-        case GET.addressTypes.segwit:
-            networkId = MAINNET_SEGWIT;
-            break;
-        case GET.addressTypes.bech32:
-            networkId = MAINNET_BECH32;
-            break;
-    }
-}
-
-function setNetworkTestnet(addressType){
-    DOM.networkElements.testnet.show();
-
-    switch (addressType) {
-        case GET.addressTypes.nonSegwit:
-            networkId = TESTNET_NONSEGWIT;
-            break;
-        case GET.addressTypes.segwit:
-            networkId = TESTNET_SEGWIT;
-            break;
-        case GET.addressTypes.bech32:
-            networkId = TESTNET_BECH32;
-            break;
-    }
-}
-
-
-function recalculateWallet() {
-    setNetwork();
-    loadWallet();
-}
-
-function initiateWallet(cb){
-    initiateHDWallet(false, password, useImprovedEntropy, function (result) {
-        mnemonic = result;
-
-        DOM.pageLoader.hide();
-        DOM.root.show();
-
-        cb();
-    });
-}
-
-function loadWallet() {
-
-    if (isAccountsFormEmpty()) {
-        initAccounts();
-    }
-
-    createWalletHTML();
-
-    if(currentPage.showWalletOnStartup){
-        $('.wallet-account').show();
-    }else {
-        $('.wallet-account').hide();
-    }
-
-    if(currentPage.allowAccounts && showXPUB){
-        $('div.xpub-wrapper').show();
-    }else{
-        $('div.xpub-wrapper').hide();
-    }
-
-    if(accounts.length > 1){
-        $('.account-title').show();
-    }else{
-        $('.account-title').hide();
-    }
-
-    if(currentPage.showWalletOnStartup) {
-        fillWalletHTML();
-    }
-}
-
-function createWalletHTML(){
-
-    DOM.wallet.template.hide();
-    DOM.wallet.container.html(DOM.wallet.templateMnemonicWrapper.clone());
-
-    if(password && currentPage !== pages.decryptMnemonic && currentPage !== pages.decryptPrivKey){
-        $('.mnemonic-title').html('Mnemonic [encrypted]');
-        $('.privkey-title').html('Private Key [encrypted]');
-    }else{
-        $('.mnemonic-title').html('Mnemonic');
-        $('.privkey-title').html('Private Key');
-    }
-
-    DOM.wallet.container.find('.mnemonic').html(mnemonic);
-
-    var mnemonicCanvas = DOM.wallet.container.find('.canvas-mnemonic').get(0);
-    QRCode.toCanvas(mnemonicCanvas, mnemonic, function (error) {
-        if (error){
-            console.error(error);
+        if (options.isAccountsFormEmpty()) {
+            init.accounts();
         }
-    });
 
-    var perAccount = function (accountIndex){
+        this.createHTML();
+
+        showDOMif(currentPage.allowAccounts && options.showXPUB, $('div.xpub-wrapper'));
+        showDOMif(accounts.length > 1, $('.account-title'));
+        showDOMif(currentPage.showWalletOnStartup, $('.wallet-account'));
+
+        if (currentPage.showWalletOnStartup) {
+            fillWalletHTML();
+        }
+    }
+
+    this.setNetwork = () => {
+
+        DOM.networkElements.all.hide();
+
+        let addressType = getURLparameter(GET.addressTypes.keyword) || defaultAddressType.getParam;
+
+        switch (getURLparameter(GET.network.keyword)) {
+            case GET.network.testnet:
+                setNetworkTestnet(addressType);
+                break;
+            case GET.network.mainnet:
+            default:
+                setNetworkMainnet(addressType);
+                break;
+        }
+
+        privkeyDecryption.resetPage(true);
+    }
+
+    this.recalculate = () => {
+        this.setNetwork();
+        this.load();
+    }
+
+
+    this.createHTML = () => {
+
+        DOM.wallet.template.hide();
+        DOM.wallet.container.html(DOM.wallet.templateMnemonicWrapper.clone());
+
+        if (password && currentPage.showEncryptedTag) {
+            $('.mnemonic-title').html('Mnemonic [encrypted]');
+            $('.privkey-title').html('Private Key [encrypted]');
+        } else {
+            $('.mnemonic-title').html('Mnemonic');
+            $('.privkey-title').html('Private Key');
+        }
+
+        createMnemonicHTML();
+
+        foreachCredential(createAccountHTML, createCredentialsHTML);
+    }
+
+    const showDOMif = (condition, domElement) => { condition ? domElement.show() : domElement.hide(); }
+
+    const setNetworkMainnet = (addressType) => {
+        DOM.networkElements.mainnet.show();
+
+        switch (addressType) {
+            case GET.addressTypes.nonSegwit:
+                networkId = MAINNET_NONSEGWIT;
+                break;
+            case GET.addressTypes.segwit:
+                networkId = MAINNET_SEGWIT;
+                break;
+            case GET.addressTypes.bech32:
+                networkId = MAINNET_BECH32;
+                break;
+        }
+    }
+
+    const setNetworkTestnet = (addressType) => {
+        DOM.networkElements.testnet.show();
+
+        switch (addressType) {
+            case GET.addressTypes.nonSegwit:
+                networkId = TESTNET_NONSEGWIT;
+                break;
+            case GET.addressTypes.segwit:
+                networkId = TESTNET_SEGWIT;
+                break;
+            case GET.addressTypes.bech32:
+                networkId = TESTNET_BECH32;
+                break;
+        }
+    }
+
+    const createMnemonicHTML = () => {
+        DOM.wallet.container.find('.mnemonic').html(bitcoinLoader.getMnemonic());
+
+        let mnemonicCanvas = DOM.wallet.container.find('.canvas-mnemonic').get(0);
+        QRCode.toCanvas(mnemonicCanvas, bitcoinLoader.getMnemonic(), function (error) {
+            if (error) {
+                console.error(error);
+            }
+        });
+    }
+
+    const createAccountHTML = (accountIndex) => {
 
         $('div#account-' + accountIndex).html('');
 
-        var accountCopy = DOM.wallet.templateAccount.clone();
+        let accountCopy = DOM.wallet.templateAccount.clone();
         accountCopy.prop('id', 'account-' + accountIndex);
-        if(accountIndex == 0){
+        if (accountIndex == 0) {
             accountCopy.addClass('first-account');
         }
         accountCopy.find('.account-title').html('Account ' + (accountIndex + 1));
@@ -1030,135 +1029,136 @@ function createWalletHTML(){
         accountCopy.find('div.credentials').remove();
 
         DOM.wallet.container.append(accountCopy);
-    };
+    }
 
-    var perAddress = function (accountIndex, addressIndex) {
+    const createCredentialsHTML = (accountIndex, addressIndex) => {
 
-        var credentialsCopy = DOM.wallet.templateCredentials.clone();
-        credentialsCopy.prop('id', 'credentials-' + accountIndex + '-' + addressIndex);
-        credentialsCopy.find('.address').prop('id', 'address-' + accountIndex + '-' + addressIndex);
-        credentialsCopy.find('.canvas-address').prop('id', 'canvas-address-' + accountIndex + '-' + addressIndex);
-        credentialsCopy.find('.privkey').prop('id', 'privkey-' + accountIndex + '-' + addressIndex);
-        credentialsCopy.find('.canvas-privkey').prop('id', 'canvas-privkey-' + accountIndex + '-' + addressIndex);
+        let identifier = accountIndex + '-' + addressIndex;
 
-        if(currentPage.numberAddresses){
+        let credentialsCopy = DOM.wallet.templateCredentials.clone();
+        credentialsCopy.prop('id', 'credentials-' + identifier);
+        credentialsCopy.find('.address').prop('id', 'address-' + identifier);
+        credentialsCopy.find('.canvas-address').prop('id', 'canvas-address-' + identifier);
+        credentialsCopy.find('.privkey').prop('id', 'privkey-' + identifier);
+        credentialsCopy.find('.canvas-privkey').prop('id', 'canvas-privkey-' + identifier);
+
+        if (currentPage.numberAddresses) {
             credentialsCopy.find('.address-title').append(' ' + (addressIndex + 1));
         }
 
-        var walletAccount = $('div#account-' + accountIndex);
+        let walletAccount = $('div#account-' + accountIndex);
         walletAccount.append(credentialsCopy);
-    };
+    }
 
-    foreachCredential(perAccount, perAddress);
-}
+    const fillWalletHTML = () => {
 
-function fillWalletHTML(){
+        let perAccount = function (accountIndex) {
+            bitcoinLoader.createAccount(networkId, accountIndex, function (account) {
+                fillAccountHTML(accountIndex, account.xpub);
+            });
+        };
 
-    var perAccount = function (accountIndex) {
-        createAccount(networkId, accountIndex, function (account) {
-            fillAccountHTML(accountIndex, account.xpub);
+        let perAddress = function (accountIndex, addressIndex) {
+
+            bitcoinLoader.asyncCreateCredentials(networkId, accountIndex, addressIndex, password, function (credentials) {
+                fillCredentialsHTML(accountIndex, addressIndex, credentials.address, credentials.privateKey);
+            });
+        };
+
+        foreachCredential(perAccount, perAddress);
+    }
+
+    const foreachCredential = (callbackPerAccount, callbackPerAddress) => {
+        // loop through accounts
+        for (let accountIndex = 0; accountIndex < accounts.length; accountIndex++) {
+            callbackPerAccount(accountIndex);
+            // loop through addresses
+            for (let addressIndex = 0; addressIndex < accounts[accountIndex]; addressIndex++) {
+                callbackPerAddress(accountIndex, addressIndex);
+            }
+        }
+    }
+
+    const fillAccountHTML = (accountIndex, xpub) => {
+        $('#xpub-' + accountIndex).html(xpub);
+
+        let xpubCanvas = $('#canvas-xpub-' + accountIndex).get(0);
+        QRCode.toCanvas(xpubCanvas, xpub, function (error) {
+            if (error) {
+                console.error(error);
+            }
         });
-    };
+    }
 
-    var perAddress = function (accountIndex, addressIndex) {
+    const fillCredentialsHTML = (accIndex, addIndex, address, privKey) => {
 
-        asyncCreateCredentials(networkId, accountIndex, addressIndex, password, function (credentials) {
-            fillCredentialsHTML(accountIndex, addressIndex, credentials.address, credentials.privateKey);
+        // remove loading spinners
+        removeCredentialsLoadingGui(accIndex, addIndex);
+
+        let addressLink = useBitcoinLink ? createBitcoinLink(address, accIndex, addIndex) : false;
+
+        let addressIdentifier = 'address-' + accIndex + '-' + addIndex;
+        let privKeyIdentifier = 'privkey-' + accIndex + '-' + addIndex;
+
+        fillCredentialsElement(addressIdentifier, address, addressLink);
+        fillCredentialsElement(privKeyIdentifier, privKey);
+    }
+
+    const fillCredentialsElement = (id, plaintext, link) => {
+
+        let qrCodeData;
+
+        if (!link) {
+            $('#' + id).text(plaintext);
+            qrCodeData = plaintext;
+        } else {
+            $('#' + id).html(wrapLinkAroundAddress(id, plaintext, link));
+            qrCodeData = link;
+        }
+
+        QRCode.toCanvas($('#canvas-' + id).get(0), qrCodeData, function (error) {
+            if (error) {
+                console.error(error);
+            }
         });
-    };
+    }
 
-    foreachCredential(perAccount, perAddress);
-}
+    const wrapLinkAroundAddress = (id, plaintext, link) => {
+        let html = '<a href="' + link + '" target="_blank">';
+        html += plaintext;
+        html += '</a>';
 
-function foreachCredential(callbackPerAccount, callbackPerAddress){
-    // loop through accounts
-    for(var accountIndex = 0; accountIndex < accounts.length; accountIndex++) {
-        callbackPerAccount(accountIndex);
-        // loop through addresses
-        for (var addressIndex = 0; addressIndex < accounts[accountIndex]; addressIndex++) {
-            callbackPerAddress(accountIndex, addressIndex);
+        return html;
+    }
+
+    const createBitcoinLink = (address, accIndex, addIndex) => {
+
+        let label;
+
+        switch (currentPage) {
+            case pages.paperWallet:
+                label = 'Paper wallet: Account ' + accIndex + ', Address ' + addIndex;
+                break;
+            case pages.singleWallet:
+            default:
+                label = 'Address generated on coinglacier.org';
+                break;
         }
+
+        return bip21.encode(address, {label: label});
+    }
+
+    const removeCredentialsLoadingGui = (accountIndex, addressIndex) => {
+        let credentialsDiv = $('div#credentials-' + accountIndex + '-' + addressIndex);
+
+        credentialsDiv.find('.address-wrapper').removeClass('loading');
+        credentialsDiv.find('.privkey-wrapper').removeClass('loading');
+        credentialsDiv.find('.okay-to-share').show();
+        credentialsDiv.find('.keep-secret').show();
+        credentialsDiv.find('canvas').show();
     }
 }
 
-function fillAccountHTML(accountIndex, xpub){
-    $('#xpub-' + accountIndex).html(xpub);
-
-    var xpubCanvas = $('#canvas-xpub-' + accountIndex).get(0);
-    QRCode.toCanvas(xpubCanvas, xpub, function (error) {
-        if (error) {
-            console.error(error);
-        }
-    });
-}
-
-function fillCredentialsHTML(accIndex, addIndex, address, privKey){
-
-    // remove loading spinners
-    removeCredentialsLoadingGui(accIndex, addIndex);
-
-    var addressLink = useBitcoinLink ? createBitcoinLink(address, accIndex, addIndex) : false;
-
-    var addressIdentifier = 'address-' + accIndex + '-' + addIndex;
-    var privKeyIdentifier = 'privkey-' + accIndex + '-' + addIndex;
-
-    fillCredentialsElement(addressIdentifier, address, addressLink);
-    fillCredentialsElement(privKeyIdentifier, privKey);
-}
-
-function fillCredentialsElement(id, plaintext, link){
-
-    var qrCodeData;
-
-    if(!link){
-        $('#' + id).text(plaintext);
-        qrCodeData = plaintext;
-    }else{
-        $('#' + id).html(wrapLinkAroundAddress(id, plaintext, link));
-        qrCodeData = link;
-    }
-
-    QRCode.toCanvas($('#canvas-' + id).get(0), qrCodeData, function (error) {
-        if (error){
-            console.error(error);
-        }
-    });
-}
-
-function wrapLinkAroundAddress(id, plaintext, link){
-    var html = '<a href="' + link + '" target="_blank">';
-    html += plaintext;
-    html += '</a>';
-
-    return html;
-}
-
-function createBitcoinLink(address, accIndex, addIndex){
-
-    var label;
-
-    switch(currentPage){
-        case pages.paperWallet:
-            label = 'Paper wallet: Account ' + accIndex + ', Address ' + addIndex;
-            break;
-        case pages.singleWallet:
-        default:
-            label = 'Address generated on coinglacier.org';
-            break;
-    }
-
-    return bip21.encode(address, {label: label});
-}
-
-function removeCredentialsLoadingGui(accountIndex, addressIndex){
-    var credentialsDiv = $('div#credentials-' + accountIndex + '-' + addressIndex);
-
-    credentialsDiv.find('.address-wrapper').removeClass('loading');
-    credentialsDiv.find('.privkey-wrapper').removeClass('loading');
-    credentialsDiv.find('.okay-to-share').show();
-    credentialsDiv.find('.keep-secret').show();
-    credentialsDiv.find('canvas').show();
-}
 
 // //////////////////////////////////////////////////
 // Handle GET Parameters
@@ -1179,9 +1179,9 @@ function addParamToURL(param) {
     }
 
     if (history.pushState) {
-        var url = window.location.href;
-        var paramConcat = (url.indexOf('?') === -1 ? "?" : "&");
-        var newURL = url + paramConcat + param.key + "=" + param.value;
+        let url = window.location.href;
+        let paramConcat = (url.indexOf('?') === -1 ? "?" : "&");
+        let newURL = url + paramConcat + param.key + "=" + param.value;
 
         window.history.pushState({path: newURL}, '', newURL);
     }
@@ -1189,18 +1189,18 @@ function addParamToURL(param) {
 
 function removeParamFromURL(param) {
     if (history.pushState) {
-        var url = window.location.href;
+        let url = window.location.href;
 
         // check whether the given parameter is actually in the URL
         if (url.indexOf(param) < 0) {
             return;
         }
 
-        var startParam = url.indexOf(param) - 1;
-        var endParam = (url.indexOf('&', startParam) <= startParam) ? url.length : url.indexOf('&', startParam);
-        var toBeRemoved = url.substring(startParam, endParam);
+        let startParam = url.indexOf(param) - 1;
+        let endParam = (url.indexOf('&', startParam) <= startParam) ? url.length : url.indexOf('&', startParam);
+        let toBeRemoved = url.substring(startParam, endParam);
 
-        var newURL = url.replace(toBeRemoved, '');
+        let newURL = url.replace(toBeRemoved, '');
 
         // if there are params left, make sure the first one starts with '?'
         if (newURL.indexOf('&') >= 0 && newURL.indexOf('?') < 0) {
@@ -1219,9 +1219,9 @@ function getURLparameter(name, url) {
 
     url = url || window.location.href;
     name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
-    var regexS = "[\\?&]" + name + "=([^&#]*)";
-    var regex = new RegExp(regexS);
-    var results = regex.exec(url);
+    let regexS = "[\\?&]" + name + "=([^&#]*)";
+    let regex = new RegExp(regexS);
+    let results = regex.exec(url);
     return results == null ? null : results[1];
 }
 
