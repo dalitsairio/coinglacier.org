@@ -321,7 +321,7 @@ function Init() {
     this.wallet = () => {
 
         if (password) {
-            bitcoinLoader.interruptWorkers();
+            bitcoinLoader.interrupt();
         }
 
         wallet.init();
@@ -439,7 +439,7 @@ function PageManagement() {
     }
 
     this.changePage = (newPage) => {
-        bitcoinLoader.interruptWorkers();
+        bitcoinLoader.interrupt();
         privkeyDecryption.resetPage();
         this.initPage(newPage);
         wallet.load();
@@ -473,7 +473,7 @@ function SwitchNetwork() {
     this.toTestnet = () => switchToNetwork(init.testnet);
 
     const switchToNetwork = (initNetwork) => {
-        bitcoinLoader.interruptWorkers();
+        bitcoinLoader.interrupt();
         initNetwork();
         wallet.load();
     }
@@ -514,7 +514,7 @@ function AddressTypes() {
     this.changeToBech32 = () => changeAddressType(GET.addressTypes.bech32);
 
     const changeAddressType = (newType) => {
-        bitcoinLoader.interruptWorkers();
+        bitcoinLoader.interrupt();
         switchURLparam({key: GET.addressTypes.keyword, value: newType});
         wallet.recalculate();
     }
@@ -579,7 +579,7 @@ function Options() {
     };
 
     this.changePassword = () => {
-        bitcoinLoader.interruptWorkers();
+        bitcoinLoader.interrupt();
         password = DOM.options.encryption.pass.val();
         init.wallet();
     };
@@ -756,7 +756,7 @@ function PrivkeyDecryption() {
         let isTestnet = networkId >= 10;
 
         bitcoinLoader.getCredentialsFromEncryptedPrivKey(encryptedPrivKey, password, isTestnet, function (credentials) {
-            fillCredentialsHTML(0, 0, credentials.address, credentials.privateKey);
+            wallet.fillCredentialsHTML(0, 0, credentials.address, credentials.privateKey);
         }, function () {
             DOM.decPriv.wrongNetwork.show();
             DOM.decPriv.pass.addClass('is-invalid');
@@ -1061,7 +1061,7 @@ function Wallet() {
         let perAddress = function (accountIndex, addressIndex) {
 
             bitcoinLoader.asyncCreateCredentials(networkId, accountIndex, addressIndex, password, function (credentials) {
-                fillCredentialsHTML(accountIndex, addressIndex, credentials.address, credentials.privateKey);
+                self.fillCredentialsHTML(accountIndex, addressIndex, credentials.address, credentials.privateKey);
             });
         };
 
@@ -1090,7 +1090,7 @@ function Wallet() {
         });
     }
 
-    const fillCredentialsHTML = (accIndex, addIndex, address, privKey) => {
+    this.fillCredentialsHTML = (accIndex, addIndex, address, privKey) => {
 
         // remove loading spinners
         removeCredentialsLoadingGui(accIndex, addIndex);

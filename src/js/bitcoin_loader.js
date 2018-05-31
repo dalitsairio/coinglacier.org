@@ -1,5 +1,6 @@
 /*
     Adds multi-threading (with web workers) and caching for the bitcoin library
+    and adds possibility to run the unit tests in the Browsers
 
     // Result Caching
     Caching is only done per mnemonic and is resetted
@@ -13,54 +14,58 @@
 const tests = require('../../test/bitcoinTest');
 const bitcoin = require('./bitcoin');
 
-function BitcoinLoader() {
-
-    // //////////////////////////////////////////////////
-    // Constants and Variables
-    // //////////////////////////////////////////////////
+function WorkerPool (){
 
     // set amount of workers to the amount of cpu cores, or to 8 if the former does not work
     const amountOfWorkers = navigator.hardwareConcurrency || 8;
-    const WORK_IN_PROGRESS = 1;
+    const workerState = {
+        available: 0,
+        busy: 1
+    };
 
-    let workerState = {};
-    workerState.available = 0;
-    workerState.busy = 1;
-
-    let cache;
-    let bip38cache; // only used for decryption, encryption is stored in "cache"
-    let mnemonic;
-    let bip32RootKey;
-    let workerpool;
+    let pool;
     let queue;
 
 
-    // //////////////////////////////////////////////////
-    // Workerpool
-    // //////////////////////////////////////////////////
-
-    const initiateWorkerpool = () => {
-        workerpool = [];
+    this.init = () => {
+        pool = [];
         queue = [];
 
         for (let x = 0; x < amountOfWorkers; x++) {
-            workerpool.push({state: workerState.available, worker: createWorker()});
+            pool.push({state: workerState.available, worker: createWorker()});
         }
 
         serveQueue();
     };
+
+    this.interruptWorkers = () => {
+
+        clearQueue();
+
+        for (let index = 0; index < pool.length; index++) {
+            resetWorker(pool[index]);
+        }
+    }
+
+    this.addToQueue = (callData, callback) => {
+        queue.push({callData: callData, callback: callback});
+    }
+
+
+    const getElementFromQueue = () => queue.shift();
+    const clearQueue = () => { queue = []; }
 
     const createWorker = () => {
 
         let workerCode = 'WORKER_CODE_PLACEHOLDER'; // is replaced with actual JS code by gulp task
         let blob = new Blob([workerCode], {type: 'application/javascript'});
 
-        return new Worker(URL.createObjectURL(blob));
+        return new Worker(URL.createObjectURL(blob));;
     }
 
     const getFreeWorkerIndex = () => {
         for (let index = 0; index < amountOfWorkers; index++) {
-            if (workerpool[index].state === workerState.available) {
+            if (pool[index].state === workerState.available) {
                 return index;
             }
         }
@@ -70,7 +75,7 @@ function BitcoinLoader() {
     const serveQueue = () => {
 
         // check every hundred milliseconds for a free worker
-        let checkingInterval = setInterval(function () {
+        setInterval(function () {
 
             // is set to the amount of work to be done, but maximum the amount of workers available
             let workForThisInterval = (queue.length < amountOfWorkers) ? queue.length : amountOfWorkers;
@@ -79,58 +84,60 @@ function BitcoinLoader() {
 
                 let workerIndex = getFreeWorkerIndex();
 
-                if (workerIndex !== false) {
-                    let callback = getElementFromQueue();
-                    callback(getFreeWorkerIndex());
+                // if no more free worker is left, break out of for loop
+                if (workerIndex === false){
+                    break;
                 }
+
+                runWorker(workerIndex, getElementFromQueue());
             }
         }, 100);
     }
 
-    const addToQueue = (callback) => {
-        queue.push(callback);
+    const runWorker = (workerIndex, task) => {
+        pool[workerIndex].worker.onmessage = function (e) {
+            pool[workerIndex].state = workerState.available;
+            task.callback(e.data);
+        };
+
+        pool[workerIndex].state = workerState.busy;
+        pool[workerIndex].worker.postMessage(JSON.stringify(task.callData));
     }
 
-    const getElementFromQueue = () => {
-        return queue.shift();
-    }
+    const resetWorker = (workerObj) => {
+        if (workerObj.state === workerState.busy) {
 
-    const clearQueue = () => {
-        queue = [];
-    }
+            // reset the worker
+            workerObj.worker.terminate();
+            workerObj.worker = createWorker();
 
-    this.interruptWorkers = () => {
-
-        clearQueue();
-
-        for (let index = 0; index < workerpool.length; index++) {
-            if (workerpool[index].state === workerState.busy) {
-
-                // reset the worker
-                workerpool[index].worker.terminate();
-                workerpool[index].worker = createWorker();
-
-                // make worker available to the pool again
-                workerpool[index].state = workerState.available;
-            }
+            // make worker available to the pool again
+            workerObj.state = workerState.available;
         }
     }
+}
 
-    initiateWorkerpool()
+function BitcoinLoader() {
 
+    const WORK_IN_PROGRESS = 1;
 
-    // //////////////////////////////////////////////////
-    // Bitcoin functions
-    // //////////////////////////////////////////////////
+    let cache;
+    let bip38cache; // only used for decryption, encryption is stored in "cache"
+    let mnemonic;
+    let bip32RootKey;
+
+    const workerPool = new WorkerPool();
+    workerPool.init();
+
 
     this.initiateHDWallet = (loadMnemonic, password, useImprovedEntropy, cb) => {
 
         // always reset the cache on new wallets
         cache = [];
 
-        bitcoin.initiateHDWallet(loadMnemonic, password, useImprovedEntropy, function (resultMnemonic, resultBip32RootKey) {
+        bitcoin.initiateHDWallet(loadMnemonic, password, useImprovedEntropy, function (resultMnemonic, resultRootKey) {
             mnemonic = resultMnemonic;
-            bip32RootKey = resultBip32RootKey;
+            bip32RootKey = resultRootKey;
             cb(mnemonic, bip32RootKey);
         });
     }
@@ -144,7 +151,7 @@ function BitcoinLoader() {
         }
 
         index = index || 0;
-        cache[networkID] = cache[networkID] || []; // initialize array if that didn't happen before
+        cache[networkID] = cache[networkID] || []; // initialize cache array if that didn't happen before
 
         if (typeof cache[networkID][index] === 'undefined') {
             cache[networkID][index] = bitcoin.createAccount(bip32RootKey, networkID, index)
@@ -173,111 +180,107 @@ function BitcoinLoader() {
                     if (currentCache !== WORK_IN_PROGRESS) {
                         callback(currentCache);
                     }
-
                     return;
                 }
 
-
-                // calculate the credentials using web workers
+                // calculate address now (asynchronously when doing encryption)
                 cache[networkID][accountIndex].credentials[password][addressIndex] = WORK_IN_PROGRESS;
 
                 let credentials = bitcoin.createCredentials(cache[networkID][accountIndex].external, addressIndex);
 
-                if (!password) {
+                let processResult = (credentials) => {
                     cache[networkID][accountIndex].credentials[password][addressIndex] = credentials;
                     callback(credentials);
-                } else {
-
-                    // asynchronous BIP38 encryption with web workers
-
-                    addToQueue(function (workerID) {
-
-                        workerpool[workerID].state = workerState.busy;
-                        let worker = workerpool[workerID].worker;
-
-                        worker.onmessage = function (e) {
-
-                            cache[networkID][accountIndex].credentials[password][addressIndex] = credentials;
-                            cache[networkID][accountIndex].credentials[password][addressIndex].privateKey = e.data;
-                            workerpool[workerID].state = workerState.available;
-
-                            callback(cache[networkID][accountIndex].credentials[password][addressIndex]);
-                        };
-
-                        worker.postMessage(JSON.stringify({
-                            mode: 'encrypt',
-                            address: credentials.address,
-                            privateKey: credentials.privateKey,
-                            password: password
-                        }));
-                    });
                 }
 
+                if (!password) {
+                    processResult(credentials);
+                } else {
+                    runPrivateKeyEncryption(function (credentialsEncrypted){
+                        processResult(credentialsEncrypted);
+                    }, credentials);
+                }
             }, 0);
         });
 
+    }
+
+    this.interrupt = () => workerPool.interruptWorkers();
+
+    const runPrivateKeyEncryption = (cb, credentials) => {
+
+        // asynchronous BIP38 encryption with web workers
+        let callData = {
+            mode: 'encrypt',
+            address: credentials.address,
+            privateKey: credentials.privateKey,
+            password: password
+        };
+
+        let onResponse = (response) => {
+            credentials.privateKey = response;
+            cb(credentials);
+        }
+
+        workerPool.addToQueue(callData, onResponse);
     }
 
     const runPrivateKeyDecryption = (encryptedPrivKey, password, success, failure) => {
 
         // reset workers if there are still some working
         // (user changed password or encrypted private key, while previous encryption was still ongoing)
-        this.interruptWorkers();
+        workerPool.interruptWorkers();
 
-        addToQueue(function (workerID) {
+        // asynchronous BIP38 decryption with web workers
+        let callData = {
+            mode: 'decrypt',
+            privateKey: encryptedPrivKey,
+            password: password
+        };
 
-            workerpool[workerID].state = workerState.busy;
-            let worker = workerpool[workerID].worker;
+        let onResponse = (response) => {
+            if (response === 'error') {
+                failure();
+            } else {
+                success(JSON.parse(response));
+            }
+        }
 
-            worker.onmessage = function (e) {
-
-                workerpool[workerID].state = workerState.available;
-
-                if (e.data === 'error') {
-                    failure();
-                } else {
-                    success(JSON.parse(e.data));
-                }
-            };
-
-            worker.postMessage(JSON.stringify({
-                mode: 'decrypt',
-                privateKey: encryptedPrivKey,
-                password: password
-            }));
-        });
+        workerPool.addToQueue(callData, onResponse);
     }
 
     this.getCredentialsFromEncryptedPrivKey = (encryptedPrivKey, password, testnet, success, otherNetwork, failure) => {
 
-        bip38cache = cache || [];
+        bip38cache = bip38cache || [];
         bip38cache[encryptedPrivKey] = bip38cache[encryptedPrivKey] || [];
         bip38cache[encryptedPrivKey][password] = bip38cache[encryptedPrivKey][password] || [];
 
         if (bip38cache[encryptedPrivKey][password][testnet]) {
             success(bip38cache[encryptedPrivKey][password][testnet]);
         } else {
-
-            let cb = function (result) {
+            let cb = (result) => {
 
                 let credentials = getCredentialsFromBIP38Result(result, testnet);
 
-                if (credentials) {
-                    success(credentials);
-
-                    // cache the result
-                    bip38cache[encryptedPrivKey][password][testnet] = credentials;
-                } else {
-                    // check whether user is in wrong network mode (mainnet/testnet)
-                    if (getCredentialsFromBIP38Result(result, !testnet)) {
-                        otherNetwork();
-                    } else {
-                        failure();
-                    }
-                }
+                processDecryptionFeedback(credentials, success, otherNetwork, failure);
+                // cache the result
+                bip38cache[encryptedPrivKey][password][testnet] = credentials;
             }
 
             runPrivateKeyDecryption(encryptedPrivKey, password, cb, failure);
+        }
+    }
+
+    const processDecryptionFeedback = (credentials, success, otherNetwork, failure) => {
+        if (credentials) {
+            success(credentials);
+        } else {
+            // check whether user is in wrong network mode (mainnet/testnet)
+            if (getCredentialsFromBIP38Result(result, !testnet)) {
+                otherNetwork();
+            } else {
+                failure();
+            }
         }
     }
 
