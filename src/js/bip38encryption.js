@@ -14,7 +14,6 @@ function decryptPrivKey(privKey_encrypted, password) {
 
     var decryptedKey = bip38.decrypt(privKey_encrypted, password);
 
-
     var result = {
         mainnet: {
             privateKey: wif.encode(0x80, decryptedKey.privateKey, decryptedKey.compressed),
