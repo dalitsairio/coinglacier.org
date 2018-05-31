@@ -7,7 +7,7 @@ const createHash = require('create-hash');
 const bip39_bitSize = 128; // = 12 words  // https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki#generating-the-mnemonic
 const bip39_byteSize = bip39_bitSize / 8;
 
-var moreEntropyGen = new mEntropy.Generator({
+let moreEntropyGen = new mEntropy.Generator({
     'loop_delay':        2, // how many milliseconds to pause between each operation loop. A lower value will generate entropy faster, but will also be harder on the CPU
     'work_min':           1 ,// milliseconds per loop; a higher value blocks the CPU more, so 1 is recommended
     'auto_stop_bits':  8192, // the generator prepares entropy for you before you request it; if it reaches this much unclaimed entropy it will stop working
@@ -46,18 +46,18 @@ async function improveEntropy(amountInBytes){
         moreEntropyGen.generate(amountInBytes * 8, function (vals) {
 
             // stuff entropy into a Uint8Array
-            var valsUint8 = new Uint8Array(vals);
+            let valsUint8 = new Uint8Array(vals);
 
             // get randomBytes (uses crypto.getRandomValues)
-            var randBytes = randomBytes(amountInBytes);
+            let randBytes = randomBytes(amountInBytes);
 
             // merge
-            var mergeArray = new Uint8Array(amountInBytes);
-            for (var i = 0; i < amountInBytes; i++) {
+            let mergeArray = new Uint8Array(amountInBytes);
+            for (let i = 0; i < amountInBytes; i++) {
                 mergeArray[i] = randBytes[i] ^ valsUint8[i];
             }
 
-            var mergedEntropy = Buffer.from(mergeArray);
+            let mergedEntropy = Buffer.from(mergeArray);
 
             resolve(mergedEntropy);
         });
@@ -71,7 +71,7 @@ function initiateHDWallet(loadMnemonic, password, useImprovedEntropy, cb) {
         getEntropy(useImprovedEntropy, function (entropy) {
 
             // create a new mnemonic and return it
-            var mnemonic = bip39.entropyToMnemonic(entropy);
+            let mnemonic = bip39.entropyToMnemonic(entropy);
 
             getRootKeyFromMnemonic(mnemonic, password, cb);
         });
@@ -87,8 +87,8 @@ function initiateHDWallet(loadMnemonic, password, useImprovedEntropy, cb) {
 }
 
 function getRootKeyFromMnemonic(mnemonic, password, cb){
-    var seed = bip39.mnemonicToSeed(mnemonic, password);
-    var bip32RootKey = bitcoinjs.HDNode.fromSeedBuffer(seed);
+    let seed = bip39.mnemonicToSeed(mnemonic, password);
+    let bip32RootKey = bitcoinjs.HDNode.fromSeedBuffer(seed);
 
     cb(mnemonic, bip32RootKey);
 }
@@ -98,14 +98,14 @@ function createAccount(bip32RootKey, networkID, index) {
     index = index || 0;
 
     // check path validity
-    var accountPath = getAccountPath(networkID, index);
-    var pathError = findDerivationPathErrors(accountPath, false, true);
+    let accountPath = getAccountPath(networkID, index);
+    let pathError = findDerivationPathErrors(accountPath, false, true);
     if (pathError) throw 'Derivation Path Error: ' + pathError;
 
-    var account = bip32RootKey.derivePath(accountPath);
+    let account = bip32RootKey.derivePath(accountPath);
     account.keyPair.network = getNetworkByID(networkID);
 
-    var result = {
+    let result = {
         account: account,
         xpub: account.neutered().toBase58(),
         credentials: []
@@ -114,8 +114,8 @@ function createAccount(bip32RootKey, networkID, index) {
     // calculate one level more downwards the tree, so time can be saved when creating multiple addresses later on
     // Masternode / BIP44 | BIP49 | BIP84 / Bitcoin | Testnet / Account / External / First Address
     //                                                                   ^^^^^^^^^
-    var externalPath = '0';
-    var pathError2 = findDerivationPathErrors(externalPath, false, false);
+    let externalPath = '0';
+    let pathError2 = findDerivationPathErrors(externalPath, false, false);
     if (pathError2) throw 'Derivation Path Error: ' + pathError;
     result.external = account.derivePath(externalPath);
 
@@ -140,6 +140,8 @@ function createCredentials(bip44external, addressIndex) {
 
 function getCredentialsFromPrivKey(privateKey, ecPair, network){
 
+    let pubKey, redeemScript, scriptPubKey;
+
     switch (network.id) {
         case bitcoinjs.networks.bitcoin.id:
         case bitcoinjs.networks.testnet.id:
@@ -149,9 +151,9 @@ function getCredentialsFromPrivKey(privateKey, ecPair, network){
         case bitcoinjs.networks.bitcoin.p2wpkhInP2sh.id:
         case bitcoinjs.networks.testnet.p2wpkhInP2sh.id:
 
-            var pubKey = ecPair.getPublicKeyBuffer();
-            var redeemScript = bitcoinjs.script.witnessPubKeyHash.output.encode(bitcoinjs.crypto.hash160(pubKey));
-            var scriptPubKey = bitcoinjs.script.scriptHash.output.encode(bitcoinjs.crypto.hash160(redeemScript));
+            pubKey = ecPair.getPublicKeyBuffer();
+            redeemScript = bitcoinjs.script.witnessPubKeyHash.output.encode(bitcoinjs.crypto.hash160(pubKey));
+            scriptPubKey = bitcoinjs.script.scriptHash.output.encode(bitcoinjs.crypto.hash160(redeemScript));
 
             return {
                 privateKey: privateKey,
@@ -161,8 +163,8 @@ function getCredentialsFromPrivKey(privateKey, ecPair, network){
         case bitcoinjs.networks.bitcoin.p2wpkh.id:
         case bitcoinjs.networks.testnet.p2wpkh.id:
 
-            var pubKey = ecPair.getPublicKeyBuffer();
-            var scriptPubKey = bitcoinjs.script.witnessPubKeyHash.output.encode(bitcoinjs.crypto.hash160(pubKey));
+            pubKey = ecPair.getPublicKeyBuffer();
+            scriptPubKey = bitcoinjs.script.witnessPubKeyHash.output.encode(bitcoinjs.crypto.hash160(pubKey));
 
             return {
                 privateKey: privateKey,
@@ -251,7 +253,7 @@ function getBip44testnetOrMainnet(networkID) {
 function getAccountPath(networkID, accountIndex) {
 
     // https://github.com/satoshilabs/slips/blob/master/slip-0044.md
-    var mainnetORtestnet = getBip44testnetOrMainnet(networkID);
+    let mainnetORtestnet = getBip44testnetOrMainnet(networkID);
 
     // get extended public key of each account
     switch (networkID) {
@@ -294,11 +296,11 @@ function findDerivationPathErrors(path, createXPUB, fromMasternode) {
     // https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki#test-vectors
     // and
     // https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki#extended-keys
-    var maxDepth = 255; // TODO verify this!!
-    var maxIndexValue = Math.pow(2, 31); // TODO verify this!!
+    let maxDepth = 255; // TODO verify this!!
+    let maxIndexValue = Math.pow(2, 31); // TODO verify this!!
 
     // check first character
-    var invalidFirstChar = path[0].replace(/^[0-9m]/, "");
+    let invalidFirstChar = path[0].replace(/^[0-9m]/, "");
     if (invalidFirstChar > 0) {
         return "first charactar must be 'm' or a number, but is " + invalidFirstChar;
     }
@@ -313,17 +315,17 @@ function findDerivationPathErrors(path, createXPUB, fromMasternode) {
         if (path[1] != '/') {
             return "Separator must be '/'";
         }
-        var indexes = path.split('/');
+        let indexes = path.split('/');
         if (indexes.length > maxDepth) {
             return 'Derivation depth is ' + indexes.length + ', must be less than ' + maxDepth;
         }
-        for (var depth = 1; depth < indexes.length; depth++) {
-            var index = indexes[depth];
-            var invalidChars = index.replace(/^[0-9]+'?$/g, "")
+        for (let depth = 1; depth < indexes.length; depth++) {
+            let index = indexes[depth];
+            let invalidChars = index.replace(/^[0-9]+'?$/g, "")
             if (invalidChars.length > 0) {
                 return "Invalid characters " + invalidChars + " found at depth " + depth;
             }
-            var indexValue = parseInt(index.replace("'", ""));
+            let indexValue = parseInt(index.replace("'", ""));
             if (isNaN(depth)) {
                 return "Invalid number at depth " + depth;
             }
@@ -334,7 +336,7 @@ function findDerivationPathErrors(path, createXPUB, fromMasternode) {
     }
 
     // Check no hardened derivation path when using xpub keys
-    var isHardenedPath = path.indexOf("'") > -1;
+    let isHardenedPath = path.indexOf("'") > -1;
     if (isHardenedPath && createXPUB) {
         return "Hardened derivation path is invalid with xpub key";
     }
