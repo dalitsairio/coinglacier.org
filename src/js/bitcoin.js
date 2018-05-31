@@ -67,33 +67,30 @@ async function improveEntropy(amountInBytes){
 
 function initiateHDWallet(loadMnemonic, password, useImprovedEntropy, cb) {
 
-    function afterGettingMnemonic(mnemonic, password) {
-        var seed = bip39.mnemonicToSeed(mnemonic, password);
-        var bip32RootKey = bitcoinjs.HDNode.fromSeedBuffer(seed);
-
-        cb(mnemonic, bip32RootKey);
-    }
-
     if (!loadMnemonic) {
-
         getEntropy(useImprovedEntropy, function (entropy) {
 
             // create a new mnemonic and return it
             var mnemonic = bip39.entropyToMnemonic(entropy);
 
-            afterGettingMnemonic(mnemonic, password);
+            getRootKeyFromMnemonic(mnemonic, password, cb);
         });
-
-
     } else {
         // import a given mnemonic
         if (bip39.validateMnemonic(loadMnemonic)) {
 
-            afterGettingMnemonic(loadMnemonic, password);
+            getRootKeyFromMnemonic(loadMnemonic, password, cb);
         } else {
             throw ('given mnemonic [' + loadMnemonic + '] is not a valid 12 word mnemonic');
         }
     }
+}
+
+function getRootKeyFromMnemonic(mnemonic, password, cb){
+    var seed = bip39.mnemonicToSeed(mnemonic, password);
+    var bip32RootKey = bitcoinjs.HDNode.fromSeedBuffer(seed);
+
+    cb(mnemonic, bip32RootKey);
 }
 
 function createAccount(bip32RootKey, networkID, index) {
@@ -108,11 +105,11 @@ function createAccount(bip32RootKey, networkID, index) {
     var account = bip32RootKey.derivePath(accountPath);
     account.keyPair.network = getNetworkByID(networkID);
 
-    var result = {};
-    result.account = account;
-
-    result.xpub = account.neutered().toBase58();
-    result.credentials = [];
+    var result = {
+        account: account,
+        xpub: account.neutered().toBase58(),
+        credentials: []
+    };
 
     // calculate one level more downwards the tree, so time can be saved when creating multiple addresses later on
     // Masternode / BIP44 | BIP49 | BIP84 / Bitcoin | Testnet / Account / External / First Address
@@ -129,21 +126,19 @@ function createAccount(bip32RootKey, networkID, index) {
 // creates addresses and privKeys on the level of a BIP32 account
 function createCredentials(bip44external, addressIndex) {
 
-    var credentials;
-
     // Masternode / BIP44 | BIP49 | BIP84 / Bitcoin | Testnet / Account / External / First Address
     //                                                                              ^^^^^^^^^^^^^^^
-    var addressPath = addressIndex + '';
-    var pathError = findDerivationPathErrors(addressPath, true, false);
+    let addressPath = addressIndex + '';
+    let pathError = findDerivationPathErrors(addressPath, true, false);
     if (pathError) throw 'Derivation Path Error: ' + pathError;
-    var bip32 = bip44external.derivePath(addressPath);
+    let bip32 = bip44external.derivePath(addressPath);
 
-    var privateKey = bip32.keyPair.toWIF();
+    let privateKey = bip32.keyPair.toWIF();
 
-    return getCredentialsFromPrivKeyByObjects(privateKey, bip32, bip32.keyPair.network);
+    return getCredentialsFromPrivKey(privateKey, bip32, bip32.keyPair.network);
 }
 
-function getCredentialsFromPrivKeyByObjects(privateKey, ecPair, network){
+function getCredentialsFromPrivKey(privateKey, ecPair, network){
 
     switch (network.id) {
         case bitcoinjs.networks.bitcoin.id:
@@ -179,39 +174,19 @@ function getCredentialsFromPrivKeyByObjects(privateKey, ecPair, network){
     }
 }
 
-function getCredentialsFromPrivKey(privateKey, networkId){
-
-    var network = getNetworkByID(networkId);
-    var ecPair = bitcoinjs.ECPair.fromWIF(privateKey, network);
-
-    return getCredentialsFromPrivKeyByObjects(privateKey, ecPair, network);
-}
-
 // todo   this should actually be part of the BIP38 library
 // todo   but testnet/segwit/bech32 support is not implemented yet (May '18)
 // is solely used for BIP38 decryption, to find out what addresstype the encrypted privKey originally was created for.
 // guesses on what address type should be returned
 function getCredentialsFromPrivKeyAndSalt(privateKey, salt, testnet){
 
-    let possibleMainnetNetworks = [
-        bitcoinjs.networks.bitcoin.p2wpkhInP2sh,
-        bitcoinjs.networks.bitcoin.p2wpkh,
-        bitcoinjs.networks.bitcoin,
-    ];
-
-    let possibleTestnetNetworks = [
-        bitcoinjs.networks.testnet.p2wpkhInP2sh,
-        bitcoinjs.networks.testnet.p2wpkh,
-        bitcoinjs.networks.testnet
-    ];
-
-    let possibleNetworks = testnet ? possibleTestnetNetworks : possibleMainnetNetworks;
+    let possibleNetworks = getNetworkArray(testnet);
 
     try {
-        for (let x = 0; x < 3; x++) {
+        for (let x = 0; x < possibleNetworks.length; x++) {
 
             let ecPair = bitcoinjs.ECPair.fromWIF(privateKey, possibleNetworks[x]);
-            let credentials = getCredentialsFromPrivKeyByObjects(privateKey, ecPair, possibleNetworks[x]);
+            let credentials = getCredentialsFromPrivKey(privateKey, ecPair, possibleNetworks[x]);
             let checksum = hash256(credentials.address).slice(0, 4);
 
             let checksumCorrect = Buffer.compare(Buffer.from(salt), Buffer.from(checksum)) === 0;
@@ -223,14 +198,26 @@ function getCredentialsFromPrivKeyAndSalt(privateKey, salt, testnet){
     }catch (e) {
         console.error('Error in BIP38 Password Decryption');
         console.error(e.message);
-        if(testnet) {
-            console.error('Trying to decrypt a testnet key in the mainnet mode?');
-        }else{
-            console.error('Trying to decrypt a mainnet key in the testnet mode?');
-        }
     }
 
     return false;
+}
+
+function getNetworkArray(testnet){
+
+    let mainnetNetworks = [
+        bitcoinjs.networks.bitcoin.p2wpkhInP2sh,
+        bitcoinjs.networks.bitcoin.p2wpkh,
+        bitcoinjs.networks.bitcoin,
+    ];
+
+    let testnetNetworks = [
+        bitcoinjs.networks.testnet.p2wpkhInP2sh,
+        bitcoinjs.networks.testnet.p2wpkh,
+        bitcoinjs.networks.testnet
+    ];
+
+    return testnet ? testnetNetworks : mainnetNetworks;
 }
 
 function getNetworkByID(networkID) {
@@ -359,7 +346,6 @@ module.exports = {
     initiateHDWallet,
     createAccount,
     createCredentials,
-    getCredentialsFromPrivKey,
     getCredentialsFromPrivKeyAndSalt,
     networks: bitcoinjs.networks
 };
