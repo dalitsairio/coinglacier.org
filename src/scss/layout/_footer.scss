@@ -56,6 +56,25 @@ footer{
             margin-top: 1rem;
         }
     }
+
+    #donations-wrapper{
+        float:right;
+        margin: 0.3rem 0 0.2rem 0;
+
+        #donations-title {
+            margin-right: 1rem;
+        }
+    }
+
+    #donations-addresses-wrapper {
+        float:right;
+    }
+}
+
+@media screen and (max-width: $bootstrap-sm) {
+    #donations-title {
+        display: none;
+    }
 }
 
 @media print {

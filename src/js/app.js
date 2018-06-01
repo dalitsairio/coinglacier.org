@@ -154,6 +154,9 @@ DOM.footer.securityChecks.mocha.title = $('footer #mocha-title');
 DOM.footer.securityChecks.mocha.failedDescription = $('footer #mocha-failed-description');
 DOM.footer.securityChecks.mocha.encryptionDialog = $('footer #encryption-tests-dialog');
 DOM.footer.securityChecks.mocha.encTestButton = $('footer #run-enc-tests-button');
+DOM.footer.donations = {};
+DOM.footer.donations.segwit = $('#donation-address-segwit');
+DOM.footer.donations.bech32 = $('#donation-address-bech32');
 
 
 // //////////////////////////////////////////////////
@@ -245,6 +248,7 @@ const pageManagement = new PageManagement();
 const switchNetwork = new SwitchNetwork();
 const options = new Options();
 const wallet = new Wallet();
+const donations = new Donations();
 const bitcoinLoader = new BitcoinLoader();
 
 
@@ -309,6 +313,7 @@ function Init() {
         popovers();
         setDefaults();
         options.addressTypes.initForm();
+        donations.init();
 
         this.accounts();
         this.wallet();
@@ -1095,7 +1100,7 @@ function Wallet() {
         // remove loading spinners
         removeCredentialsLoadingGui(accIndex, addIndex);
 
-        let addressLink = useBitcoinLink ? createBitcoinLink(address, accIndex, addIndex) : false;
+        let addressLink = useBitcoinLink ? setupBitcoinLink(address, accIndex, addIndex) : false;
 
         let addressIdentifier = 'address-' + accIndex + '-' + addIndex;
         let privKeyIdentifier = 'privkey-' + accIndex + '-' + addIndex;
@@ -1112,7 +1117,7 @@ function Wallet() {
             $('#' + id).text(plaintext);
             qrCodeData = plaintext;
         } else {
-            $('#' + id).html(wrapLinkAroundAddress(id, plaintext, link));
+            $('#' + id).html(wrapLinkAroundText(plaintext, link));
             qrCodeData = link;
         }
 
@@ -1123,29 +1128,23 @@ function Wallet() {
         });
     }
 
-    const wrapLinkAroundAddress = (id, plaintext, link) => {
-        let html = '<a href="' + link + '" target="_blank">';
-        html += plaintext;
-        html += '</a>';
-
-        return html;
-    }
-
-    const createBitcoinLink = (address, accIndex, addIndex) => {
+    const setupBitcoinLink = (address, accIndex, addIndex) => {
 
         let label;
 
         switch (currentPage) {
             case pages.paperWallet:
+            case pages.decryptMnemonic:
                 label = 'Paper wallet: Account ' + accIndex + ', Address ' + addIndex;
                 break;
             case pages.singleWallet:
+            case pages.decryptPrivKey:
             default:
                 label = 'Address generated on coinglacier.org';
                 break;
         }
 
-        return bip21.encode(address, {label: label});
+        return createBitcoinLink(address, label);
     }
 
     const removeCredentialsLoadingGui = (accountIndex, addressIndex) => {
@@ -1159,6 +1158,119 @@ function Wallet() {
     }
 }
 
+
+// //////////////////////////////////////////////////
+// Donations
+// //////////////////////////////////////////////////
+
+function Donations() {
+
+    const segwitAddresses = [
+        '3DPSFabdQfUTTQz3aBmcq5ZcxQ7dpXS6Vj',
+        '3JhPVnRgSZB3mHA4SYQT5fRjnb7npTnkfe',
+        '3QFzu1cC8sR6SrBGkavdssX3XZ9r86vQE4',
+        '34UuKWyqPEjpnfhVy3Zrk1t8Dz6imA59SR',
+        '3AV6iytTv7brMQ2r6t4JC1iWYVN9XELgZi',
+        '36JHcPfyhjV7cp2udRDUAEfV9re3MyGSWn',
+        '36aSDRUydVSWgincAwhis9TcbJKMC5i9LT',
+        '3QpszzvnH4HqKvgtjQCD4vKidCbgA8gVGi',
+        '3HXeBvwGytNuiXBnmsdfaTyh5P9RqR8CNK',
+        '368cx33jWrmi4vKeHsFkHbUh8tQBZNZW4d',
+        '3DbP8unTKE7MLDnnkosnnvKCLUsumyqZ7R',
+        '33LZB4qMyDxUetAeTq3xdkVeYv9XELixSp',
+        '3CCuRXbSpC9c9UwZh1ksRcmBigDEmSUfSx',
+        '32Wq18nPpcgKXj875kTUXJDG7gXfB4CHy7',
+        '39KzLeFCEVq24KNFBsg3p85ZXbjV1zAASY',
+        '3JgqS7TVWgfxeGzJtqa5MAdjVKWT9W3wFQ',
+        '3GT1rXmUnRrZahwpDURmB8gnaiKoJLuEKw',
+        '34dT35usTZcf3WwTYNuntyC53PVH9c2q8h',
+        '36SiMcXRxDH2Foi8unmToJLBkzFUAExwNv',
+        '38bUPjMMth3ti5MS8FCmRAyLVGtjGqzeaF',
+        '3G9FtZ7ndDD2gPrXMGAz84dG9aCERy4UsT',
+        '3M3TFZgUxUDpiT8u861ZUe8YvbADootCBF',
+        '3MUWj9JrrSyEWgh14vLFNbFrjou9H9it7B',
+        '34pUQDd9eDnsDRMJuWNhS64mPbn7D5oYXw',
+        '337YiDjgaUAW2BNAboUJUCgeLkRbUL73YU',
+        '37wzbUXYPNGMxHM13EH8DHeAcC97QAGaBK',
+        '34pY2oHEGWyxLqdPwSvSDByPa4NQQ5DJg7',
+        '3FNFzMXpjnjcgf3ebymKDWc8Le1PmeaT4a',
+        '3JpMmYzH4fZieZvQSqxCMVE9KJSaUsK3o6',
+        '3L9uKmjL5RuZJKVUPePGqJRVbJLFskKTif'
+    ];
+
+    const bech32Addresses = [
+        'bc1q5r2nkl767t600jsz79s8xqwcz308f8vrl9nxv0',
+        'bc1q8t33ezncwanux8q3zlq3vhhryw8sz6wzqmmuy6',
+        'bc1qvew6wc8tqtqvutum37tcn8lj2955ct58c5k3zv',
+        'bc1qppry89qrecwysam8q5lt2dr2v8th5e2luxxqew',
+        'bc1qmdluw36v0yc4h6usnpk8kshcdrld6ua58h9mdm',
+        'bc1qthl7zrqsw26dv6yp8pa3du4ypv89xc5r8a6j4g',
+        'bc1qve3g04vuzlhzuf669j49tjf0dkv8w3qlqkagwq',
+        'bc1qj3trvm7pddxaklfvv52y9ka79r8pk9lzuwhpcj',
+        'bc1qzss0j9kek9eykxg0qur3dvuse3qdaapglu5kkl',
+        'bc1qhx9e7l346c7zktgs32t6scdx33r7jjkfu6ta3h',
+        'bc1qkuusckp8pf7mlqrdfxu3zul5zqlqqdsex559u0',
+        'bc1qays4mkrv653l3hg0nydkxz5r2u4jajvuqwmjrq',
+        'bc1qwl9qk37j2cl8cwvvu0ahnm5l3e5rl2rtnm77v5',
+        'bc1qqw0ejdkul49ul6w4hykzfk3dm02v48slpuuzk0',
+        'bc1q3x7qkgw2ewkp3a97gzq8zuc2fdmrhknkylxm8w',
+        'bc1q3qd6j0uc2zrf2vmecg098d3wvz2ekurfupv9eh',
+        'bc1qf8j46trllacmgejryqnldr8974dlh7spt57lr2',
+        'bc1qjcl0w65ngsglcyf5asu8zvwzjt5k5adljqcdg6',
+        'bc1qxnye4vwseuygee683dh5wnjn6l869an98xvshl',
+        'bc1qwml2zj59wg625pnmyq9m8v8hmha5hq99erpt74',
+        'bc1qgrkts732fysxdk3q7dyhdrnehkl5ha8smn93ku',
+        'bc1q49szkqpht2uwt4j0q20l2e67mw3w0dmagm0kjv',
+        'bc1q0nxl395cgeh6kkghaanunfq8kdn8gwjqq8jnet',
+        'bc1q6yg2knfn2lfvacpr8vcwen6w3feffuy48lpx6m',
+        'bc1qpvq2zcry3yks4h66lf69fy7qqees2yd4e579d8',
+        'bc1qa3pcwej3jh76vld4s9cr5hj70j4tjty30gaktc',
+        'bc1qnaw4mtpg9wh7fuy9kmy2xv4e5yap9kpvk3tg4m',
+        'bc1qvhrt2esp7983nafrnpd2pgxewnqxu6tneesaaa',
+        'bc1qynwkl5x95pnu9zmkjpsyjnk4yd7u8jwhkew4ku',
+        'bc1qaf0d8t04qrh4t78ay3aesyet4nsj3fvmtyhky7'
+    ];
+
+    this.init = () => {
+        DOM.footer.donations.segwit.html(this.getLink(MAINNET_SEGWIT));
+        DOM.footer.donations.bech32.html(this.getLink(MAINNET_BECH32));
+    }
+
+    this.getLink = (addressType) => {
+        let label = 'Donation to coinglacier.org';
+        let amount =  0.001;
+        let address = this.getAddress(addressType);
+
+        return wrapLinkAroundText(address, createBitcoinLink(address, label, amount));
+    }
+
+    this.getAddress = (addressType) => {
+
+        let index;
+
+        switch(addressType){
+
+            case MAINNET_SEGWIT:
+                index = getRandPerDay(0, segwitAddresses.length -1);
+                return segwitAddresses[index];
+                break;
+
+            case MAINNET_BECH32:
+                index = getRandPerDay(0, bech32Addresses.length -1);
+                return bech32Addresses[index];
+                break;
+        }
+
+        return false;
+    }
+
+    const getRandPerDay = (from, to) => {
+        let d = new Date();
+        let rand = d.getDate() + d.getDay() + d.getMonth();
+
+        return rand % (to + 1) + from;
+    }
+}
 
 // //////////////////////////////////////////////////
 // Handle GET Parameters
@@ -1223,6 +1335,18 @@ function getURLparameter(name, url) {
     let regex = new RegExp(regexS);
     let results = regex.exec(url);
     return results == null ? null : results[1];
+}
+
+function createBitcoinLink(address, label, amount) {
+    return bip21.encode(address, {label: label, amount: amount});
+}
+
+function wrapLinkAroundText(text, link){
+    let html = '<a href="' + link + '" target="_blank">';
+    html += text;
+    html += '</a>';
+
+    return html;
 }
 
 function print(){

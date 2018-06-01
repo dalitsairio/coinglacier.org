@@ -210,6 +210,22 @@ footer, .testnet footer {
             font-style: italic;
         }
     }
+
+    #donations-wrapper{
+        font-size: 0.8rem;
+        word-break: break-all;
+
+        a:link, a:visited, a:hover, a:active{
+            color: #fff;
+        }
+
+        #donations-title {
+            font-style: italic;
+            color: darken($mainnet-primary-color, 55);
+            text-transform: uppercase;
+            font-size: 1.55rem;
+        }
+    }
 }
 
 .testnet {
@@ -368,6 +384,7 @@ footer, .testnet footer {
         color: #c1dfff;
         font-size: 3rem;
         font-style: italic;
+        margin-top: 3.5rem;
         margin-bottom: 0.25rem;
         text-align: center;
     }
@@ -388,20 +405,20 @@ footer, .testnet footer {
 
         .wallet-account {
             .xpub {
-                font-size: 1.7rem;
+                font-size: 1.5rem;
             }
         }
 
         .credentials {
             .address-wrapper {
                 .address {
-                    font-size: 1.3rem;
+                    font-size: 0.9rem;
                 }
             }
 
             .privkey-wrapper {
                 .privkey {
-                    font-size: 1.3rem;
+                    font-size: 0.8rem;
                 }
             }
         }
