@@ -192,7 +192,7 @@ gulp.task('html', function () {
 gulp.task('watch', function () {
     gulp.watch([
         'src/js/**/*.js',
-        '!src/js/bundle.js',
+        '!src/js/compiled/bundle.js',
         '!src/js/' + concatFile,
         '!src/js/encryptionWorker.js',
         '!src/js/compiled/' + encWorkerBundleFile,
