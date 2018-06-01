@@ -1,4 +1,4 @@
-const bitcoinjs = require('./bitcoinjs-lib_patched').bitcoinjs;
+const bitcoinjs = require('./patchedLibs/bitcoinjs-lib_patched').bitcoinjs;
 const bip39 = require('bip39');
 const mEntropy = require('more-entropy');
 const randomBytes = require('randombytes');

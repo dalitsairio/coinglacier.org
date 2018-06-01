@@ -64,32 +64,32 @@ gulp.task('bundle', function () {
             params: ["window", "document", "$", "undefined"],
             args: ["window", "document", "jQuery"]
         }))
-        .pipe(sourcemaps.write('../maps/'))
-        .pipe(gulp.dest('./src/js'));
+        .pipe(sourcemaps.write('../../maps/'))
+        .pipe(gulp.dest('./src/js/compiled'));
 });
 
 gulp.task('create-bundle',  gulp.series('concat-app-and-loader', 'bundle'));
 
 gulp.task('prepare-worker-code', function () {
-    return gulp.src(['src/js/' + encWorkerBundleFile])
+    return gulp.src(['src/js/compiled/' + encWorkerBundleFile])
         .pipe(replace('\\', '\\\\')) // escape the backslashes (replace \ by \\)
         .pipe(replace('\'', '\\\'')) // escape the quotes (replace ' by \')
         .pipe(replace(/(\r\n\t|\n|\r\t)/gm, '')) // remove new lines
-        .pipe(gulp.dest('./src/js'))
+        .pipe(gulp.dest('./src/js/compiled'))
 });
 
 gulp.task('inject-worker-code', function () {
-    var workerFileContent = fs.readFileSync('src/js/' + encWorkerBundleFile, 'utf8');
+    var workerFileContent = fs.readFileSync('src/js/compiled/' + encWorkerBundleFile, 'utf8');
 
-    return gulp.src(['src/js/bundle.js'])
+    return gulp.src(['src/js/compiled/bundle.js'])
         .pipe(replace('is replaced with actual JS code by gulp task', 'code injected by gulp task'))
         .pipe(replace('WORKER_CODE_PLACEHOLDER', workerFileContent))
-        .pipe(gulp.dest('./src/js'))
+        .pipe(gulp.dest('./src/js/compiled'))
         .pipe(reload({stream: true}))
 });
 
 gulp.task('remove-temporary-files', function () {
-    return gulp.src(['./src/js/' + concatFile, 'src/js/' + encWorkerBundleFile], {read:false})
+    return gulp.src(['./src/js/' + concatFile, 'src/js/compiled/' + encWorkerBundleFile], {read:false})
         .pipe(clean());
 });
 
@@ -113,7 +113,7 @@ gulp.task('create-webworker', function () {
         .pipe(sourcemaps.init({loadMaps: true}))
         .pipe(uglify())
         .pipe(sourcemaps.write( ))
-        .pipe(gulp.dest('./src/js'));
+        .pipe(gulp.dest('./src/js/compiled'));
 });
 
 gulp.task('javascript', gulp.series('create-webworker', 'create-main'));
@@ -195,7 +195,7 @@ gulp.task('watch', function () {
         '!src/js/bundle.js',
         '!src/js/' + concatFile,
         '!src/js/encryptionWorker.js',
-        '!src/js/' + encWorkerBundleFile,
+        '!src/js/compiled/' + encWorkerBundleFile,
         'test/**/*.js'
     ], gulp.parallel('javascript'));
 });

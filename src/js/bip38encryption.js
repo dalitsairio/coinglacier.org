@@ -1,4 +1,4 @@
-var bip38 = require('./bip38_patched');
+var bip38 = require('./patchedLibs/bip38_patched');
 var wif = require('wif');
 
 // privKey must be in WIF format

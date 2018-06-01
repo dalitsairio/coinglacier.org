@@ -2,7 +2,7 @@
 .idea
 node_modules
 temporary
-src/js/bundle.js
+src/js/compiled
 src/js/temporary_concat.js
 src/js/encryptionWorker_bundled.min.js
 src/js/libs
