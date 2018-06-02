@@ -145,10 +145,6 @@ DOM.footer.securityChecks.crypto = $('footer #status-crypto');
 DOM.footer.securityChecks.cryptoSupported= $('footer #crypto-supported');
 DOM.footer.securityChecks.cryptoNotSupported= $('footer #crypto-not-supported');
 DOM.footer.securityChecks.unittests = $('footer #status-unittests');
-DOM.footer.securityChecks.windows = {};
-DOM.footer.securityChecks.windows.online = $('footer #online-check-wrapper');
-DOM.footer.securityChecks.windows.crypto = $('footer #crypto-check-wrapper');
-DOM.footer.securityChecks.windows.mocha = $('footer #mocha-wrapper');
 DOM.footer.securityChecks.mocha = {};
 DOM.footer.securityChecks.mocha.title = $('footer #mocha-title');
 DOM.footer.securityChecks.mocha.failedDescription = $('footer #mocha-failed-description');
@@ -157,6 +153,17 @@ DOM.footer.securityChecks.mocha.encTestButton = $('footer #run-enc-tests-button'
 DOM.footer.donations = {};
 DOM.footer.donations.segwit = $('#donation-address-segwit');
 DOM.footer.donations.bech32 = $('#donation-address-bech32');
+DOM.footer.donations.segwitQrIcon = $('#donations-segwit-qr-icon');
+DOM.footer.donations.bech32QrIcon = $('#donations-bech32-qr-icon');
+DOM.footer.donations.segwitQR = $('#canvas-donations-segwit').get(0);
+DOM.footer.donations.bech32QR = $('#canvas-donations-bech32').get(0);
+
+DOM.footer.windows = {};
+DOM.footer.windows.online = $('footer #online-check-wrapper');
+DOM.footer.windows.crypto = $('footer #crypto-check-wrapper');
+DOM.footer.windows.mocha = $('footer #mocha-wrapper');
+DOM.footer.windows.segwitQR = $('footer #donation-segwit-qr-wrapper');
+DOM.footer.windows.bech32QR = $('footer #donation-bech32-qr-wrapper');
 
 
 // //////////////////////////////////////////////////
@@ -242,7 +249,7 @@ currentPage = pages.singleWallet;
 
 const privkeyDecryption = new PrivkeyDecryption();
 const securityChecks = new SecurityChecks();
-const securityChecksWindows = new SecurityCheckWindows();
+const footerWindows = new FooterWindows();
 const init = new Init();
 const pageManagement = new PageManagement();
 const switchNetwork = new SwitchNetwork();
@@ -295,10 +302,12 @@ DOM.decPriv.checkTestnet.click(privkeyDecryption.checkTestnet);
 DOM.decPriv.checkMainnet.click(privkeyDecryption.checkMainnet);
 
 // Footer
-DOM.footer.securityChecks.online.click(securityChecksWindows.toggleOnline);
-DOM.footer.securityChecks.crypto.click(securityChecksWindows.toggleCrypto);
-DOM.footer.securityChecks.unittests.click(securityChecksWindows.toggleUnitTests);
+DOM.footer.securityChecks.online.click(footerWindows.toggleOnline);
+DOM.footer.securityChecks.crypto.click(footerWindows.toggleCrypto);
+DOM.footer.securityChecks.unittests.click(footerWindows.toggleUnitTests);
 DOM.footer.securityChecks.mocha.encTestButton.click(securityChecks.reloadAndRunAllTests);
+DOM.footer.donations.segwitQrIcon.click(footerWindows.toggleSegwitQr);
+DOM.footer.donations.bech32QrIcon.click(footerWindows.toggleBech32Qr);
 
 // //////////////////////////////////////////////////
 // Page Loading
@@ -866,21 +875,26 @@ function SecurityChecks() {
     }
 }
 
-function SecurityCheckWindows() {
+function FooterWindows() {
 
-    const ONLINE = {id: 0, window: DOM.footer.securityChecks.windows.online};
-    const CRYPTO = {id: 1, window: DOM.footer.securityChecks.windows.crypto};
-    const UNITTESTS = {id: 2, window: DOM.footer.securityChecks.windows.mocha};
+    const ONLINE = {id: 0, window: DOM.footer.windows.online};
+    const CRYPTO = {id: 1, window: DOM.footer.windows.crypto};
+    const UNITTESTS = {id: 2, window: DOM.footer.windows.mocha};
+    const SEGWIT_QR = {id: 3, window: DOM.footer.windows.segwitQR};
+    const BECH32_QR = {id: 4, window: DOM.footer.windows.bech32QR};
 
     let shownWindow = null;
 
     this.toggleOnline = () => toggleWindow(ONLINE);
     this.toggleCrypto = () => toggleWindow(CRYPTO);
     this.toggleUnitTests = () => toggleWindow(UNITTESTS);
+    this.toggleSegwitQr = () => toggleWindow(SEGWIT_QR);
+    this.toggleBech32Qr = () => toggleWindow(BECH32_QR);
 
     const hideAllWindows = function () {
-        for(let window in DOM.footer.securityChecks.windows){
-            DOM.footer.securityChecks.windows[window].hide();
+
+        for(let window in DOM.footer.windows){
+            DOM.footer.windows[window].hide();
         }
     };
 
@@ -1232,16 +1246,37 @@ function Donations() {
     ];
 
     this.init = () => {
-        DOM.footer.donations.segwit.html(this.getLink(MAINNET_SEGWIT));
-        DOM.footer.donations.bech32.html(this.getLink(MAINNET_BECH32));
+        initAddress(MAINNET_SEGWIT, DOM.footer.donations.segwit, DOM.footer.donations.segwitQR);
+        initAddress(MAINNET_BECH32, DOM.footer.donations.bech32, DOM.footer.donations.bech32QR);
     }
 
-    this.getLink = (addressType) => {
+    const initAddress = (addressType, linkDOM, qrDOM) => {
+
+        let link = getLink(addressType);
+        let htmlLink = getHtmlLink(addressType);
+
+        linkDOM.html(htmlLink);
+
+        QRCode.toCanvas(qrDOM, link, function (error) {
+            if (error) {
+                console.error(error);
+            }
+        });
+    }
+
+    const getLink = (addressType) => {
         let label = 'Donation to coinglacier.org';
         let amount =  0.001;
         let address = this.getAddress(addressType);
 
-        return wrapLinkAroundText(address, createBitcoinLink(address, label, amount));
+        return createBitcoinLink(address, label, amount);
+    }
+
+    const getHtmlLink = (addressType) => {
+        let address = this.getAddress(addressType);
+        let link = getLink(addressType);
+
+        return wrapLinkAroundText(address, link);
     }
 
     this.getAddress = (addressType) => {
