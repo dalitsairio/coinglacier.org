@@ -68,12 +68,14 @@ footer{
         }
     }
 
-    #donations-wrapper{
+    #donations-wrapper {
         float:right;
         margin: 0.3rem 0 0.2rem 0;
 
         #donations-title {
-            margin-right: 0.5rem;
+            float: left;
+            margin-right: 1rem;
+            margin-top: 0.25rem;
         }
     }
 
@@ -93,7 +95,7 @@ footer{
 
         no-repeat left center;
 
-        margin-left: 0.5rem;
+        margin-left: 0.5rem;    
         padding: 5px 5px 5px 20px;
     }
 }

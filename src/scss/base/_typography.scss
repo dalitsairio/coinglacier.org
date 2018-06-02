@@ -220,10 +220,9 @@ footer, .testnet footer {
         }
 
         #donations-title {
+            color: lighten($mainnet-primary-color, 10);
+            font-size: 1.1rem;
             font-style: italic;
-            color: darken($mainnet-primary-color, 55);
-            text-transform: uppercase;
-            font-size: 1.55rem;
         }
     }
 }
@@ -290,6 +289,12 @@ footer, .testnet footer {
 
             &.failed {
                 color: #800000;
+            }
+        }
+
+        #donations-wrapper {
+            #donations-title {
+                color: lighten($testnet-primary-color, 10);
             }
         }
     }
