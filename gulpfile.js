@@ -32,6 +32,8 @@ const concatFile = 'temporary_concat.js';
 const encWorkerBundleFile = 'encryptionWorker_bundled.min.js';
 const hashsumFilename = 'mainFileSha256';
 const packageFile = 'package.json';
+const readmeFile = 'README.md';
+const changelogFile = 'CHANGELOG.md';
 
 // //////////////////////////////////////////////////
 // JavaScript Task
@@ -45,7 +47,7 @@ gulp.task('concat-app-and-loader', function () {
 });
 
 gulp.task('bundle', function () {
-    var b = browserify({
+    let b = browserify({
         entries: ['./src/js/' + concatFile],
         debug: true,
         standalone: 'bundle'
@@ -79,7 +81,7 @@ gulp.task('prepare-worker-code', function () {
 });
 
 gulp.task('inject-worker-code', function () {
-    var workerFileContent = fs.readFileSync('src/js/compiled/' + encWorkerBundleFile, 'utf8');
+    let workerFileContent = fs.readFileSync('src/js/compiled/' + encWorkerBundleFile, 'utf8');
 
     return gulp.src(['src/js/compiled/bundle.js'])
         .pipe(replace('is replaced with actual JS code by gulp task', 'code injected by gulp task'))
@@ -102,7 +104,7 @@ gulp.task('create-main', gulp.series('create-bundle', 'prepare-worker-code', 'in
 
 gulp.task('create-webworker', function () {
 
-    var b = browserify({
+    let b = browserify({
         entries: ['./src/js/encryptionWorker.js']
     });
 
@@ -240,7 +242,7 @@ gulp.task('default', gulp.parallel('page-setup', 'tests'));
 // Build Task
 // //////////////////////////////////////////////////
 
-var semverType = 'patch';
+let semverType = 'patch';
 
 gulp.task('build:remove-old-mainFile', function () {
     return gulp.src('./' + domain + '_*.html*', {read:false})
@@ -271,14 +273,10 @@ gulp.task('build:create-checksum-file', function () {
 
 });
 
-gulp.task('build:rename-main-file', function () {
-
-    // read hashsum into variable
-    var sha256 = JSON.parse(fs.readFileSync('./' + temporaryFolder + '/' + hashsumFilename)).sha256;
-
+gulp.task('build:update-package-json', function () {
     // write hash to package.json
-    var packageJson = JSON.parse(fs.readFileSync('./' + packageFile));
-    packageJson.sha256sum = sha256;
+    let packageJson = JSON.parse(fs.readFileSync('./' + packageFile));
+    packageJson.sha256sum = getSha256sum();
 
     fs.writeFile('./' + packageFile, JSON.stringify(packageJson, null, 2), function(err) {
         if(err) {
@@ -289,15 +287,61 @@ gulp.task('build:rename-main-file', function () {
         }
     });
 
-    // get Version
-    var version = packageJson.version;
+    return gulp.src('./' + packageFile); // need to return a gulp stream to  finish the task
+});
+
+gulp.task('build:rename-main-file', function () {
+
+    let fileName = getMainFileName();
 
     // rename the main file and put the version and the files hashsum into its name
     return gulp.src(temporaryFolder + '/' + mainFile)
-        .pipe(rename(domain + '_v' + version + '_' + 'SHA256-' + sha256 + '.html'))
+        .pipe(rename(fileName))
         .pipe(gulp.dest('./'));
 
 });
+
+gulp.task('build:replace-filenames-in-readme', function () {
+
+    let fileName = getMainFileName();
+
+    return gulp.src('./' + readmeFile)
+        .pipe(replace(/coinglacier.org_v.*?.html/g, fileName))
+        .pipe(gulp.dest('./'))
+});
+
+//todo
+gulp.task('build:update-changelog', function () {
+
+    let currentFile = fs.readFileSync('./' + changelogFile);
+    let d = new Date();
+    let date = [
+        d.getFullYear(),
+        makeNumberDoubleDigit(d.getMonth() + 1),
+        makeNumberDoubleDigit(d.getDate())
+    ];
+
+    let newEntry = '# ' + getVersion() +
+        '\n-------------------------------------' +
+        '\ndate: ' + date.join('-') +
+        '\nSHA256 checksum: ' + getSha256sum() +
+        '\n* ADD' +
+        '\n* CHANGES' +
+        '\n* HERE' +
+        '\n\n';
+
+    fs.writeFile('./' + changelogFile, newEntry + currentFile, function(err) {
+        if(err) {
+            console.log(err);
+        }
+        else {
+            console.log('JSON saved to ' + packageFile);
+        }
+    });
+
+    return gulp.src('./' + changelogFile); // need to return a gulp stream to  finish the task
+});
+
 
 gulp.task('build:remove-temp-folder', function () {
 
@@ -310,7 +354,7 @@ gulp.task('build', gulp.series(
 
     // go through the unit tests
     // build will fail, if any unit test fails
-    'tests',
+    // 'tests',
     // remove the old build [eg mainFile], as a new on will be created
     'build:remove-old-mainFile',
     // create new version in package.json
@@ -319,8 +363,14 @@ gulp.task('build', gulp.series(
     'build:bundle-html',
     // create a SHA256 checksum for the resulting HTML file
     'build:create-checksum-file',
+    // update sha256sum in package.json
+    'build:update-package-json',
     // inlude the version and sha256 hash in the filename of the main file
     'build:rename-main-file',
+    // Add new version number, hash and date to the change log
+    'build:update-changelog',
+    // rewrite all the filenames containing the sha256 hash in README.md
+    'build:replace-filenames-in-readme',
     // remove the temp folder which was used for the build
     'build:remove-temp-folder'
 ));
@@ -338,3 +388,24 @@ gulp.task('dummy-major', function () {
 });
 
 gulp.task('build-major', gulp.series('dummy-major', 'build'));
+
+
+function getMainFileName(){
+    return domain + '_v' + getVersion() + '_' + 'SHA256-' + getSha256sum() + '.html';
+}
+
+function getSha256sum(){
+    return JSON.parse(fs.readFileSync('./' + temporaryFolder + '/' + hashsumFilename)).sha256;
+}
+
+function getVersion(){
+    return JSON.parse(fs.readFileSync('./' + packageFile)).version;
+}
+
+function makeNumberDoubleDigit(number){
+    if(number < 10){
+        return '0' + number;
+    }else{
+        return number;
+    }
+}
