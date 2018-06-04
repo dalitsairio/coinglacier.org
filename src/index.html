@@ -1314,6 +1314,41 @@ Git Repo: https://github.com/dalitsairio/coinglacier.org.git
             <div style="clear: both;"></div>
         </div>
 
+        <!-- Mnemonic key decryption page-->
+        <div class="page-element decrypt-mnemonic">
+            <div id="mnemonic-dec-params">
+                <form class="needs-validation">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="spacer">
+                                <h6>Encrypted Mnemonic</h6>
+                                <input id="mnemonic-dec-mnemonic" class="form-control" type="text" placeholder="Enter encrypted Mnemonic">
+                                <div class="invalid-tooltip">
+                                    Invalid Mnemonic!
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="spacer">
+                                <h6>Password</h6>
+                                <div id="mnemonic-decryption-pw-group" class="form-inline password-box">
+                                    <div class="input-group">
+                                        <div class="input-group-append">
+                                            <span id="mnemonic-dec-hidePass" class="hide-pass input-group-text text-center">Hide</span>
+                                        </div>
+                                        <input id="mnemonic-dec-password" data-toggle="Not Encrypted" class="form-control form-control-sm" type="text" placeholder="Enter Password">
+                                        <div class="invalid-tooltip">
+                                            Please enter the correct password!
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
         <!-- Private key decryption page-->
         <div class="page-element decrypt-privkey">
             <div id="privkey-dec-params">

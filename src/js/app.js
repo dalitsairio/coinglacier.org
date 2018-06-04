@@ -22,6 +22,9 @@ const TESTNET_NONSEGWIT = 10;
 const TESTNET_SEGWIT = 11;
 const TESTNET_BECH32 = 12;
 
+const CSS_CLASS_VALID = 'is-valid';
+const CSS_CLASS_INVALID = 'is-invalid';
+
 // GET parameters
 let GET = {};
 // GET pages
@@ -117,6 +120,12 @@ DOM.popovers.encryption = $('#password-input-group');
 DOM.popovers.numberAddresses = $('#address-numbering-label');
 DOM.popovers.qrcodeLinks = $('#qrcode-links-label');
 
+// Decrypt mnemonic page
+DOM.decMnemonic = {};
+DOM.decMnemonic.mnemonic = $('#mnemonic-dec-mnemonic');
+DOM.decMnemonic.pass = $('#mnemonic-dec-password');
+DOM.decMnemonic.hidePass = $('#mnemonic-dec-hidePass');
+
 // Decrypt private key page
 DOM.decPriv = {};
 DOM.decPriv.privKey = $('#privkey-dec-key');
@@ -177,7 +186,7 @@ pages.singleWallet.parentMenuEntryDOM = false;
 pages.singleWallet.menuEntryDOM = DOM.menuEntry.singleWallet;
 pages.singleWallet.getParam = GET.pages.singleWallet;
 // set default values
-pages.singleWallet.showWalletOnStartup = true;
+pages.singleWallet.showWallet = true;
 pages.singleWallet.addressesPerAccount = 1;
 pages.singleWallet.allowAccounts = false;
 pages.singleWallet.showXPUB = false;
@@ -192,7 +201,7 @@ pages.paperWallet.parentMenuEntryDOM = false;
 pages.paperWallet.menuEntryDOM = DOM.menuEntry.paperWallet;
 pages.paperWallet.getParam = GET.pages.paperWallet;
 // set default values
-pages.paperWallet.showWalletOnStartup = true;
+pages.paperWallet.showWallet = true;
 pages.paperWallet.addressesPerAccount = 3;
 pages.paperWallet.allowAccounts = true;
 pages.paperWallet.showXPUB = false;
@@ -207,7 +216,7 @@ pages.decryptMnemonic.parentMenuEntryDOM = DOM.menuEntry.decrypt;
 pages.decryptMnemonic.menuEntryDOM = DOM.menuEntry.decryptMnemonic;
 pages.decryptMnemonic.getParam = GET.pages.decryptMnemonic;
 // set default values
-pages.decryptMnemonic.showWalletOnStartup = false;
+pages.decryptMnemonic.showWallet = false;
 pages.decryptMnemonic.addressesPerAccount = 3;
 pages.decryptMnemonic.allowAccounts = true;
 pages.decryptMnemonic.showXPUB = false;
@@ -222,7 +231,7 @@ pages.decryptPrivKey.parentMenuEntryDOM = DOM.menuEntry.decrypt;
 pages.decryptPrivKey.menuEntryDOM = DOM.menuEntry.decryptPrivKey;
 pages.decryptPrivKey.getParam = GET.pages.decryptPrivKey;
 // set default values
-pages.decryptPrivKey.showWalletOnStartup = false;
+pages.decryptPrivKey.showWallet = false;
 pages.decryptPrivKey.addressesPerAccount = 1;
 pages.decryptPrivKey.allowAccounts = false;
 pages.decryptPrivKey.showXPUB = false;
@@ -247,6 +256,7 @@ currentPage = pages.singleWallet;
 // Global Objects
 // //////////////////////////////////////////////////
 
+const mnemonicDecryption = new MnemonicDecryption();
 const privkeyDecryption = new PrivkeyDecryption();
 const securityChecks = new SecurityChecks();
 const footerWindows = new FooterWindows();
@@ -256,6 +266,7 @@ const switchNetwork = new SwitchNetwork();
 const options = new Options();
 const wallet = new Wallet();
 const donations = new Donations();
+const formCheck = new FormCheck();
 const bitcoinLoader = new BitcoinLoader();
 
 
@@ -294,6 +305,11 @@ DOM.actions.newAddress.click(init.wallet);
 DOM.actions.newMnemonic.click(init.wallet);
 DOM.actions.print.click(print);
 
+// Decrypt mnemonic page
+DOM.decMnemonic.mnemonic.change(mnemonicDecryption.mnemonicChanged);
+DOM.decMnemonic.pass.change(mnemonicDecryption.passwordChanged);
+DOM.decMnemonic.hidePass.click(mnemonicDecryption.togglePwVisibility);
+
 // Decrypt private key page
 DOM.decPriv.privKey.change(privkeyDecryption.encrypedPrivkeyChanged);
 DOM.decPriv.pass.change(privkeyDecryption.passwordChanged);
@@ -308,6 +324,7 @@ DOM.footer.securityChecks.unittests.click(footerWindows.toggleUnitTests);
 DOM.footer.securityChecks.mocha.encTestButton.click(securityChecks.reloadAndRunAllTests);
 DOM.footer.donations.segwitQrIcon.click(footerWindows.toggleSegwitQr);
 DOM.footer.donations.bech32QrIcon.click(footerWindows.toggleBech32Qr);
+
 
 // //////////////////////////////////////////////////
 // Page Loading
@@ -338,7 +355,7 @@ function Init() {
             bitcoinLoader.interrupt();
         }
 
-        wallet.init();
+        wallet.init(false);
     }
 
     this.mainnet = () => {
@@ -434,6 +451,7 @@ function Init() {
     }
 }
 
+
 // //////////////////////////////////////////////////
 // Page Management
 // //////////////////////////////////////////////////
@@ -454,6 +472,7 @@ function PageManagement() {
 
     this.changePage = (newPage) => {
         bitcoinLoader.interrupt();
+        mnemonicDecryption.resetPage();
         privkeyDecryption.resetPage();
         this.initPage(newPage);
         wallet.load();
@@ -586,7 +605,7 @@ function Options() {
     this.toggleQRcodeLink = () => {
         useBitcoinLink = DOM.options.qrcodeLink.prop('checked');
         if (currentPage === pages.decryptPrivKey) {
-            initPasswordDecryption();
+            privkeyDecryption.initDecryption();
         } else {
             wallet.load();
         }
@@ -703,49 +722,86 @@ function togglePasswordVisibility(domTextfield, domButton) {
 };
 
 // //////////////////////////////////////////////////
+// Mnemonic Decryption
+// //////////////////////////////////////////////////
+
+function MnemonicDecryption() {
+
+    this.mnemonicChanged = () => {
+        formCheck.validateInput(verifyMnemonic(), DOM.decMnemonic.mnemonic);
+        initDecryption();
+    }
+
+    this.passwordChanged = () => {      
+        formCheck.validateInput(verifyPassword(), DOM.decMnemonic.pass);
+        initDecryption();
+    }
+
+    this.resetPage = (leaveMnemonic) => {
+        DOM.decMnemonic.pass.val('');
+        formCheck.removeValidityClasses(DOM.decMnemonic.pass);
+        pages.decryptMnemonic.showWallet = false;
+
+        if (!leaveMnemonic) {
+            DOM.decMnemonic.mnemonic.val('');
+            formCheck.removeValidityClasses(DOM.decMnemonic.mnemonic);
+        }
+    }
+
+    this.togglePwVisibility = () => togglePasswordVisibility(DOM.decMnemonic.pass, DOM.decMnemonic.hidePass);
+
+    const verifyMnemonic = () => bitcoin.validateMnemonic(DOM.decMnemonic.mnemonic.val());
+    const verifyPassword = () => DOM.decMnemonic.pass.val() !== '';
+
+    const initDecryption = () => {
+        
+        if (checkInputsFulfilled()) {
+            let encryptedMnemonic = DOM.decMnemonic.mnemonic.val();
+            wallet.init(encryptedMnemonic);
+            $('.wallet-account').show();
+        }
+    }
+
+    const checkInputsFulfilled = () => {
+        if (verifyMnemonic() && verifyPassword()) {
+            pages.decryptMnemonic.showWallet = true;
+        } else {
+            pages.decryptMnemonic.showWallet = false;
+            $('.wallet-account').hide();
+        }
+
+        return pages.decryptMnemonic.showWallet;
+    }
+}
+
+// //////////////////////////////////////////////////
 // BIP38 Private Key Decryption
 // //////////////////////////////////////////////////
 
 function PrivkeyDecryption() {
 
-    let password;
-
     this.encrypedPrivkeyChanged = () => {
-        resetPrivKeyValidityClasses();
-        let encryptedPrivKey = DOM.decPriv.privKey.val();
-
-        if (bip38.verify(encryptedPrivKey)) {
-            DOM.decPriv.privKey.addClass('is-valid');
-
-            initDecryption();
-        } else {
-            DOM.decPriv.privKey.addClass('is-invalid');
-            $('.wallet-account').hide();
-        }
+        formCheck.validateInput(verifyPrivKey(), DOM.decPriv.privKey);
+        // When privKey changes, password could theoretically be correct now, even if it was wrong before.
+        // Hence, the password validation needs to be resetted for the next decryption.
+        formCheck.removeValidityClasses(DOM.decPriv.pass);
+        this.initDecryption();
     }
 
     this.passwordChanged = () => {
-        resetPasswordValidityClasses();
-        password = DOM.decPriv.pass.val();
-
-        if (password == '') {
-            DOM.decPriv.pass.addClass('is-invalid');
-            $('.wallet-account').hide();
-        } else {
-            DOM.decPriv.pass.addClass('is-valid');
-            initDecryption();
-        }
+        formCheck.validateInput(verifyPassword(), DOM.decPriv.pass);
+        this.initDecryption();
     }
 
     this.resetPage = (leavePrivKey) => {
         DOM.decPriv.pass.val('');
         DOM.decPriv.wrongNetwork.hide();
-        resetPasswordValidityClasses();
-        password = '';
+        formCheck.removeValidityClasses(DOM.decPriv.pass);
+        pages.decryptPrivKey.showWallet = false;
 
         if (!leavePrivKey) {
             DOM.decPriv.privKey.val('');
-            resetPrivKeyValidityClasses();
+            formCheck.removeValidityClasses(DOM.decPriv.privKey);
         }
     }
 
@@ -753,49 +809,53 @@ function PrivkeyDecryption() {
     this.checkMainnet = () => checkOtherNetwork(init.mainnet);
     this.checkTestnet = () => checkOtherNetwork(init.testnet);
 
+    this.initDecryption = () => {
+        if (checkInputsFulfilled()) {
+            let encryptedPrivKey = DOM.decPriv.privKey.val();
+            let password = DOM.decPriv.pass.val();
 
-    const initDecryption = () => {
-        let encryptedPrivKey = DOM.decPriv.privKey.val();
-
-        if (bip38.verify(encryptedPrivKey) && password !== '') {
             DOM.decPriv.wrongNetwork.hide();
             wallet.createHTML();
             $('.wallet-account').show();
-            decryptPrivKey(encryptedPrivKey);
+            decryptPrivKey(encryptedPrivKey, password);
         }
     }
 
-    const decryptPrivKey = (encryptedPrivKey) => {
+    const verifyPrivKey = () => bip38.verify(DOM.decPriv.privKey.val());
+    const verifyPassword = () => DOM.decPriv.pass.val() !== '';
+
+    const decryptPrivKey = (encryptedPrivKey, password) => {
 
         let isTestnet = networkId >= 10;
-
+        
         bitcoinLoader.getCredentialsFromEncryptedPrivKey(encryptedPrivKey, password, isTestnet, function (credentials) {
             wallet.fillCredentialsHTML(0, 0, credentials.address, credentials.privateKey);
         }, function () {
             DOM.decPriv.wrongNetwork.show();
-            DOM.decPriv.pass.addClass('is-invalid');
+            DOM.decPriv.pass.addClass(CSS_CLASS_INVALID);
             $('.wallet-account').hide();
         }, function () {
-            DOM.decPriv.pass.addClass('is-invalid');
+            DOM.decPriv.pass.addClass(CSS_CLASS_INVALID);
             $('.wallet-account').hide();
         });
     }
 
-    const resetPrivKeyValidityClasses = () => {
-        DOM.decPriv.privKey.removeClass('is-valid');
-        DOM.decPriv.privKey.removeClass('is-invalid');
-    }
-
-    const resetPasswordValidityClasses = () => {
-        DOM.decPriv.pass.removeClass('is-valid');
-        DOM.decPriv.pass.removeClass('is-invalid');
-    }
-
     const checkOtherNetwork = (initNetwork) => {
-        let pass = DOM.decPriv.pass.val();
-        initNetwork();
-        DOM.decPriv.pass.val(pass);
+        let password = DOM.decPriv.pass.val();
+
+        initNetwork(); // resets the password field
+        DOM.decPriv.pass.val(password);
         this.passwordChanged();
+    }
+
+    const checkInputsFulfilled = () => {
+        if (verifyPrivKey() && verifyPassword()) {
+            pages.decryptPrivKey.showWallet = true;
+        } else {
+            pages.decryptPrivKey.showWallet = false;
+            $('.wallet-account').hide();
+        }
+        return pages.decryptPrivKey.showWallet;
     }
 }
 
@@ -919,12 +979,12 @@ function Wallet() {
 
     let self = this;
 
-    this.init = () => {
-        bitcoinLoader.initiateHDWallet(false, password, useImprovedEntropy, function (result) {
+    this.init = (mnemonic) => {
+        bitcoinLoader.initiateHDWallet(mnemonic, password, useImprovedEntropy, function (result) {
             DOM.pageLoader.hide();
             DOM.root.show();
 
-            self.load();
+            self.load(mnemonic);
         });
     }
 
@@ -938,9 +998,9 @@ function Wallet() {
 
         showDOMif(currentPage.allowAccounts && options.showXPUB, $('div.xpub-wrapper'));
         showDOMif(accounts.length > 1, $('.account-title'));
-        showDOMif(currentPage.showWalletOnStartup, $('.wallet-account'));
+        showDOMif(currentPage.showWallet, $('.wallet-account'));
 
-        if (currentPage.showWalletOnStartup) {
+        if (currentPage.showWallet) {
             fillWalletHTML();
         }
     }
@@ -962,6 +1022,7 @@ function Wallet() {
         }
 
         privkeyDecryption.resetPage(true);
+        mnemonicDecryption.resetPage(true);
     }
 
     this.recalculate = () => {
@@ -1306,6 +1367,34 @@ function Donations() {
         return rand % (to + 1) + from;
     }
 }
+
+
+// //////////////////////////////////////////////////
+// Handle UI feedback for forms
+// //////////////////////////////////////////////////
+
+function FormCheck() {
+
+    this.setValidityClass = (condition, domElement) => {
+        if (condition) {
+            domElement.addClass(CSS_CLASS_VALID);
+        } else {
+            domElement.addClass(CSS_CLASS_INVALID);
+        }
+    }
+
+    this.removeValidityClasses = (domElement) => {
+        domElement.removeClass(CSS_CLASS_VALID);
+        domElement.removeClass(CSS_CLASS_INVALID);
+    }
+
+    this.validateInput = (condition, domElement) => {
+        this.removeValidityClasses(domElement);       
+        this.setValidityClass(condition, domElement);
+    }
+
+}
+
 
 // //////////////////////////////////////////////////
 // Handle GET Parameters

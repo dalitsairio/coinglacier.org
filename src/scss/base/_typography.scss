@@ -157,7 +157,12 @@ h2 {
     }
 }
 
-input#privkey-dec-key{
+#privkey-dec-key {
+    font-size: 0.8rem;
+    font-family: monospace;
+}
+
+#mnemonic-dec-mnemonic {
     font-size: 0.8rem;
     font-family: monospace;
 }

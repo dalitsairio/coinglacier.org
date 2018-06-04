@@ -349,5 +349,6 @@ module.exports = {
     createAccount,
     createCredentials,
     getCredentialsFromPrivKeyAndSalt,
+    validateMnemonic: bip39.validateMnemonic,
     networks: bitcoinjs.networks
 };
