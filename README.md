@@ -23,14 +23,14 @@ Please send DONATIONS for this project to one of the following Bitcoin Addresses
 ## End Users
 
 *Only use this application on a secure computer that has not been compromised.*<br />
-Consider creating a bootable USB stick with a clean Linux distribution installed on it
+Consider creating a bootable USB flash drive with a clean Linux distribution installed on it
 and use this system to run the application.<br />
 
 ### Installing the source code
 The entire coinglacier.org application is packed into one single HTML file. There are various ways to download this file.<br />
 You may download the [zip file](https://github.com/dalitsairio/coinglacier.org/archive/master.zip) from Github
 or visit [coinglacier.org](https://coinglacier.org) and save the file hitting CTRL + S .<br />
-**HOWEVER,** for optimal safety you should follow the recommended installation method stated below, 
+**However,** for optimal safety you should follow the recommended installation method stated below, 
 in order to prevent you from being a victim of attackers that try to tamper with the coinglacier.org files.
 
 ### Recommended installation method (+ authenticity check)
@@ -71,7 +71,7 @@ To create safe wallets, print your created wallets but DO NOT store any file any
 This is also true for any other device your machine might be connected to.<br />
 After having installed coinglacier.org on your machine, disconnect your machine from the internet for using the application
 and consider never ever connecting the machine again to the internet. Consider reinstalling the OS of your machine respectively
-reformatting your USB Stick if you were using a bootable live system.
+reformatting your USB flash drive if you were using a bootable live system.
 We recommend encrypting wallets with a password, however you must never lose your password
 since if you lose it you will not be able to access your funds anymore and nobody will be able to help you.
 Consider using a password manager for this purpose.
@@ -94,7 +94,7 @@ You cand find this functionality in the coinglacier.org application.
 
 Install git, NodeJS and NPM
 ```sh
-apt install git nodejs-legacy npm
+apt install git nodejs npm
 ```
 
 Install Gulp 4 globally
