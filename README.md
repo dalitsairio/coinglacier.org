@@ -66,7 +66,7 @@ You can now disconnect your machine from the internet and use the application of
 ### Using the coinglacier.org application
 After having installed coinglacier.org on a trustworthy machine, disconnect your machine from the internet.
 Open coinglacier.org_v0.0.1_SHA256-b4c1f6db3c3a70beff0db88b65bc8595bd2373f787a4def1743c1fa0084bd691.html in the incognito mode of your trustworthy browser.<br />
-To create safe wallets, print your created wallets but *do not* store any file anywhere digitally. The idea is that your confidential information is *only* stored offline, not digitally, for example on paper.<br />
+To create safe wallets, print your created wallets but *do not* store any file anywhere digitally. The idea is that your confidential data is *only* stored offline, not digitally, for example on paper.<br />
 If you print the keys, make sure the printer you are using does not store any data you send to it or transmit it to any other device/service.
 This also applies to any other device your machine may be connected to.<br />
 
@@ -181,7 +181,7 @@ Each commit message should begin with one of the following tags:
    [BIP21]: <https://github.com/bitcoin/bips/blob/master/bip-0021.mediawiki>
 
 
-# Notice of Copyrights and Licenses:
+# Notice of Copyrights and Licenses
 The coinglacier.org project, software and embedded resources are
 copyright coinglacier.org.
 
