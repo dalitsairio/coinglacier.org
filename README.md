@@ -57,7 +57,7 @@ sha256sum coinglacier.org_v0.0.1_SHA256-b4c1f6db3c3a70beff0db88b65bc8595bd2373f7
 Download the signed changelog from coinglacier.org and verify its authenticity using the coinglacier.org GPG key.<br />
 Manually check that your versions hashsum matches the hashsum calculated in the previous step
 ```sh
-wget -q0- https://coinglacier.org/git/CHANGELOG.md.asc | gpg -d
+wget -qO- https://coinglacier.org/git/CHANGELOG.md.asc | gpg -d
 ```
 
 Congratulations, you have verified that the file was actually produced by us and has not been tampered with.<br />
