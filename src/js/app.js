@@ -1087,11 +1087,7 @@ function Wallet() {
         DOM.wallet.container.find('.mnemonic').html(bitcoinLoader.getMnemonic());
 
         let mnemonicCanvas = DOM.wallet.container.find('.canvas-mnemonic').get(0);
-        QRCode.toCanvas(mnemonicCanvas, bitcoinLoader.getMnemonic(), function (error) {
-            if (error) {
-                console.error(error);
-            }
-        });
+        createQRCode(mnemonicCanvas, bitcoinLoader.getMnemonic());
     }
 
     const createAccountHTML = (accountIndex) => {
@@ -1163,11 +1159,7 @@ function Wallet() {
         $('#xpub-' + accountIndex).html(xpub);
 
         let xpubCanvas = $('#canvas-xpub-' + accountIndex).get(0);
-        QRCode.toCanvas(xpubCanvas, xpub, function (error) {
-            if (error) {
-                console.error(error);
-            }
-        });
+        createQRCode(xpubCanvas, xpub);
     }
 
     this.fillCredentialsHTML = (accIndex, addIndex, address, privKey) => {
@@ -1196,11 +1188,7 @@ function Wallet() {
             qrCodeData = link;
         }
 
-        QRCode.toCanvas($('#canvas-' + id).get(0), qrCodeData, function (error) {
-            if (error) {
-                console.error(error);
-            }
-        });
+        createQRCode($('#canvas-' + id).get(0), qrCodeData);
     }
 
     const setupBitcoinLink = (address, accIndex, addIndex) => {
@@ -1318,11 +1306,7 @@ function Donations() {
 
         linkDOM.html(htmlLink);
 
-        QRCode.toCanvas(qrDOM, link, function (error) {
-            if (error) {
-                console.error(error);
-            }
-        });
+        createQRCode(qrDOM, link);
     }
 
     const getLink = (addressType) => {
@@ -1471,6 +1455,19 @@ function wrapLinkAroundText(text, link){
     html += '</a>';
 
     return html;
+}
+
+function createQRCode(canvas, data){
+
+    let options = {
+        errorCorrectionLevel: 'L'
+    };
+
+    QRCode.toCanvas(canvas, data,  options, function (error) {
+        if (error) {
+            console.error(error);
+        }
+    });
 }
 
 function print(){
