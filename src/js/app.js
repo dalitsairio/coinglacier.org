@@ -445,8 +445,10 @@ function Init() {
     }
 
     const popovers = () => {
-        for (let x in DOM.popovers) {
-            DOM.popovers[x].popover({html: true});
+        if($(window).width() > 1000) { // DO NOT show popovers on mobile phones
+            for (let x in DOM.popovers) {
+                DOM.popovers[x].popover({html: true});
+            }
         }
     }
 }
