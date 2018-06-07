@@ -1039,8 +1039,9 @@ function Wallet() {
         DOM.wallet.container.html(DOM.wallet.templateMnemonicWrapper.clone());
 
         if (password && currentPage.showEncryptedTag) {
-            $('.mnemonic-title').html('Mnemonic [encrypted]');
-            $('.privkey-title').html('Private Key [encrypted]');
+            let encryptedTag = '<span class="encrypted-tag">[encrypted]</span>';
+            $('.mnemonic-title').html('Mnemonic ' + encryptedTag);
+            $('.privkey-title').html('Private Key ' + encryptedTag);
         } else {
             $('.mnemonic-title').html('Mnemonic');
             $('.privkey-title').html('Private Key');
@@ -1122,6 +1123,10 @@ function Wallet() {
 
         if (currentPage.numberAddresses) {
             credentialsCopy.find('.address-title').append(' ' + (addressIndex + 1));
+        }
+
+        if(password){
+            credentialsCopy.find('.privkey-title').addClass('encrypted');
         }
 
         let walletAccount = $('div#account-' + accountIndex);

@@ -1,6 +1,11 @@
+html {
+    // basis for rem calculation
+    font-size: 16px;
+}
+
 h1 {
     color: darken($mainnet-primary-color, 35);
-    font-size: 1.6rem;
+    font-size: 1.5rem;
     font-style: italic;
 }
 
@@ -94,43 +99,37 @@ h2 {
 
 .mnemonic-wrapper {
 	.keep-secret {
-		font-size: 1.6rem;
+		font-size: 1.4rem;
 	}
 }
 
 .xpub-wrapper {
 	.okay-to-share {
-		font-size: 1.25rem;
+		font-size: 1.1rem;
 	}
 }
 
 .address-wrapper {
     .address{
-        font-size: 1rem;
-
         a:link, a:visited, a:hover, a:active{
             color: #000;
         }
     }
 
     .okay-to-share {
-        font-size: 1.1rem;
+        font-size: 1rem;
     }
 }
 
 .privkey-wrapper {
 	.keep-secret {
-		font-size: 1.15rem;
+		font-size: 1rem;
 	}
-
-    .privkey {
-        font-size: 1rem;
-    }
 }
 
 .address, .privkey, .xpub {
     font-family: monospace;
-    font-size: 1.2rem;
+    font-size: 0.95rem;
 }
 
 .keep-secret {
@@ -307,7 +306,22 @@ footer, .testnet footer {
 
 @media screen and (max-width: $bootstrap-xl) {
     .address-wrapper .address, .privkey-wrapper .privkey {
-        font-size: 0.8rem;
+        font-size: 0.7rem;
+    }
+}
+
+@media screen and (max-width: $bootstrap-md) and (min-width: $bootstrap-sm) {
+
+    .address-wrapper .address, .privkey-wrapper .privkey {
+        font-size: 0.7rem;
+    }
+
+    .privkey {
+        word-break: break-all;
+    }
+
+    .address-title, .privkey-title {
+        font-size: 1.1em;
     }
 }
 
@@ -318,17 +332,13 @@ footer, .testnet footer {
         }
     }
 
-    .address, .privkey {
-        font-size: 0.9rem;
-    }
-
     .address, .privkey, .mnemonic, .xpub {
-        font-size: 0.8rem;
+        font-size: 0.7rem;
     }
 
     .mnemonic-wrapper {
     	.keep-secret {
-    		font-size: 1rem;
+    		font-size: 0.9rem;
     	}
 
     	.mnemonic-title {
@@ -346,7 +356,7 @@ footer, .testnet footer {
         }
 
         .xpub-title {
-            font-size: 0.8rem;
+            font-size: 1rem;
         }
 
         .okay-to-share {
@@ -360,7 +370,7 @@ footer, .testnet footer {
         }
 
         .address-title {
-            font-size:0rem;
+            font-size:1rem;
         }
 
         .address {

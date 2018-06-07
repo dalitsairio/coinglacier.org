@@ -4,12 +4,12 @@
 
     .mnemonic-wrapper {
 	    border-bottom: 1px #000 dashed;
-	    padding-bottom: 1.5rem;
-	    padding-top: 1.5rem;
+	    padding-bottom: 0.8rem;
+	    padding-top: 0.8rem;
 
-	    h1 {
+	    .mnemonic-title {
 	    	margin-bottom: 1.1rem;
-    		margin-left: 3.2rem;
+    		margin-left: 2.4rem;
 	    }
 
 	    .canvas-mnemonic {
@@ -19,7 +19,7 @@
 	    
 	    .keep-secret {
 			float: left;
-			margin: 6.4rem -4.5rem 0 -5.1rem;
+			margin: 4.8rem -4.2rem 0 -4.5rem;
 			transform: rotate(270deg);
 	    }
 	}
@@ -40,7 +40,7 @@
 
 		.okay-to-share {
 			float:right;
-			margin: 4.75rem -4.6rem 0 -5rem;
+			margin: 4.2rem -3.4rem 0 -3.8rem;
 			transform: rotate(90deg);
 		}
 	}
@@ -50,20 +50,23 @@
     	padding-top: 1.5em;
 
     	.address-wrapper {
+
+			min-height: 10.4rem;
+
 		    .okay-to-share {
 				float:left;
-				margin: 4.2rem -3.9rem 0 -4.2rem;
+				margin: 3.6rem -3.7rem 0 -3.8rem;
 				transform: rotate(270deg);
 		    }
 
-			.address {
+			.address-title, .address {
 				position: relative;
 				z-index: 10;
 			}
 
 		    .canvas-address {
 				float: left;
-				margin-top: -0.7rem;
+				margin-top: -0.8rem;
 		    }
 
 		    &.loading {
@@ -84,7 +87,7 @@
 
 			.keep-secret {
 				float: right;
-				margin: 3.4rem -2.8rem 0 -3.4rem;
+				margin: 3.1rem -3rem 0 -3.2rem;
 				transform: rotate(90deg);
 			}
 
@@ -95,15 +98,25 @@
 
 			.privkey-title {
 				position: relative;
-				padding-top: 5rem;
+				padding-top: 4.3rem;
 			}
 
 			&.loading {
-				margin-top: -11.5rem;
+				margin-top: -16.2rem;
 
 				.small-loader {
 					float: right;
 					margin: 1rem 3.2rem 2.5rem 0;
+				}
+			}
+
+			// with an encrypted private key, the QR code gets sligthly bigger.
+			// therefore move the privkey title a little downwards, but NOT yet while it's loading
+			&:not(.loading){
+				.privkey-title {
+					&.encrypted {
+						padding-top: 5.1rem;
+					}
 				}
 			}
 
@@ -116,11 +129,43 @@
 	}
 }
 
+@media screen and (max-width: $bootstrap-md) and (min-width: $bootstrap-sm) {
+
+	#wallet {
+		.xpub-wrapper {
+			.okay-to-share {
+				margin: 4.2rem -4.4rem 0 -4.2rem;
+			}
+		}
+		.credentials {
+			.address-wrapper {
+				.okay-to-share {
+					margin: 3.6rem -3.9rem 0 -4.3rem;
+				}
+			}
+			.privkey-wrapper {
+				.keep-secret {
+					margin: 3.1rem -3.6rem 0 -3.4rem;
+				}
+
+				.privkey-title {
+					margin-bottom: 0.1rem;
+				}
+
+				.privkey {
+					max-width: 25rem;
+					margin-left: 15rem;
+				}
+			}
+		}
+	}
+}
+
 @media screen and (max-width: $bootstrap-sm) {
 	#wallet {
 		.mnemonic-wrapper {
 			.keep-secret {
-				margin: 3.9rem -3rem 0 -3.2rem;
+				margin: 3.2rem -2.5rem 0 -2.8rem;
 			}
 
 			.mnemonic-title {
@@ -134,10 +179,6 @@
 		}
 
 		.xpub-wrapper {
-			.keep-secret {
-				margin: 3.4rem -3rem 0 -3.2rem;
-			}
-
 			.canvas-xpub {
 				height: 110px !important;
 				margin-top: -0.3rem;
@@ -155,8 +196,11 @@
 			padding-top: 0.5rem;
 
 			.address-wrapper {
+
+				min-height: 4.5rem;
+
 				.canvas-address {
-					display: none;
+					display: none !important;
 				}
 
 				.okay-to-share {
@@ -174,7 +218,7 @@
 				margin-top: 0;
 
 				.canvas-privkey {
-					display:none;
+					display:none !important;
 				}
 
 				.keep-secret{
@@ -184,9 +228,27 @@
 				}
 
 				.privkey-title {
-					margin: 0;
-					padding: 0;
-					position: relative;
+					padding-top: 11.65rem;
+
+					.encrypted-tag {
+						display: none;
+					}
+				}
+
+				&:not(.loading) {
+					.privkey-title {
+						margin: 0;
+						padding: 0;
+						position: relative;
+
+						&.encrypted {
+							padding: 0;
+						}
+
+						.encrypted-tag {
+							display: inline;
+						}
+					}
 				}
 			}
 		}
@@ -207,6 +269,10 @@
         	.xpub-wrapper {
         		border-bottom: none;
 
+				.okay-to-share {
+					margin: 5.2rem -3.4rem 0 -3.8rem;
+				}
+
         		canvas {
         			margin-top: 0;
         		}
@@ -214,8 +280,27 @@
         }
 
         .credentials {
-        	border-top: 1px #757677 dotted;
+
+			padding-bottom: 1.25rem;
+			padding-top: 1.25rem;
+
+			border-top: 1px #757677 dotted;
         	page-break-inside: avoid;
+
+			.privkey-wrapper {
+				.privkey-title {
+					padding-top: 5rem;
+				}
+				// with an encrypted private key, the QR code gets sligthly bigger.
+				// therefore move the privkey title a little downwards, but NOT yet while it's loading
+				&:not(.loading){
+					.privkey-title {
+						&.encrypted {
+							padding-top: 6.2rem;
+						}
+					}
+				}
+			}
         }
     }
 }
