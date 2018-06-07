@@ -193,7 +193,7 @@ pages.singleWallet.showXPUB = false;
 pages.singleWallet.numberAddresses = false;
 pages.singleWallet.useBitcoinLink = true;
 pages.singleWallet.defaultPassword = '';
-pages.singleWallet.showEncryptedTag = true;
+pages.singleWallet.bip38encrypt = false;
 
 pages.paperWallet = {};
 pages.paperWallet.pageElementsDOM = DOM.pageElements.paperWallet;
@@ -208,7 +208,7 @@ pages.paperWallet.showXPUB = false;
 pages.paperWallet.numberAddresses = true;
 pages.paperWallet.useBitcoinLink = true;
 pages.paperWallet.defaultPassword = '';
-pages.paperWallet.showEncryptedTag = true;
+pages.paperWallet.bip38encrypt = true;
 
 pages.decryptMnemonic = {};
 pages.decryptMnemonic.pageElementsDOM = DOM.pageElements.decryptMnemonic;
@@ -223,7 +223,7 @@ pages.decryptMnemonic.showXPUB = false;
 pages.decryptMnemonic.numberAddresses = true;
 pages.decryptMnemonic.useBitcoinLink = true;
 pages.decryptMnemonic.defaultPassword = '';
-pages.decryptMnemonic.showEncryptedTag = false;
+pages.decryptMnemonic.bip38encrypt = false;
 
 pages.decryptPrivKey = {};
 pages.decryptPrivKey.pageElementsDOM = DOM.pageElements.decryptPrivKey;
@@ -238,7 +238,7 @@ pages.decryptPrivKey.showXPUB = false;
 pages.decryptPrivKey.numberAddresses = false;
 pages.decryptPrivKey.useBitcoinLink = true;
 pages.decryptPrivKey.defaultPassword = '';
-pages.decryptPrivKey.showEncryptedTag = false;
+pages.decryptPrivKey.bip38encrypt = false;
 
 
 // //////////////////////////////////////////////////
@@ -759,6 +759,7 @@ function MnemonicDecryption() {
         
         if (checkInputsFulfilled()) {
             let encryptedMnemonic = DOM.decMnemonic.mnemonic.val();
+            password = DOM.decMnemonic.pass.val();
             wallet.init(encryptedMnemonic);
             $('.wallet-account').show();
         }
@@ -1024,7 +1025,6 @@ function Wallet() {
         }
 
         privkeyDecryption.resetPage(true);
-        mnemonicDecryption.resetPage(true);
     }
 
     this.recalculate = () => {
@@ -1038,7 +1038,7 @@ function Wallet() {
         DOM.wallet.template.hide();
         DOM.wallet.container.html(DOM.wallet.templateMnemonicWrapper.clone());
 
-        if (password && currentPage.showEncryptedTag) {
+        if (password && currentPage.bip38encrypt) {
             let encryptedTag = '<span class="encrypted-tag">[encrypted]</span>';
             $('.mnemonic-title').html('Mnemonic ' + encryptedTag);
             $('.privkey-title').html('Private Key ' + encryptedTag);
@@ -1125,7 +1125,7 @@ function Wallet() {
             credentialsCopy.find('.address-title').append(' ' + (addressIndex + 1));
         }
 
-        if(password){
+        if (password && currentPage.bip38encrypt) {
             credentialsCopy.find('.privkey-title').addClass('encrypted');
         }
 
@@ -1143,7 +1143,12 @@ function Wallet() {
 
         let perAddress = function (accountIndex, addressIndex) {
 
-            bitcoinLoader.asyncCreateCredentials(networkId, accountIndex, addressIndex, password, function (credentials) {
+            let encryption = {
+                password: password,
+                bip38encrypt: currentPage.bip38encrypt
+            };
+
+            bitcoinLoader.asyncCreateCredentials(networkId, accountIndex, addressIndex, encryption, function (credentials) {
                 self.fillCredentialsHTML(accountIndex, addressIndex, credentials.address, credentials.privateKey);
             });
         };

@@ -159,7 +159,7 @@ function BitcoinLoader() {
         callback(cache[networkID][index]);
     }
 
-    this.asyncCreateCredentials = (networkID, accountIndex, addressIndex, password, callback) => {
+    this.asyncCreateCredentials = (networkID, accountIndex, addressIndex, encryption, callback) => {
 
         if (typeof mnemonic === 'undefined') {
             throw 'you must run initiateHDWallet before calling asyncCreateCredentials()';
@@ -170,8 +170,8 @@ function BitcoinLoader() {
             setTimeout(function () {
 
                 // initiate cache array for all credentials under the given password
-                cache[networkID][accountIndex].credentials[password] = cache[networkID][accountIndex].credentials[password] || [];
-                let currentCache = cache[networkID][accountIndex].credentials[password][addressIndex];
+                cache[networkID][accountIndex].credentials[encryption.password] = cache[networkID][accountIndex].credentials[encryption.password] || [];
+                let currentCache = cache[networkID][accountIndex].credentials[encryption.password][addressIndex];
 
                 // return result from cache if available
                 if (currentCache) {
@@ -184,21 +184,21 @@ function BitcoinLoader() {
                 }
 
                 // calculate address now (asynchronously when doing encryption)
-                cache[networkID][accountIndex].credentials[password][addressIndex] = WORK_IN_PROGRESS;
+                cache[networkID][accountIndex].credentials[encryption.password][addressIndex] = WORK_IN_PROGRESS;
 
                 let credentials = bitcoin.createCredentials(cache[networkID][accountIndex].external, addressIndex);
 
                 let processResult = (credentials) => {
-                    cache[networkID][accountIndex].credentials[password][addressIndex] = credentials;
+                    cache[networkID][accountIndex].credentials[encryption.password][addressIndex] = credentials;
                     callback(credentials);
                 }
 
-                if (!password) {
-                    processResult(credentials);
-                } else {
+                if (encryption.password && encryption.bip38encrypt) {
                     runPrivateKeyEncryption(function (credentialsEncrypted){
                         processResult(credentialsEncrypted);
                     }, credentials);
+                } else {
+                    processResult(credentials);
                 }
             }, 0);
         });
