@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!--
 Project: coinglacier.org
-Author: Dalit Sairio
+Author: coinglacier.org
 Git Repo: https://github.com/dalitsairio/coinglacier.org.git
 -->
 <html>
@@ -9,6 +9,11 @@ Git Repo: https://github.com/dalitsairio/coinglacier.org.git
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Browser Tools for Bitcoin Cold Storage">
+    <meta name="author" content="coinglacier.org">
+    <meta name="copyright" content="coinglacier.org" />
+    <meta name="keywords" content="bitcoin,wallet,cold storage,paper wallet,HD wallet,mnemonic,BIP32,BIP38,BIP39,segwit,bech32">
+
     <!-- mocha -->
     <link rel="stylesheet" href="css/libs/mocha.css" inline>
 
@@ -530,7 +535,7 @@ Git Repo: https://github.com/dalitsairio/coinglacier.org.git
 <body>
 
 <div id="page-loader">
-    <h1 class="text-center">loading wallet generator</h1>
+    <span class="page-loader-title text-center">loading wallet generator</span>
     <div id="spinner-wrapper"><div class="loader"></div></div>
 </div>
 
@@ -552,6 +557,11 @@ Git Repo: https://github.com/dalitsairio/coinglacier.org.git
     <span class="print print-subtitle">Bitcoin Cold Storage & Paper Wallets</span>
     <div id="page">
         <header>
+            <h1 class="site-title">Browser Tools for Bitcoin Cold Storage</h1>
+            <h2 class="page-title">Single Wallet</h2>
+            <h2 class="page-title">Paper Wallet</h2>
+            <h2 class="page-title">Decrypt Mnemonic</h2>
+            <h2 class="page-title">Decrypt Private Key</h2>
             <nav id="mainmenu" class="navbar navbar-expand-md bg-dark">
                 <a class="navbar-brand" href="javascript:void(0);">
                     <span id="service-name" class="d-inline d-md-none d-lg-inline">COINGLACIER.ORG</span>
@@ -1186,7 +1196,7 @@ Git Repo: https://github.com/dalitsairio/coinglacier.org.git
                         <div class="col-xl-7 col-md-6">
                             <div id="checkmark-options" class= "page-element single-wallet paper-wallet decrypt-mnemonic decrypt-privkey">
 
-                                <h6>Features</h6>
+                                <span class="option-title">Features</span>
 
                                 <!-- show xpub -->
                                 <div id="show-xpub" class="page-element paper-wallet decrypt-mnemonic">
@@ -1234,7 +1244,7 @@ Git Repo: https://github.com/dalitsairio/coinglacier.org.git
 
                             <!-- address type -->
                             <div id="address-type" class="page-element single-wallet paper-wallet decrypt-mnemonic">
-                                <h6>Address Type</h6>
+                                <span class="option-title">Address Type</span>
                                 <div class="form-check">
                                     <input name="address-types" id="non-segwit" class="form-check-input" type="radio">
                                     <label class="form-check-label" for="non-segwit">
@@ -1264,8 +1274,8 @@ Git Repo: https://github.com/dalitsairio/coinglacier.org.git
 
                             <!-- amount of accounts and addresses -->
                             <div class="page-element paper-wallet decrypt-mnemonic" class="form-control">
-                                <h6 id="options-accounts-title" style="display: none;">Accounts</h6>
-                                <h6 id="options-addresses-amount-title">Amount of Addresses</h6>
+                                <span id="options-accounts-title" class="option-title" style="display: none;">Accounts</span>
+                                <span id="options-addresses-amount-title" class="option-title">Amount of Addresses</span>
                                 <div id="account-row-template" class="account-row">
                                     <div class="form-text">
                                         <span class="account-number" style="display: none;"># 1</span>
@@ -1282,7 +1292,7 @@ Git Repo: https://github.com/dalitsairio/coinglacier.org.git
 
                             <!-- encrypt private keys and mnemonic -->
                             <div id="wallet-encryption" class= "page-element paper-wallet">
-                                <h6>Encrypt with Password</h6>
+                                <span class="option-title">Encrypt with Password</span>
                                 <div class="form-inline">
                                     <div id="password-input-group" class="input-group password-box"
                                          data-trigger="hover" data-placement="bottom" title="Never forget your password!"
@@ -1321,7 +1331,7 @@ Git Repo: https://github.com/dalitsairio/coinglacier.org.git
                     <div class="row">
                         <div class="col-lg-6">
                             <div class="spacer">
-                                <h6>Encrypted Mnemonic</h6>
+                                <span class="input-title">Encrypted Mnemonic</<span>
                                 <input id="mnemonic-dec-mnemonic" class="form-control" type="text" placeholder="Enter encrypted Mnemonic">
                                 <div class="invalid-tooltip">
                                     Invalid Mnemonic!
@@ -1330,7 +1340,7 @@ Git Repo: https://github.com/dalitsairio/coinglacier.org.git
                         </div>
                         <div class="col-lg-6">
                             <div class="spacer">
-                                <h6>Password</h6>
+                                <span class="input-title">Password</span>
                                 <div id="mnemonic-decryption-pw-group" class="form-inline password-box">
                                     <div class="input-group">
                                         <div class="input-group-append">
@@ -1356,7 +1366,7 @@ Git Repo: https://github.com/dalitsairio/coinglacier.org.git
                     <div class="row">
                         <div class="col-lg-6">
                             <div class="spacer">
-                                <h6>Encrypted Private Key</h6>
+                                <span class="input-title">Encrypted Private Key</span>
                                 <input id="privkey-dec-key" class="form-control" type="text" placeholder="Enter encrypted private key">
                                 <div class="invalid-tooltip">
                                     Invalid BIP38 encrypted private key!
@@ -1365,7 +1375,7 @@ Git Repo: https://github.com/dalitsairio/coinglacier.org.git
                         </div>
                         <div class="col-lg-6">
                             <div class="spacer">
-                                <h6>Password</h6>
+                                <span class="input-title">Password</span>
                                 <div id="priv-key-decryption-pw-group" class="form-inline password-box">
                                     <div class="input-group">
                                         <div class="input-group-append">
@@ -1412,7 +1422,7 @@ Git Repo: https://github.com/dalitsairio/coinglacier.org.git
             <div class="mnemonic-wrapper page-element paper-wallet">
                 <div class="keep-secret">Keep secret</div>
                 <div>
-                    <h1 class="mnemonic-title">Mnemonic</h1>
+                    <span class="mnemonic-title">Mnemonic</span>
                     <canvas class="canvas-mnemonic "></canvas>
                     <div class="mnemonic"> ... loading wallet ... </div>
                 </div>
@@ -1423,8 +1433,8 @@ Git Repo: https://github.com/dalitsairio/coinglacier.org.git
                     <div class="okay-to-share">Okay to share</div>
                     <div>
                         <canvas id="template-canvas-xpub-0" class="canvas-xpub"></canvas>
-                        <h1 class="account-title" style="display:none">Account 1</h1>
-                        <h2 class="xpub-title">Extended Public Key</h2>
+                        <span class="account-title" style="display:none">Account 1</span>
+                        <span class="xpub-title">Extended Public Key</span>
                         <div id="xpub-0'" class="xpub"> ... wait ... </div>
                     </div>
                     <div style="clear: both;"></div>
@@ -1435,7 +1445,7 @@ Git Repo: https://github.com/dalitsairio/coinglacier.org.git
                         <div class="okay-to-share" style="display:none;">Okay to share</div>
                         <div>
                             <canvas id="template-canvas-address-0-0" class="canvas-address" style="display:none;"></canvas>
-                            <h1 class="address-title">Address</h1>
+                            <span class="address-title">Address</span>
                             <div id="template-address-0-0" class="address"><div class="small-loader"></div></div>
                         </div>
                     </div>
@@ -1443,7 +1453,7 @@ Git Repo: https://github.com/dalitsairio/coinglacier.org.git
                         <div class="keep-secret" style="display:none;">Keep secret</div>
                         <div>
                             <canvas id="template-canvas-privkey-0-0" class="canvas-privkey" style="display:none;"></canvas>
-                            <h1 class="privkey-title">Private Key</h1>
+                            <span class="privkey-title">Private Key</span>
                             <div id="template-privkey-0-0" class="privkey"><div class="small-loader"></div></div>
                         </div>
                     </div>
@@ -1508,7 +1518,7 @@ Git Repo: https://github.com/dalitsairio/coinglacier.org.git
                 </div>
             </div>
             <div id="mocha-wrapper" class="footer-window with-margin" style="display:none;">
-                <h1 id="mocha-title">Unit tests still running ... </h1>
+                <span id="mocha-title" class="mocha-title">Unit tests still running ... </span>
                 <div id="encryption-tests-dialog">
                     <div class="description">
                         If you want to password protect your data,
