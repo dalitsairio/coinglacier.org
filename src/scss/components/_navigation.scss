@@ -1,58 +1,60 @@
 #mainmenu {
-	padding-left: 285px;
+	padding-left: 17.8125rem;
     position: relative;
 
     #service-name {
-        margin-right: 10px;
+        margin-right: 0.625rem;
     }
 
     .navbar-brand{
-        left: 26px;
+        left: 1.625rem;
         position: absolute;
-        top: -14px;
+        top: -0.875rem;
         
         img {
-            width: 75px;
+            width: 4.6875rem;
         }
     }
 }
 
 @media screen and (min-width: $bootstrap-sm) and (max-width: $bootstrap-md) {
 	#mainmenu {
-        padding-left: 95px;
+        padding-left: 5.9375rem;
 
         a.navbar-brand {
-            left: 10px;
+            left: 0.625rem;
         }
     }
 
     .privkey-wrapper {
         margin-top: -8rem;
     }
-
 }
 
 @media screen and (max-width: $bootstrap-sm) {
     #mainmenu {
-        padding: 0px;
+        padding: 0;
 
         .navbar-toggler {
             position: absolute;
-            right: 12px;
-            top: 8px;
+            right: 0.75rem;
+            top: 0.5rem;
         }
 
         #navbarNav {
-            margin: 0 18px;
+            margin-bottom: 0;
+            margin-left: 1.125rem;
+            margin-right: 1.125rem;
+            margin-top: 0;
         }
 
         .navbar-brand {
+            margin-top: 0.75rem;
+            margin-bottom: 0.9375rem;
             position: relative;
-            margin-top: 12px;
-            margin-bottom: -15px;
 
             img {
-                width: 50px;
+                width: 3.125rem;
             }
         }
     }
@@ -60,7 +62,7 @@
 
 @media screen and (max-width: $screen-xs) {
     #mainmenu {
-        min-height: 56px;
+        min-height: 3.5rem;
 
         img {
             display: none;

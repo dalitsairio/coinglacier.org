@@ -10,11 +10,11 @@ $theme-colors: (
 // Ambiance (major settings, background colors, ...)
 // //////////////////////////////////////////////////
 #page {
-    box-shadow: 0px 0px 50px 1px rgba(136, 136, 136, 0.25);
+    box-shadow: 0 0 3.125rem 0.0625rem rgba(136, 136, 136, 0.25);
 }
 
 #testnet-warning {
-    border: 1px #856404 dotted;
+    border: 0.0625rem #856404 dotted;
 }
 
 // this is a hack. Usually popovers have a max-width of 276px
@@ -28,75 +28,6 @@ $theme-colors: (
 
 .popover .normal-popover {
     max-width: 276px;
-}
-
-#account-row-template {
-    display: none;
-}
-
-#address-numbering .form-check,
-#show-xpub .form-check,
-#qrcode-links .form-check {
-    padding-left: 0px;
-}
-
-//////////////////////////////
-///         SPINNER        ///
-//////////////////////////////
-.loader {
-    -webkit-animation: spin 2s linear infinite; /* Safari */
-    animation: spin 1s linear infinite;
-    border: 14px solid #f3f3f3;
-    border-radius: 50%;
-    border-top: 14px solid $mainnet-primary-color;
-    height: 100px;
-    width: 100px;
-}
-
-.small-loader {
-    -webkit-animation: spin 2s linear infinite; /* Safari */
-    animation: spin 1s linear infinite;
-    border: 5px solid #f3f3f3;
-    border-radius: 50%;
-    border-top: 5px solid $mainnet-primary-color;
-    height: 25px;
-    width: 25px;
-}
-
-/* Safari */
-@-webkit-keyframes spin {
-    0% { -webkit-transform: rotate(0deg); }
-    100% { -webkit-transform: rotate(360deg); }
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-// page loading
-#page-loader {
-    margin-top: 8%;
-
-    #spinner-wrapper {
-        margin: 0 auto;
-        margin-top:8%;
-        width:100px;
-    }
-}
-
-@media screen and (max-width: $bootstrap-sm) {
-    // spinner
-    .loader {
-        border: 8px solid #f3f3f3;
-        border-top: 8px solid $mainnet-primary-color;
-        height: 60px;
-        width: 60px;
-    }
-
-    div#spinner-wrapper {
-        width:60px;
-    }
 }
 
 .print {

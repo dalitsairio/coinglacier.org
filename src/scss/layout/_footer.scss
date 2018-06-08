@@ -16,15 +16,15 @@ footer{
         margin: 0.8rem 0;
 
         &.with-margin {
-          padding: 1.5rem 1.8rem;
+            padding: 1.5rem 1.8rem;
         }
 
-        canvas{
-          padding-left: 0;
-          padding-right: 0;
-          margin-left: auto;
-          margin-right: auto;
-          display: block;
+        canvas {
+            padding-left: 0;
+            padding-right: 0;
+            margin-left: auto;
+            margin-right: auto;
+            display: block;
         }
     }
 
@@ -37,8 +37,8 @@ footer{
             #mocha-stats{
                 margin-top: 0;
                 position: relative;
-                right: 0px;
-                top: 0px;    
+                right: 0;
+                top: 0;    
             }
 
             .replay {
@@ -47,6 +47,8 @@ footer{
 
             // disable the title links
             h1 {
+                margin-top: 0.5rem;
+                
                 a {
                     pointer-events: none;
                 }
@@ -55,7 +57,7 @@ footer{
     }
 
     #encryption-tests-dialog {
-        border: 1px solid lightgray;
+        border: 0.0625rem solid lightgray;
         margin-bottom: 0.2rem;
         padding: 1rem;
         
@@ -95,8 +97,11 @@ footer{
 
         no-repeat left center;
 
-        margin-left: 0.5rem;    
-        padding: 5px 5px 5px 20px;
+        margin-left: 0.5rem;
+        padding-bottom: 0.3125rem;
+        padding-left: 1.25rem;
+        padding-right: 0.3125rem;
+        padding-top: 0.3125rem;
     }
 }
 

@@ -1,8 +1,30 @@
 #options {
     background: lighten($mainnet-primary-color, 30);
-    border: 1px solid $dark;
+    border: 0.0625rem solid $dark;
     border-top: none;
     padding: 0rem 0rem 0.8rem 1.2rem;
+
+    #show-xpub {
+    	.form-check {
+    		padding-left: 0;
+    	}
+    }
+
+    #address-numbering {
+    	.form-check {
+    		padding-left: 0;
+    	}
+    }
+
+    #qrcode-links {
+    	.form-check {
+    		padding-left: 0;
+    	}
+    } 
+
+    #account-row-template {
+    	display: none;
+	}
 
     .account-row .form-text {
 		span {
@@ -17,20 +39,20 @@
 		button {
 			margin-bottom: 0.25rem;
 			padding: 0.05rem 0.25rem;
-		}
 
-		button.account-add {
-			margin-left: 0.5rem;
-		}
+			&.account-add {
+				margin-left: 0.5rem;
+			}
 
-		button.account-remove{
-			padding: 0.05rem 0.42rem;
+			&.account-remove {
+				padding: 0.05rem 0.42rem;
+			}
 		}
 	}
 
     #wallet-encryption {
     	label {
-        	margin: 5px;
+        	margin: 0.3125rem;
     	}
 	}
 }

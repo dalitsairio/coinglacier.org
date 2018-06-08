@@ -2,12 +2,44 @@
     background: white;
     padding: 1.1rem 1.6rem;
 
+    .loader {
+	    -webkit-animation: spin 2s linear infinite; /* Safari */
+	    animation: spin 1s linear infinite;
+	    border: 0.875rem solid #f3f3f3;
+	    border-radius: 50%;
+	    border-top: 0.875rem solid $mainnet-primary-color;
+	    height: 6.25rem;
+	    width: 6.25rem;
+	}
+
+	.small-loader {
+	    -webkit-animation: spin 2s linear infinite; /* Safari */
+	    animation: spin 1s linear infinite;
+	    border: 0.3125rem solid #f3f3f3;
+	    border-radius: 50%;
+	    border-top: 0.3125rem solid $mainnet-primary-color;
+	    height: 1.5625rem;
+	    width: 1.5625rem;
+	}
+
+	/* Safari */
+	@-webkit-keyframes spin {
+	    0% { -webkit-transform: rotate(0deg); }
+	    100% { -webkit-transform: rotate(360deg); }
+	}
+
+	@keyframes spin {
+	    0% { transform: rotate(0deg); }
+	    100% { transform: rotate(360deg); }
+	}
+
     .mnemonic-wrapper {
-	    border-bottom: 1px #000 dashed;
+	    border-bottom: 0.0625rem #000 dashed;
 	    padding-bottom: 0.8rem;
 	    padding-top: 0.8rem;
 
 	    .mnemonic-title {
+	    	display: block;
 	    	margin-bottom: 1.1rem;
     		margin-left: 2.4rem;
 	    }
@@ -25,23 +57,28 @@
 	}
 
 	.wallet-account:not(.first-account) {
-    	border-top: 1px #7c7c7c dashed;
+    	border-top: 0.0625rem #7c7c7c dashed;
 	}
 
 	.xpub-wrapper {
-		border-bottom: 1px lightgrey dotted;
+		border-bottom: 0.0625rem lightgrey dotted;
 		padding-bottom: 1.5rem;
 		padding-top: 1.5rem;
 
 		canvas {
-			float:right;
+			float: right;
 			margin-top: -1rem;
 		}
 
 		.okay-to-share {
-			float:right;
+			float: right;
 			margin: 4.2rem -3.4rem 0 -3.8rem;
 			transform: rotate(90deg);
+		}
+
+		.xpub-title {
+			display: block;
+			margin-bottom: 0.5rem;
 		}
 	}
 
@@ -59,7 +96,14 @@
 				transform: rotate(270deg);
 		    }
 
-			.address-title, .address {
+		    .address-title {
+		    	display: block;
+		    	margin-bottom: 0.5rem;
+		    	position: relative;
+				z-index: 10;
+		    }
+
+			.address {
 				position: relative;
 				z-index: 10;
 			}
@@ -97,6 +141,8 @@
 			}
 
 			.privkey-title {
+				display: block;
+				margin-bottom: 0.5rem;
 				position: relative;
 				padding-top: 4.3rem;
 			}
@@ -163,6 +209,17 @@
 
 @media screen and (max-width: $bootstrap-sm) {
 	#wallet {
+		.loader {
+	        border: 8px solid #f3f3f3;
+	        border-top: 8px solid $mainnet-primary-color;
+	        height: 60px;
+	        width: 60px;
+    	}
+
+	    #spinner-wrapper {
+	        width:60px;
+	    }
+
 		.mnemonic-wrapper {
 			.keep-secret {
 				margin: 3.2rem -2.5rem 0 -2.8rem;
@@ -173,16 +230,16 @@
 			}
 
 			.canvas-mnemonic {
-				height: 100px !important;
-				width: 100px !important;
+				height: 6.25rem !important;
+				width: 6.25rem !important;
 			}
 		}
 
 		.xpub-wrapper {
 			.canvas-xpub {
-				height: 110px !important;
+				height: 6.875rem !important;
 				margin-top: -0.3rem;
-				width: 110px !important;
+				width: 6.875rem !important;
 			}
 
 			.okay-to-share {
@@ -191,7 +248,7 @@
 		}
 
 		.credentials {
-			border-bottom: grey dotted 1px;
+			border-bottom: grey dotted 0.0625rem;
 			padding-bottom: 0.5rem;
 			padding-top: 0.5rem;
 
@@ -283,7 +340,6 @@
         }
 
         .credentials {
-
 			padding-bottom: 1.25rem;
 			padding-top: 1.25rem;
 
