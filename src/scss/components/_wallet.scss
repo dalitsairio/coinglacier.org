@@ -20,7 +20,7 @@
 	    .mnemonic-title {
 	    	display: block;
 	    	margin-bottom: 1.1rem;
-    		margin-left: 2.4rem;
+	    	z-index: 10;
 	    }
 
 	    .canvas-mnemonic {
@@ -30,7 +30,7 @@
 	    
 	    .keep-secret {
 			float: left;
-			margin: 4.8rem -4.2rem 0 -4.5rem;
+			margin: 3.2rem -3.6rem 0 -3.9rem;
 			transform: rotate(270deg);
 	    }
 	}
@@ -43,6 +43,10 @@
 		border-bottom: 0.0625rem lightgrey dotted;
 		padding-bottom: 1.5rem;
 		padding-top: 1.5rem;
+
+		.account-title {
+			margin-bottom: 1rem;
+		}
 
 		canvas {
 			float: right;
@@ -75,6 +79,11 @@
 				transform: rotate(270deg);
 		    }
 
+		    .canvas-address {
+				float: left;
+				margin-top: -0.8rem;
+		    }
+
 		    .address-title {
 		    	display: block;
 		    	margin-bottom: 0.5rem;
@@ -86,11 +95,6 @@
 				position: relative;
 				z-index: 10;
 			}
-
-		    .canvas-address {
-				float: left;
-				margin-top: -0.8rem;
-		    }
 
 		    &.loading {
 		    	.small-loader {
@@ -123,7 +127,7 @@
 				display: block;
 				margin-bottom: 0.5rem;
 				position: relative;
-				padding-top: 4.3rem;
+				padding-top: 3.5rem;
 			}
 
 			&.loading {
@@ -191,10 +195,11 @@
 
 		.mnemonic-wrapper {
 			.keep-secret {
-				margin: 3.2rem -2.5rem 0 -2.8rem;
+				margin: 1.5rem -2.5rem 0 -2.8rem;
 			}
 
 			.mnemonic-title {
+				margin-bottom: 1.2rem;
 				margin-left: 1.6rem;
 			}
 
@@ -212,7 +217,7 @@
 			}
 
 			.okay-to-share {
-				margin: 2.8rem -3rem 0 -2.8rem;
+				margin: 2.6rem -3rem 0 -2.8rem;
 			}
 		}
 

@@ -128,15 +128,16 @@ header {
             font-size: 1.5rem;
             font-style: italic;
             font-weight: 500;
+            line-height: 0.6;
         }
 
         .keep-secret {
-            font-size: 1.4rem;
+            font-size: 1.3rem;
         }
 
         .mnemonic {
             font-family: monospace;
-            font-size: 1.5rem;
+            font-size: 1.3rem;
         }
     }
 
@@ -147,11 +148,19 @@ header {
             font-size: 1.5rem;
             font-style: italic;
             font-weight: 500;
+            line-height: 0.7;
         }
 
         .xpub-title {
             font-size: 1.3rem;
             font-weight:bold;
+            line-height: 0.7;
+        }
+
+        .xpub {
+            font-family: monospace;
+            font-size: 0.95rem;
+            word-break: break-all;
         }
 
         .okay-to-share {
@@ -159,41 +168,47 @@ header {
         }
     }
 
-    .address-wrapper {
-        .address-title {
-            color: darken($mainnet-primary-color, 35);
-            font-size: 1.5rem;
-            font-style: italic;
-            font-weight: 500;
-        }
+    .credentials {
+        .address-wrapper {
+            .address-title {
+                color: darken($mainnet-primary-color, 35);
+                font-size: 1.5rem;
+                font-style: italic;
+                font-weight: 500;
+                line-height: 1;
+            }
 
-        .address{
-            a:link, a:visited, a:hover, a:active{
-                color: #000;
+            .address{
+                font-family: monospace;
+                font-size: 0.95rem;
+
+                a:link, a:visited, a:hover, a:active{
+                    color: #000;
+                }
+            }
+
+            .okay-to-share {
+                font-size: 1rem;
             }
         }
 
-        .okay-to-share {
-            font-size: 1rem;
+        .privkey-wrapper {
+            .privkey-title {
+                color: darken($mainnet-primary-color, 35);
+                font-size: 1.5rem;
+                font-style: italic;
+                font-weight: 500;
+            }
+
+            .privkey {
+                font-family: monospace;
+            }
+
+            .keep-secret {
+                font-size: 1rem;
+                font-size: 0.95rem;
+            }
         }
-    }
-
-    .privkey-wrapper {
-        .privkey-title {
-            color: darken($mainnet-primary-color, 35);
-            font-size: 1.5rem;
-            font-style: italic;
-            font-weight: 500;
-        } 
-
-        .keep-secret {
-            font-size: 1rem;
-        }
-    }
-
-    .address, .privkey, .xpub {
-        font-family: monospace;
-        font-size: 0.95rem;
     }
 
     .keep-secret {
@@ -207,10 +222,6 @@ header {
         font-weight: bold;
         text-transform: uppercase;
     }
-
-    .xpub {
-        word-break: break-all;
-    }  
 }
 
 footer, .testnet footer {
@@ -342,16 +353,18 @@ footer, .testnet footer {
             }
         }
 
-        .address-wrapper {
-            .address-title {
-                color: darken($testnet-primary-color, 30);
+        .credentials {
+            .address-wrapper {
+                .address-title {
+                    color: darken($testnet-primary-color, 30);
+                }
             }
-        }
 
-        .privkey-wrapper {
-            .privkey-title {
-                color: darken($testnet-primary-color, 30);
-            } 
+            .privkey-wrapper {
+                .privkey-title {
+                    color: darken($testnet-primary-color, 30);
+                } 
+            }
         }
     }
 
@@ -387,24 +400,30 @@ footer, .testnet footer {
     }
 }
 
-@media screen and (max-width: $bootstrap-xl) {
-    .address-wrapper .address, .privkey-wrapper .privkey {
-        font-size: 0.7rem;
-    }
-}
-
 @media screen and (max-width: $bootstrap-md) and (min-width: $bootstrap-sm) {
+    #wallet {
+        .credentials {
+            .address-wrapper {
+                .address-title {
+                    font-size: 1.1rem;
+                }
 
-    .address-wrapper .address, .privkey-wrapper .privkey {
-        font-size: 0.7rem;
-    }
+                .address {
+                    font-size: 0.7rem;
+                }
+            }
 
-    .privkey {
-        word-break: break-all;
-    }
+            .privkey-wrapper {
+                .privkey-title {
+                    font-size: 1.1rem;
+                }
 
-    .address-title, .privkey-title {
-        font-size: 1.1em;
+                .privkey {
+                    font-size: 0.7rem;
+                    word-break: break-all;
+                }
+            }
+        }
     }
 }
 
@@ -415,63 +434,75 @@ footer, .testnet footer {
         }
     }
 
-    .address, .privkey, .mnemonic, .xpub {
-        font-size: 0.7rem;
-    }
+    #wallet {
+        .mnemonic-wrapper {
+            .keep-secret {
+                font-size: 0.8rem;
+            }
 
-    .mnemonic-wrapper {
-    	.keep-secret {
-    		font-size: 0.9rem;
-    	}
+            .mnemonic-title {
+                font-size: 1.1rem;
+                line-height: 0;
+            }
 
-    	.mnemonic-title {
-    		font-size: 1.2rem;
-    	}
-    }
-
-    .xpub-wrapper {
-        .keep-secret {
-            font-size: 1rem;
+            .mnemonic {
+                font-size: 0.8rem;
+            }
         }
 
-        .account-title {
-            font-size: 1rem;
+        .xpub-wrapper {
+            .keep-secret {
+                font-size: 1rem;
+            }
+
+            .account-title {
+                font-size: 1rem;
+            }
+
+            .xpub-title {
+                font-size: 0.9rem;
+            }
+
+            .xpub {
+                font-size: 0.7rem;
+            }
+
+            .okay-to-share {
+                font-size: 0.7rem;
+            }
         }
 
-        .xpub-title {
-            font-size: 1rem;
-        }
+        .credentials {
+            .address-wrapper {
+                .okay-to-share {
+                    font-size: 0.9rem;
+                }
 
-        .okay-to-share {
-            font-size: 0.8rem;
-        }
-    }
+                .address-title {
+                    font-size: 1rem;
+                    line-height: 1.5rem;
+                }
 
-    .address-wrapper {
-        .okay-to-share {
-            font-size: 0.9rem;
-        }
+                .address {
+                    font-size: 0.7rem;
+                    word-break: break-all;
+                }
+            }
 
-        .address-title {
-            font-size:1rem;
-        }
+            .privkey-wrapper {
+                .keep-secret {
+                    font-size: 0.9rem;
+                }
 
-        .address {
-            word-break: break-all;
-        }
-    }
+                .privkey-title {
+                    font-size: 1rem;
+                }
 
-    .privkey-wrapper {
-    	.keep-secret {
-    		font-size: 0.9rem;
-    	}
-
-    	.privkey-title {
-    		font-size: 1rem;
-    	}
-
-    	.privkey {
-            word-break: break-all;
+                .privkey {
+                    font-size: 0.7rem;
+                    word-break: break-all;
+                }
+            }
         }
     }
 }
