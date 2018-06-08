@@ -264,7 +264,10 @@
 
         .wallet-account{
 			border-top: none !important;
-        	page-break-after: always;
+
+			&:not(.last-account) {
+				page-break-after: always;
+			}
 
         	.xpub-wrapper {
         		border-bottom: none;

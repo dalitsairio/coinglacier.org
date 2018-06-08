@@ -1099,15 +1099,24 @@ function Wallet() {
 
         let accountCopy = DOM.wallet.templateAccount.clone();
         accountCopy.prop('id', 'account-' + accountIndex);
-        if (accountIndex == 0) {
-            accountCopy.addClass('first-account');
-        }
         accountCopy.find('.account-title').html('Account ' + (accountIndex + 1));
         accountCopy.find('.xpub').prop('id', 'xpub-' + accountIndex);
         accountCopy.find('.canvas-xpub').prop('id', 'canvas-xpub-' + accountIndex);
         accountCopy.find('div.credentials').remove();
 
+        addOrderingAccountClasses(accountCopy, accountIndex);
+
         DOM.wallet.container.append(accountCopy);
+    }
+
+    const addOrderingAccountClasses = (domElement, accountIndex) => {
+        if (accountIndex == 0) {
+            domElement.addClass('first-account');
+        }
+
+        if(accountIndex == accounts.length - 1){
+            domElement.addClass('last-account');
+        }
     }
 
     const createCredentialsHTML = (accountIndex, addressIndex) => {
