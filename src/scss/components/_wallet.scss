@@ -2,16 +2,6 @@
     background: white;
     padding: 1.1rem 1.6rem;
 
-    .loader {
-	    -webkit-animation: spin 2s linear infinite; /* Safari */
-	    animation: spin 1s linear infinite;
-	    border: 0.875rem solid #f3f3f3;
-	    border-radius: 50%;
-	    border-top: 0.875rem solid $mainnet-primary-color;
-	    height: 6.25rem;
-	    width: 6.25rem;
-	}
-
 	.small-loader {
 	    -webkit-animation: spin 2s linear infinite; /* Safari */
 	    animation: spin 1s linear infinite;
@@ -20,17 +10,6 @@
 	    border-top: 0.3125rem solid $mainnet-primary-color;
 	    height: 1.5625rem;
 	    width: 1.5625rem;
-	}
-
-	/* Safari */
-	@-webkit-keyframes spin {
-	    0% { -webkit-transform: rotate(0deg); }
-	    100% { -webkit-transform: rotate(360deg); }
-	}
-
-	@keyframes spin {
-	    0% { transform: rotate(0deg); }
-	    100% { transform: rotate(360deg); }
 	}
 
     .mnemonic-wrapper {
@@ -209,16 +188,6 @@
 
 @media screen and (max-width: $bootstrap-sm) {
 	#wallet {
-		.loader {
-	        border: 8px solid #f3f3f3;
-	        border-top: 8px solid $mainnet-primary-color;
-	        height: 60px;
-	        width: 60px;
-    	}
-
-	    #spinner-wrapper {
-	        width:60px;
-	    }
 
 		.mnemonic-wrapper {
 			.keep-secret {
