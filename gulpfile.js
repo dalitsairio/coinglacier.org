@@ -245,7 +245,7 @@ gulp.task('default', gulp.parallel('page-setup', 'tests'));
 let semverType = 'patch';
 
 gulp.task('build:remove-old-mainFile', function () {
-    return gulp.src('./' + domain + '_*.html*', {read:false})
+    return gulp.src('./' + domain + '_*.html', {read:false})
         .pipe(clean());
 
 });
