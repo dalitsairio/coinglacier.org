@@ -14,9 +14,15 @@
         background: lighten($testnet-primary-color, 30);
     }
 
-    .loader {
-        // should be 14px for big loader and 8px for small one. But who cares, I'm too lazy for this.
-        border-top: 12px solid $testnet-primary-color;
+    #page-loader {
+        #spinner-wrapper {
+                .loader {
+                    // should be 14px for big loader and 8px for small one. But who cares, I'm too lazy for this.
+                    border-top: 12px solid $testnet-primary-color;
+            }
+
+        }
+
     }
     
     .small-loader {

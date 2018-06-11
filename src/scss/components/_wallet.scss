@@ -2,16 +2,6 @@
     background: white;
     padding: 1.1rem 1.6rem;
 
-	.small-loader {
-	    -webkit-animation: spin 2s linear infinite; /* Safari */
-	    animation: spin 1s linear infinite;
-	    border: 0.3125rem solid #f3f3f3;
-	    border-radius: 50%;
-	    border-top: 0.3125rem solid $mainnet-primary-color;
-	    height: 1.5625rem;
-	    width: 1.5625rem;
-	}
-
     .mnemonic-wrapper {
 	    border-bottom: 0.0625rem #000 dashed;
 	    padding-bottom: 0.8rem;
@@ -30,7 +20,7 @@
 	    
 	    .keep-secret {
 			float: left;
-			margin: 3.2rem -3.6rem 0 -3.9rem;
+			margin: 3.2rem -2.9rem 0 -3rem;
 			transform: rotate(270deg);
 	    }
 	}
@@ -131,7 +121,7 @@
 			}
 
 			&.loading {
-				margin-top: -16.2rem;
+				margin-top: -15.4rem;
 
 				.small-loader {
 					float: right;
@@ -161,6 +151,18 @@
 @media screen and (max-width: $bootstrap-md) and (min-width: $bootstrap-sm) {
 
 	#wallet {
+		.mnemonic-wrapper {
+		    border-bottom: 0.0625rem #000 dashed;
+		    padding-bottom: 0.8rem;
+		    padding-top: 0.8rem;
+	    
+		    .keep-secret {
+				float: left;
+				margin: 3.2rem -2.9rem 0 -3.5rem;
+				transform: rotate(270deg);
+		    }
+		}
+
 		.xpub-wrapper {
 			.okay-to-share {
 				margin: 4.2rem -4.4rem 0 -4.2rem;
@@ -175,10 +177,6 @@
 			.privkey-wrapper {
 				.keep-secret {
 					margin: 3.1rem -3.6rem 0 -3.4rem;
-				}
-
-				.privkey-title {
-					margin-bottom: 0.1rem;
 				}
 
 				.privkey {
@@ -199,7 +197,7 @@
 			}
 
 			.mnemonic-title {
-				margin-bottom: 1.2rem;
+				margin-bottom: 1rem;
 				margin-left: 1.6rem;
 			}
 
@@ -228,6 +226,7 @@
 
 			.address-wrapper {
 
+				margin-bottom: 0.8rem;
 				min-height: 4.5rem;
 
 				.canvas-address {
@@ -264,6 +263,10 @@
 					.encrypted-tag {
 						display: none;
 					}
+				}
+
+				&.loading {
+					margin-top: -17rem;
 				}
 
 				&:not(.loading) {

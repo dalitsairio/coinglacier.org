@@ -33,6 +33,16 @@
 	}
 }
 
+.small-loader {
+    -webkit-animation: spin 2s linear infinite; /* Safari */
+    animation: spin 1s linear infinite;
+    border: 0.3125rem solid #f3f3f3;
+    border-radius: 50%;
+    border-top: 0.3125rem solid $mainnet-primary-color;
+    height: 1.5625rem;
+    width: 1.5625rem;
+}
+
 @media screen and (max-width: $bootstrap-sm) {
 	#page-loader {
 		#spinner-wrapper {
@@ -47,6 +57,8 @@
 		}
 	}
 }
+
+
 
 
 

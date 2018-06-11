@@ -132,7 +132,7 @@ header {
         }
 
         .keep-secret {
-            font-size: 1.3rem;
+            font-size: 1rem;
         }
 
         .mnemonic {
@@ -198,6 +198,7 @@ header {
                 font-size: 1.5rem;
                 font-style: italic;
                 font-weight: 500;
+                line-height: 1;
             }
 
             .privkey {
@@ -410,6 +411,16 @@ footer, .testnet footer {
 
 @media screen and (max-width: $bootstrap-md) and (min-width: $bootstrap-sm) {
     #wallet {
+        .mnemonic-wrapper {
+            .mnemonic-title {
+                font-size: 1.1rem;
+            }
+
+            .mnemonic {
+                font-size: 1rem;
+            }
+        }
+
         .credentials {
             .address-wrapper {
                 .address-title {
@@ -454,7 +465,7 @@ footer, .testnet footer {
             }
 
             .mnemonic {
-                font-size: 0.8rem;
+                font-size: 0.7rem;
             }
         }
 
@@ -504,6 +515,7 @@ footer, .testnet footer {
 
                 .privkey-title {
                     font-size: 1rem;
+                    line-height: 1.5rem;
                 }
 
                 .privkey {
