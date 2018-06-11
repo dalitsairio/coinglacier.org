@@ -53,7 +53,7 @@ Proof the authenticity of the HTML file by verifying its signature.
 ```sh
 gpg --verify coinglacier.org_v0.0.1_SHA256-b4c1f6db3c3a70beff0db88b65bc8595bd2373f787a4def1743c1fa0084bd691.html.asc
 ```
-If the verification fails, immediately stop the process. Somebody is trying to trick you.
+*If the verification fails, immediately stop the process. Somebody is trying to trick you.*
 
 Congratulations, you have verified that the file was actually produced by us and has not been tampered with.<br />
 You can now disconnect your machine from the internet and use the application offline.
