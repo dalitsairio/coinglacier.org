@@ -1,5 +1,7 @@
 .git
 .idea
+*.php
+*.txt
 node_modules
 temporary
 src/js/compiled
