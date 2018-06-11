@@ -309,12 +309,19 @@ footer, .testnet footer {
 }
 
 #page-loader {
-    .page-loader-title {
+    .title {
         color: darken($mainnet-primary-color, 35);
         font-size: 2.4rem;
         font-style: normal;
         font-weight: 500;
         text-transform: uppercase;
+    }
+
+    #loader-explanation{
+        a:link, a:visited, a:hover, a:active{
+            font-size: 0.875rem;
+            color: $body-color;
+        }
     }
 }
 
