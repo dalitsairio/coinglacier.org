@@ -88,13 +88,22 @@ If you only want to import single private keys, there are also wallets that let 
 If your paper wallet is password-encrypted, you will most likely need to decrypt the private keys before you can import them.
 You cand find this functionality in the coinglacier.org application.
 
+### The reason for the long loading times
+If you use Internet Explorer or other non-standard or outdated browsers, the loading might go on forever.
+In this case we recommend that you download and use the latest version of Firefox (it's open source!) for coinglacier.org.
+
+However, in most cases the loading process will eventually end at some point but it will take a long time.
+This is the cost you pay for better security. While you are waiting, coinglacier.org calculates some entropy for you
+which it uses in addition to the secure random number generator from window.crypto.
+This means that you do not fully depend on window.crypto and have some security even if there are flaws in window.crypto
+or some attacker manages to sneak into your browser.
+
 ### End user notes
 
  1) Coinglacier.org was designed to be used on PCs, it is very slow on mobile devices.
-
  2) Only modern browsers are supported.
-
- 3) DO NOT use Opera Mini it renders JavaScript output server side, therefore
+ 3) Internet Explorer is not supported.
+ 4) DO NOT use Opera Mini it renders JavaScript output server side, therefore
     they might record the private key you generated.
 
 ## Developers (install guide)
