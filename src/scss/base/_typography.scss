@@ -299,6 +299,14 @@ footer, .testnet footer {
     }
 }
 
+#below-footer {
+  font-size: 0.875rem;
+
+  a:link, a:visited, a:hover, a:active{
+    color: $body-color;
+  }
+}
+
 #page-loader {
     .page-loader-title {
         color: darken($mainnet-primary-color, 35);

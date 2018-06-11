@@ -119,6 +119,7 @@ DOM.popovers.showXPUB = $('#showXPUBlabel');
 DOM.popovers.encryption = $('#password-input-group');
 DOM.popovers.numberAddresses = $('#address-numbering-label');
 DOM.popovers.qrcodeLinks = $('#qrcode-links-label');
+DOM.popovers.pgpLinks = $('#pgp-key');
 
 // Decrypt mnemonic page
 DOM.decMnemonic = {};
@@ -166,6 +167,7 @@ DOM.footer.donations.segwitQrIcon = $('#donations-segwit-qr-icon');
 DOM.footer.donations.bech32QrIcon = $('#donations-bech32-qr-icon');
 DOM.footer.donations.segwitQR = $('#canvas-donations-segwit').get(0);
 DOM.footer.donations.bech32QR = $('#canvas-donations-bech32').get(0);
+DOM.footer.pgpSignature = $('#pgp-signature');
 
 DOM.footer.windows = {};
 DOM.footer.windows.online = $('footer #online-check-wrapper');
@@ -258,8 +260,7 @@ currentPage = pages.singleWallet;
 
 const mnemonicDecryption = new MnemonicDecryption();
 const privkeyDecryption = new PrivkeyDecryption();
-const securityChecks = new SecurityChecks();
-const footerWindows = new FooterWindows();
+const footer = new Footer();
 const init = new Init();
 const pageManagement = new PageManagement();
 const switchNetwork = new SwitchNetwork();
@@ -318,12 +319,13 @@ DOM.decPriv.checkTestnet.click(privkeyDecryption.checkTestnet);
 DOM.decPriv.checkMainnet.click(privkeyDecryption.checkMainnet);
 
 // Footer
-DOM.footer.securityChecks.online.click(footerWindows.toggleOnline);
-DOM.footer.securityChecks.crypto.click(footerWindows.toggleCrypto);
-DOM.footer.securityChecks.unittests.click(footerWindows.toggleUnitTests);
-DOM.footer.securityChecks.mocha.encTestButton.click(securityChecks.reloadAndRunAllTests);
-DOM.footer.donations.segwitQrIcon.click(footerWindows.toggleSegwitQr);
-DOM.footer.donations.bech32QrIcon.click(footerWindows.toggleBech32Qr);
+DOM.footer.securityChecks.online.click(footer.windows.toggleOnline);
+DOM.footer.securityChecks.crypto.click(footer.windows.toggleCrypto);
+DOM.footer.securityChecks.unittests.click(footer.windows.toggleUnitTests);
+DOM.footer.securityChecks.mocha.encTestButton.click(footer.securityChecks.reloadAndRunAllTests);
+DOM.footer.donations.segwitQrIcon.click(footer.windows.toggleSegwitQr);
+DOM.footer.donations.bech32QrIcon.click(footer.windows.toggleBech32Qr);
+DOM.footer.pgpSignature.click(footer.redirectToSignature);
 
 
 // //////////////////////////////////////////////////
@@ -345,7 +347,7 @@ function Init() {
         this.wallet();
 
         // Run the security checks shown in the footer of the page
-        securityChecks.runAll();
+        footer.securityChecks.runAll();
     }
 
 
@@ -866,6 +868,17 @@ function PrivkeyDecryption() {
 // //////////////////////////////////////////////////
 // Footer
 // //////////////////////////////////////////////////
+
+function Footer() {
+
+    this.securityChecks = new SecurityChecks();
+    this.windows = new FooterWindows();
+
+    this.redirectToSignature = () => {
+        let signatureFileName = window.location.pathname + '.sig';
+        window.open(signatureFileName, '_blank');
+    }
+}
 
 function SecurityChecks() {
 

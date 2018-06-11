@@ -1,5 +1,4 @@
 footer{
-    margin-bottom: 6rem;
     padding: 0.2rem 1.4rem;
 
     .statusicon {
@@ -38,7 +37,7 @@ footer{
                 margin-top: 0;
                 position: relative;
                 right: 0;
-                top: 0;    
+                top: 0;
             }
 
             .replay {
@@ -48,7 +47,7 @@ footer{
             // disable the title links
             h1 {
                 margin-top: 0.5rem;
-                
+
                 a {
                     pointer-events: none;
                 }
@@ -60,7 +59,7 @@ footer{
         border: 0.0625rem solid lightgray;
         margin-bottom: 0.2rem;
         padding: 1rem;
-        
+
         .description {
             // no specific design so far
         }
@@ -105,11 +104,44 @@ footer{
     }
 }
 
+#below-footer {
+    margin-top: 0.4rem;
+    margin-bottom: 6rem;
+
+    text-align: center;
+
+    #github-links{
+        margin-left: 0.4rem;
+    }
+
+    #pgp-data {
+        margin-right: 0.4rem;
+    }
+
+    #no-warranty {
+        margin-left: 1.5rem;
+    }
+}
+
 @media screen and (max-width: $bootstrap-sm) {
     #donations-title, .qr-code-icon {
         display: none;
     }
 
+    #below-footer{
+        #github-links, #pgp-data {
+            display: none;
+        }
+    }
+
+}
+
+@media screen and (max-width: $screen-xs) {
+    #below-footer{
+        #no-warranty {
+            display: block;
+        }
+    }
 
 }
 

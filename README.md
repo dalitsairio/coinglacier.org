@@ -33,18 +33,18 @@ or visit [coinglacier.org](https://coinglacier.org) with your browser and save t
 to avoid becoming a victim of attackers trying to tamper with the coinglacier.org files.
 
 ### Recommended installation method (+ authenticity check)
-If you do this procedure for the first time on this machine, add our GPG key to your Public Key ring
+If you do this procedure for the first time on this machine, add our PGP key to your Public Key ring
 ```sh
 wget https://coinglacier.org/coinglacier-gpg-key.txt
 gpg --import coinglacier-gpg-key.txt
 ```
 
-List the imported GPG key and make sure its fingerprint is 12A2411A8C5CC0356DDB767C24B0274E5B6CA8B1
+List the imported PGP key and make sure its fingerprint is 12A2411A8C5CC0356DDB767C24B0274E5B6CA8B1
 ```sh
 gpg --list-keys dalit.sairio@protonmail.com
 ```
 
-Download the HTML file and the corresponding GPG signature from coinglacier.org
+Download the HTML file and the corresponding PGP signature from coinglacier.org
 ```sh
 wget https://coinglacier.org/git/coinglacier.org_v0.0.1_SHA256-b4c1f6db3c3a70beff0db88b65bc8595bd2373f787a4def1743c1fa0084bd691.html https://coinglacier.org/git/coinglacier.org_v0.0.1_SHA256-b4c1f6db3c3a70beff0db88b65bc8595bd2373f787a4def1743c1fa0084bd691.html.asc
 ```
