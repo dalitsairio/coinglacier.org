@@ -44,21 +44,16 @@ List the imported GPG key and make sure its fingerprint is 12A2411A8C5CC0356DDB7
 gpg --list-keys dalit.sairio@protonmail.com
 ```
 
-Download the HTML file from coinglacier.org
+Download the HTML file and the corresponding GPG signature from coinglacier.org
 ```sh
-wget https://coinglacier.org/git/coinglacier.org_v0.0.1_SHA256-b4c1f6db3c3a70beff0db88b65bc8595bd2373f787a4def1743c1fa0084bd691.html
+wget https://coinglacier.org/git/coinglacier.org_v0.0.1_SHA256-b4c1f6db3c3a70beff0db88b65bc8595bd2373f787a4def1743c1fa0084bd691.html https://coinglacier.org/git/coinglacier.org_v0.0.1_SHA256-b4c1f6db3c3a70beff0db88b65bc8595bd2373f787a4def1743c1fa0084bd691.html.asc
 ```
 
-Create the SHA256 hashsum of the file and make sure it matches the hashsum in the filename
+Proof the authenticity of the HTML file by verifying its signature.
 ```sh
-sha256sum coinglacier.org_v0.0.1_SHA256-b4c1f6db3c3a70beff0db88b65bc8595bd2373f787a4def1743c1fa0084bd691.html
+gpg --verify coinglacier.org_v0.0.1_SHA256-b4c1f6db3c3a70beff0db88b65bc8595bd2373f787a4def1743c1fa0084bd691.html.asc
 ```
-
-Download the signed changelog from coinglacier.org and verify its authenticity using the coinglacier.org GPG key.<br />
-Manually check that your versions hashsum matches the hashsum calculated in the previous step
-```sh
-wget -qO- https://coinglacier.org/git/CHANGELOG.md.asc | gpg -d
-```
+If the verification fails, immediately stop the process. Somebody is trying to trick you.
 
 Congratulations, you have verified that the file was actually produced by us and has not been tampered with.<br />
 You can now disconnect your machine from the internet and use the application offline.
