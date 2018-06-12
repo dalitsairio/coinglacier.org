@@ -152,7 +152,7 @@ footer{
 }
 
 @media print {
-    footer {
+    footer, #below-footer {
         display: none;
     }
 }
