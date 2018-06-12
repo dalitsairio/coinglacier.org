@@ -325,6 +325,8 @@ footer, .testnet footer {
     }
 }
 
+
+
 .testnet {
     #mainmenu {
         li {
@@ -414,6 +416,12 @@ footer, .testnet footer {
             }
         }
     }
+
+    #page-loader {
+        .title {
+            color: darken($testnet-primary-color, 35);
+        }
+    }
 }
 
 @media screen and (max-width: $bootstrap-md) and (min-width: $bootstrap-sm) {
@@ -447,6 +455,24 @@ footer, .testnet footer {
                 .privkey {
                     font-size: 0.7rem;
                     word-break: break-all;
+                }
+            }
+        }
+    }
+}
+
+
+@media screen and (max-width: $bootstrap-xl) and (min-width: $bootstrap-md) {
+    #wallet {
+        .credentials {
+            .address-wrapper {
+                .address {
+                    font-size: 0.8rem;
+                }
+            }
+            .privkey-wrapper {
+                .privkey {
+                    font-size: 0.8rem;
                 }
             }
         }
