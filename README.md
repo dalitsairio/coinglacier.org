@@ -11,6 +11,7 @@ XMLHttpRequest's (no AJAX). The benefit of this technique is you can load the
 JavaScript locally and trust that the JavaScript did not change after being 
 loaded. 
 
+Here is a link to the BitcoinTalk.org forum topic discussing this project:<br />
 https://bitcointalk.org/index.php?topic=4461152
 
 Please send DONATIONS for this project to one of the following Bitcoin Addresses:<br />
