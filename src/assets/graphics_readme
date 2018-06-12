@@ -1,0 +1,1 @@
+The graphics inside of this directory are all directly included into the index.html file (as base64 data). The files in this directory are never referenced in the source code and are only stored here for completeness.

@@ -1,6 +1,13 @@
 .git
 .idea
+*.php
+*.txt
 node_modules
 temporary
+src/js/compiled
 src/js/temporary_concat.js
 src/js/encryptionWorker_bundled.min.js
+src/js/libs
+src/maps
+src/scss/vendors
+src/css

@@ -1,0 +1,158 @@
+footer{
+    padding: 0.2rem 1.4rem;
+
+    .statusicon {
+        float: left;
+        margin: 0 0.5rem 0 0;
+
+        .small-loader {
+            margin: 0.4rem 0.4rem 0 0.4rem;
+        }
+    }
+
+    .footer-window {
+        background: #fff;
+        margin: 0.8rem 0;
+
+        &.with-margin {
+            padding: 1.5rem 1.8rem;
+        }
+
+        canvas {
+            padding-left: 0;
+            padding-right: 0;
+            margin-left: auto;
+            margin-right: auto;
+            display: block;
+        }
+    }
+
+    #mocha-wrapper{
+
+        // override mocha defaults
+        #mocha {
+            margin: 0;
+
+            #mocha-stats{
+                margin-top: 0;
+                position: relative;
+                right: 0;
+                top: 0;
+            }
+
+            .replay {
+                display: none;
+            }
+
+            // disable the title links
+            h1 {
+                margin-top: 0.5rem;
+
+                a {
+                    pointer-events: none;
+                }
+            }
+        }
+    }
+
+    #encryption-tests-dialog {
+        border: 0.0625rem solid lightgray;
+        margin-bottom: 0.2rem;
+        padding: 1rem;
+
+        .description {
+            // no specific design so far
+        }
+
+        button {
+            margin-top: 1rem;
+        }
+    }
+
+    #donations-wrapper {
+        float:right;
+        margin: 0.3rem 0 0.2rem 0;
+
+        #donations-title {
+            float: left;
+            margin-right: 1rem;
+            margin-top: 0.25rem;
+        }
+    }
+
+    #donations-addresses-wrapper {
+        float:right;
+    }
+
+    .qr-code-icon {
+        background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+
+        gvaeTAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAAB3RJTUUH4gYBFhErR2qHfgAAAbRJREFUOMt9krGK8lAQhb+7mqiBFBISwdYmFtbiC
+        9j5Br6Arc8hYiX2sUsXSBMVfQNbGwVLi4DYWFx0/sJ/s8Z1PTDNucOcc+cMgLxWkiTyiiRJ5F3vF4BhGPi+j+u6PONwOHA4HHKc67r
+        4vo9hGBknvu+LiEgQBDkH3yrPDoIgEBER3/cFkCJAmqbM53OiKMqpVSoVXvHdk6bpj4PXiuP4l4M4jt/uoJgkSU5Ba0273QZguVxmf
+        LvdJo7j3N8B1H+ljxARlFJv374sy6LVauXIXq9HqVTCsiwcx0EpxWq1QinFbDYDoNVqYVkWxU/K1+v1F6e1BuB+v2f2/oRpmmKaZo4
+        bDAYCyOl0EhGR4mKxeLtEx3HodrsZn6Yp2+0W27bpdDpsNhuq1ernGJ+xXq8FkOl0KiIitVrt55Bc12U8HhNFEWEYZlENh0O01iilO
+        B6PANxuNwBs2+Z0Oj2W6DgO/X4fgDAMM9uTyYTXlAuFAgCXywXgMWC/39NsNnPnCVAulxERjscjl8sFy7IYjUZUq1WiKKJerz8GaK3
+        Z7XZvo1RK4XkenudlSz6fz9TrdRqNBv8AtHU5uFEGDrIAAAAASUVORK5CYII=')
+
+        no-repeat left center;
+
+        margin-left: 0.5rem;
+        padding-bottom: 0.3125rem;
+        padding-left: 1.25rem;
+        padding-right: 0.3125rem;
+        padding-top: 0.3125rem;
+    }
+}
+
+#below-footer {
+    margin-top: 0.4rem;
+    margin-bottom: 6rem;
+
+    text-align: center;
+
+    #github-links{
+        margin-left: 0.4rem;
+    }
+
+    #pgp-data {
+        margin-right: 0.4rem;
+    }
+
+    #no-warranty {
+        margin-left: 1.5rem;
+    }
+}
+
+@media screen and (max-width: $bootstrap-sm) {
+    #donations-title, .qr-code-icon {
+        display: none;
+    }
+
+    #below-footer{
+        #github-links, #pgp-data {
+            display: none;
+        }
+    }
+
+}
+
+@media screen and (max-width: $screen-xs) {
+    #below-footer{
+        #no-warranty {
+            display: block;
+        }
+    }
+
+}
+
+@media screen and (max-width: 500px) {
+    #donations-wrapper, #donations-addresses-wrapper{
+        float: left !important;
+    }
+}
+
+@media print {
+    footer, #below-footer {
+        display: none;
+    }
+}

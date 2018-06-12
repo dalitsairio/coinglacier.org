@@ -1,0 +1,64 @@
+#options {
+    background: lighten($mainnet-primary-color, 30);
+    border: 0.0625rem solid $dark;
+    border-top: none;
+    padding: 0rem 0rem 0.8rem 1.2rem;
+
+    #show-xpub {
+    	.form-check {
+    		padding-left: 0;
+    	}
+    }
+
+    #address-numbering {
+    	.form-check {
+    		padding-left: 0;
+    	}
+    }
+
+    #qrcode-links {
+    	.form-check {
+    		padding-left: 0;
+    	}
+    } 
+
+    #account-row-template {
+    	display: none;
+	}
+
+    .account-row .form-text {
+		span {
+			margin-right: 1rem;
+		}
+
+		input {
+			margin-left: 0.4rem;
+			width: 4rem;
+		}
+
+		button {
+			margin-bottom: 0.25rem;
+			padding: 0.05rem 0.25rem;
+
+			&.account-add {
+				margin-left: 0.5rem;
+			}
+
+			&.account-remove {
+				padding: 0.05rem 0.42rem;
+			}
+		}
+	}
+
+    #wallet-encryption {
+    	label {
+        	margin: 0.3125rem;
+    	}
+	}
+}
+
+@media print {
+	#options {
+		display: none;
+	}
+}

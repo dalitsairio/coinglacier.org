@@ -1,0 +1,51 @@
+body {
+    background: #f6f6f0;
+}
+
+$theme-colors: (
+    "primary": $mainnet-primary-color
+);
+
+// //////////////////////////////////////////////////
+// Ambiance (major settings, background colors, ...)
+// //////////////////////////////////////////////////
+#page {
+    box-shadow: 0 0 3.125rem 0.0625rem rgba(136, 136, 136, 0.25);
+}
+
+#testnet-warning {
+    border: 0.0625rem #856404 dotted;
+}
+
+// this is a hack. Usually popovers have a max-width of 276px
+// however some of them should be bigger.
+// therefore we changed the popovers size to 630px.
+// the content of the small popover must always be encapsulated
+// in a div with the class .normal-popover to keep them small
+.popover, .testnet .popover {
+    max-width: 630px;
+}
+
+.popover .normal-popover {
+    max-width: 276px;
+}
+
+.print {
+    display: none;
+}
+
+@page {
+    margin: 1.2cm 0 1.2cm 0;
+    size: A4;
+
+}
+
+@media print {
+    #switch-network {
+        display: none;
+    }
+
+    .print {
+        display: block;
+    }
+}

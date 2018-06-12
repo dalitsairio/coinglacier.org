@@ -1,0 +1,342 @@
+#wallet {
+    background: white;
+    padding: 1.1rem 1.6rem;
+
+    .mnemonic-wrapper {
+	    border-bottom: 0.0625rem #000 dashed;
+	    padding-bottom: 0.8rem;
+	    padding-top: 0.8rem;
+
+	    .mnemonic-title {
+	    	display: block;
+	    	margin-bottom: 0.7rem;
+	    	z-index: 10;
+	    }
+
+	    .canvas-mnemonic {
+    		float: left;
+    		margin-top: -1rem;
+		}
+	    
+	    .keep-secret {
+			float: left;
+			margin: 3.4rem -3.4rem 0 -3.45rem;
+			transform: rotate(270deg);
+	    }
+	}
+
+	.wallet-account:not(.first-account) {
+    	border-top: 0.0625rem #7c7c7c dashed;
+	}
+
+	.xpub-wrapper {
+		border-bottom: 0.0625rem lightgrey dotted;
+		padding-bottom: 1.5rem;
+		padding-top: 1.5rem;
+
+		.account-title {
+			margin-bottom: 1rem;
+		}
+
+		canvas {
+			float: right;
+			margin-top: -1rem;
+		}
+
+		.okay-to-share {
+			float: right;
+			margin: 4.2rem -4.15rem 0 -4rem;
+			transform: rotate(90deg);
+		}
+
+		.xpub-title {
+			display: block;
+			margin-bottom: 0.5rem;
+		}
+	}
+
+	.credentials {
+		padding-bottom: 1.5em;
+    	padding-top: 1.5em;
+
+    	.address-wrapper {
+
+			min-height: 10.4rem;
+
+		    .okay-to-share {
+				float:left;
+				margin: 3.6rem -3.7rem 0 -3.8rem;
+				transform: rotate(270deg);
+		    }
+
+		    .canvas-address {
+				float: left;
+				margin-top: -0.8rem;
+		    }
+
+		    .address-title {
+		    	display: block;
+		    	margin-bottom: 0.5rem;
+		    	position: relative;
+				z-index: 10;
+		    }
+
+			.address {
+				position: relative;
+				z-index: 10;
+			}
+
+		    &.loading {
+		    	.small-loader {
+        			margin: 1.5rem 0 0 2.6rem;
+    			}
+		    }
+
+		    &:after {
+		    	content: '';
+    			display: block;
+    			clear: both;
+		    }
+		}
+
+		.privkey-wrapper {
+			margin-top: -12rem;
+
+			.keep-secret {
+				float: right;
+				margin: 3.1rem -3.2rem 0 -3.0rem;
+				transform: rotate(90deg);
+			}
+
+			.canvas-privkey {
+				float: right;
+				margin-top: -0.8rem;
+			}
+
+			.privkey-title {
+				display: block;
+				margin-bottom: 0.5rem;
+				position: relative;
+				padding-top: 3.5rem;
+			}
+
+			&.loading {
+				margin-top: -15.4rem;
+
+				.small-loader {
+					float: right;
+					margin: 1rem 3.2rem 2.5rem 0;
+				}
+			}
+
+			// with an encrypted private key, the QR code gets sligthly bigger.
+			// therefore move the privkey title a little downwards, but NOT yet while it's loading
+			&:not(.loading){
+				.privkey-title {
+					&.encrypted {
+						padding-top: 5.1rem;
+					}
+				}
+			}
+
+			&:after {
+		    	content: '';
+    			display: block;
+    			clear: both;
+		    }
+		}
+	}
+}
+
+@media screen and (max-width: $bootstrap-md) and (min-width: $bootstrap-sm) {
+
+	#wallet {
+		.mnemonic-wrapper {
+		    border-bottom: 0.0625rem #000 dashed;
+		    padding-bottom: 0.8rem;
+		    padding-top: 0.8rem;
+	    
+		    .keep-secret {
+				float: left;
+				margin: 3.3rem -3.5rem 0 -4rem;
+				transform: rotate(270deg);
+		    }
+		}
+
+		.xpub-wrapper {
+			.okay-to-share {
+				margin: 4.2rem -4.4rem 0 -4.2rem;
+			}
+		}
+		.credentials {
+			.address-wrapper {
+				.okay-to-share {
+					margin: 3.6rem -3.9rem 0 -4.3rem;
+				}
+			}
+			.privkey-wrapper {
+				.keep-secret {
+					margin: 3.1rem -3.6rem 0 -3.4rem;
+				}
+
+				.privkey {
+					max-width: 25rem;
+					margin-left: 15rem;
+				}
+			}
+		}
+	}
+}
+
+@media screen and (max-width: $bootstrap-sm) {
+	#wallet {
+
+		.mnemonic-wrapper {
+			.keep-secret {
+				margin: 1.5rem -2.5rem 0 -2.8rem;
+			}
+
+			.mnemonic-title {
+				margin-bottom: 1rem;
+				margin-left: 1.6rem;
+			}
+
+			.canvas-mnemonic {
+				height: 6.25rem !important;
+				width: 6.25rem !important;
+			}
+		}
+
+		.xpub-wrapper {
+			.canvas-xpub {
+				height: 6.875rem !important;
+				margin-top: -0.3rem;
+				width: 6.875rem !important;
+			}
+
+			.okay-to-share {
+				margin: 2.6rem -3rem 0 -2.8rem;
+			}
+		}
+
+		.credentials {
+			border-bottom: grey dotted 0.0625rem;
+			padding-bottom: 0.5rem;
+			padding-top: 0.5rem;
+
+			.address-wrapper {
+
+				margin-bottom: 0.8rem;
+				min-height: 4.5rem;
+
+				.canvas-address {
+					display: none !important;
+				}
+
+				.okay-to-share {
+					float: none;
+					margin: 0;
+					transform: rotate(0deg);
+				}
+
+				.address-title {
+					margin: 0;
+				}
+			}
+
+			.privkey-wrapper {
+				margin-top: 0;
+
+				.canvas-privkey {
+					display:none !important;
+				}
+
+				.keep-secret{
+					float: none;
+					margin: 0;
+					transform: rotate(0deg);
+				}
+
+				.privkey-title {
+					padding-top: 11.65rem;
+
+					.encrypted-tag {
+						display: none;
+					}
+				}
+
+				&.loading {
+					margin-top: -17rem;
+				}
+
+				&:not(.loading) {
+					.privkey-title {
+						margin: 0;
+						padding: 0;
+						position: relative;
+
+						&.encrypted {
+							padding: 0;
+						}
+
+						.encrypted-tag {
+							display: inline;
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+@media print {
+    #wallet {
+        .mnemonic-wrapper {
+            border-bottom: none;
+            page-break-after: always;
+        }
+
+        .wallet-account{
+			border-top: none !important;
+
+			&:not(.last-account) {
+				page-break-after: always;
+			}
+
+        	.xpub-wrapper {
+        		border-bottom: none;
+
+				.okay-to-share {
+					margin: 5.2rem -4.15rem 0 -4rem;
+				}
+
+        		canvas {
+        			margin-top: 0;
+        		}
+        	}
+        }
+
+        .credentials {
+			padding-bottom: 1.25rem;
+			padding-top: 1.25rem;
+
+			border-top: 1px #757677 dotted;
+        	page-break-inside: avoid;
+
+			.privkey-wrapper {
+				.privkey-title {
+					padding-top: 5rem;
+				}
+				// with an encrypted private key, the QR code gets sligthly bigger.
+				// therefore move the privkey title a little downwards, but NOT yet while it's loading
+				&:not(.loading){
+					.privkey-title {
+						&.encrypted {
+							padding-top: 6.2rem;
+						}
+					}
+				}
+			}
+        }
+    }
+}

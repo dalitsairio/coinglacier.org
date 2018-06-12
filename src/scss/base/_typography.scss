@@ -1,0 +1,613 @@
+html {
+    // basis for rem calculation
+    font-size: 16px;
+}
+
+header {
+    .site-title{
+        margin-top: -300rem;
+        position: absolute;
+    }
+
+    .page-title {
+        margin-top: -300rem;
+        position: absolute;
+    }
+}
+
+#mainmenu {
+	font-weight: bold;
+
+    li {
+        a {
+            color: $mainnet-primary-color;
+        }
+
+        &.active {
+            > a {
+                color: lighten($mainnet-primary-color, 20);
+                text-shadow: 0 0 0.1875rem #000;
+            }
+        }
+
+        a {
+            @include hover {
+                color: darken($mainnet-primary-color, 15)
+            }
+        }
+
+        #menu-decrypt-dropdown {
+            .dropdown-item {
+                color: $mainnet-primary-color;
+
+                &:hover, &:focus, &.active, &:active{
+                    color:black;
+                }
+            }
+        }
+    }
+
+    #service-name {
+        color: #c1dfff;
+        font-size: 0.9375rem;
+        font-style: italic;
+    }
+}
+
+#switch-network {
+    button, button:visited {
+        color: $gray-700 !important;
+    }
+
+    button:hover, button:active {
+        color: $gray-900 !important;
+    }
+}
+
+.popover-highlight {
+    color: #800000;
+    font-style: italic;
+}
+
+#options {
+    font-size: smaller;
+
+    .option-title{
+        display: block;
+        font-size: 1rem;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        margin-top: 1.2rem;
+    }
+
+    .account-row .form-text {
+        span {
+            font-weight: bold;
+        }
+
+        button {
+            font-size: 1.2rem;
+            line-height: 1;
+        }
+    }
+}
+
+.hide-pass {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+}
+
+#mnemonic-dec-params {
+    .input-title {
+        font-size: 1rem;
+        font-weight: 500;
+    }
+
+    #mnemonic-dec-mnemonic {
+        font-size: 0.8rem;
+        font-family: monospace;
+    }
+}
+
+#privkey-dec-params {
+    .input-title {
+        font-size: 1rem;
+        font-weight: 500;
+    }
+
+    #privkey-dec-key {
+        font-size: 0.8rem;
+        font-family: monospace;
+    }
+}
+
+#wallet {
+    .mnemonic-wrapper {
+        .mnemonic-title {
+            color: darken($mainnet-primary-color, 35);
+            font-size: 1.5rem;
+            font-style: italic;
+            font-weight: 500;
+            line-height: 0.6;
+        }
+
+        .keep-secret {
+            font-size: 1.1rem;
+        }
+
+        .mnemonic {
+            font-family: monospace;
+            font-size: 1.3rem;
+        }
+    }
+
+    .xpub-wrapper {
+        .account-title {
+            color: darken($mainnet-primary-color, 35);
+            display: block;
+            font-size: 1.5rem;
+            font-style: italic;
+            font-weight: 500;
+            line-height: 0.7;
+        }
+
+        .xpub-title {
+            font-size: 1.3rem;
+            font-weight:bold;
+            line-height: 0.7;
+        }
+
+        .xpub {
+            font-family: monospace;
+            font-size: 0.95rem;
+            word-break: break-all;
+        }
+
+        .okay-to-share {
+            font-size: 1.1rem;
+        }
+    }
+
+    .credentials {
+        .address-wrapper {
+            .address-title {
+                color: darken($mainnet-primary-color, 35);
+                font-size: 1.5rem;
+                font-style: italic;
+                font-weight: 500;
+                line-height: 1;
+            }
+
+            .address{
+                font-family: monospace;
+                font-size: 0.95rem;
+
+                a:link, a:visited, a:hover, a:active{
+                    color: #000;
+                }
+            }
+
+            .okay-to-share {
+                font-size: 1rem;
+            }
+        }
+
+        .privkey-wrapper {
+            .privkey-title {
+                color: darken($mainnet-primary-color, 35);
+                font-size: 1.5rem;
+                font-style: italic;
+                font-weight: 500;
+                line-height: 1;
+            }
+
+            .privkey {
+                font-family: monospace;
+            }
+
+            .keep-secret {
+                font-size: 1rem;
+                font-size: 0.95rem;
+            }
+        }
+    }
+
+    .keep-secret {
+        color: #f00000;
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+
+    .okay-to-share {
+        color: #009500;
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+}
+
+footer, .testnet footer {
+	color: white;
+
+	.statusicon {
+		color: #fff;
+		font-size: 1.6rem;
+        text-decoration: none;
+
+        &.warning {
+            color: #ff7820;
+        }
+	}
+
+    .footer-window {
+    	color: #000;
+
+    	a {
+            color: darken($mainnet-primary-color, 20);
+        }
+    }
+
+    .status-good {
+        color: #009500;
+        font-weight: bold;
+    }
+
+    .status-warn {
+        color: #ff7820;
+        font-weight: bold;
+    }
+
+    #encryption-tests-dialog {
+    	.notice{
+            font-style: italic;
+        }
+    }
+
+    #mocha-wrapper {
+        .mocha-title{
+            color: #222;
+            display: block;
+            font-size: 1.5rem;
+            font-weight: 500;
+
+            &.success {
+                color: #009500;
+            }
+
+            &.failed {
+                color: #800000;
+            }
+        }
+
+        h1 {
+            color: #000;
+            font-style: normal;
+        } 
+    }
+
+    #donations-wrapper{
+        font-size: 0.8rem;
+        word-break: break-all;
+
+        a:link, a:visited, a:hover, a:active{
+            color: #fff;
+        }
+
+        #donations-title {
+            color: lighten($mainnet-primary-color, 10);
+            font-size: 1.1rem;
+            font-style: italic;
+        }
+    }
+}
+
+#below-footer {
+  font-size: 0.875rem;
+
+  a:link, a:visited, a:hover, a:active{
+    color: $body-color;
+  }
+}
+
+#page-loader {
+    .title {
+        color: darken($mainnet-primary-color, 35);
+        font-size: 2.4rem;
+        font-style: normal;
+        font-weight: 500;
+        text-transform: uppercase;
+    }
+
+    #loader-explanation{
+        a:link, a:visited, a:hover, a:active{
+            font-size: 0.875rem;
+            color: $body-color;
+        }
+    }
+}
+
+
+
+.testnet {
+    #mainmenu {
+        li {
+            a {
+                color: $testnet-primary-color;
+            }
+
+            &.active {
+                a {
+                    color: lighten($testnet-primary-color, 20);
+                }
+            }
+
+            a {
+                @include hover {
+                    color: darken($testnet-primary-color, 15)
+                }
+            }
+
+            #menu-decrypt-dropdown {
+                .dropdown-item {
+                    color: $testnet-primary-color;
+
+                    &:hover, &:focus, &.active, &:active{
+                        color:black;
+                    }
+                }
+            }
+        }
+    }
+
+    #wallet {
+        .mnemonic-wrapper {
+            .mnemonic-title {
+                color: darken($testnet-primary-color, 30);
+            }
+        }
+
+        .xpub-wrapper {
+            .account-title {
+                color: darken($testnet-primary-color, 30);
+            }
+        }
+
+        .credentials {
+            .address-wrapper {
+                .address-title {
+                    color: darken($testnet-primary-color, 30);
+                }
+            }
+
+            .privkey-wrapper {
+                .privkey-title {
+                    color: darken($testnet-primary-color, 30);
+                } 
+            }
+        }
+    }
+
+    footer {
+    	.statusicon {
+            color: #fff;
+            text-decoration: none; 
+        }
+
+        .footer-window {
+            a {
+                color: darken($testnet-primary-color, 30);
+            }
+        }
+
+        h1 {
+            color: #222;
+
+            &.success {
+                color: #009500;
+            }
+
+            &.failed {
+                color: #800000;
+            }
+        }
+
+        #donations-wrapper {
+            #donations-title {
+                color: lighten($testnet-primary-color, 10);
+            }
+        }
+    }
+
+    #page-loader {
+        .title {
+            color: darken($testnet-primary-color, 35);
+        }
+    }
+}
+
+@media screen and (max-width: $bootstrap-md) and (min-width: $bootstrap-sm) {
+    #wallet {
+        .mnemonic-wrapper {
+            .mnemonic-title {
+                font-size: 1.1rem;
+            }
+
+            .mnemonic {
+                font-size: 1rem;
+            }
+        }
+
+        .credentials {
+            .address-wrapper {
+                .address-title {
+                    font-size: 1.1rem;
+                }
+
+                .address {
+                    font-size: 0.7rem;
+                }
+            }
+
+            .privkey-wrapper {
+                .privkey-title {
+                    font-size: 1.1rem;
+                }
+
+                .privkey {
+                    font-size: 0.7rem;
+                    word-break: break-all;
+                }
+            }
+        }
+    }
+}
+
+
+@media screen and (max-width: $bootstrap-xl) and (min-width: $bootstrap-md) {
+    #wallet {
+        .credentials {
+            .address-wrapper {
+                .address {
+                    font-size: 0.8rem;
+                }
+            }
+            .privkey-wrapper {
+                .privkey {
+                    font-size: 0.8rem;
+                }
+            }
+        }
+    }
+}
+
+@media screen and (max-width: $bootstrap-sm) {
+	#page-loader {
+        h1 {
+            font-size: 1.8rem;
+        }
+    }
+
+    #wallet {
+        .mnemonic-wrapper {
+            .keep-secret {
+                font-size: 0.8rem;
+            }
+
+            .mnemonic-title {
+                font-size: 1.1rem;
+                line-height: 0;
+            }
+
+            .mnemonic {
+                font-size: 0.7rem;
+            }
+        }
+
+        .xpub-wrapper {
+            .keep-secret {
+                font-size: 1rem;
+            }
+
+            .account-title {
+                font-size: 1rem;
+            }
+
+            .xpub-title {
+                font-size: 0.9rem;
+            }
+
+            .xpub {
+                font-size: 0.7rem;
+            }
+
+            .okay-to-share {
+                font-size: 0.7rem;
+            }
+        }
+
+        .credentials {
+            .address-wrapper {
+                .okay-to-share {
+                    font-size: 0.9rem;
+                }
+
+                .address-title {
+                    font-size: 1rem;
+                    line-height: 1.5rem;
+                }
+
+                .address {
+                    font-size: 0.7rem;
+                    word-break: break-all;
+                }
+            }
+
+            .privkey-wrapper {
+                .keep-secret {
+                    font-size: 0.9rem;
+                }
+
+                .privkey-title {
+                    font-size: 1rem;
+                    line-height: 1.5rem;
+                }
+
+                .privkey {
+                    font-size: 0.7rem;
+                    word-break: break-all;
+                }
+            }
+        }
+    }
+}
+
+@media print {
+    .address {
+        a {
+            text-decoration: none;
+        }
+    }
+
+    .print-title{
+        color: #c1dfff;
+        font-size: 3rem;
+        font-style: italic;
+        margin-top: 3.5rem;
+        margin-bottom: 0.25rem;
+        text-align: center;
+    }
+
+    .print-subtitle{
+        color: #000;
+        font-size: 1.2rem;
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+
+    #wallet {
+        .mnemonic-wrapper {
+            .mnemonic {
+                font-size: 1.5em;
+            }
+        }
+
+        .wallet-account {
+            .xpub {
+                font-size: 1.5rem;
+            }
+        }
+
+        .credentials {
+            .address-wrapper {
+                .address {
+                    font-size: 0.9rem;
+                }
+            }
+
+            .privkey-wrapper {
+                .privkey {
+                    font-size: 0.8rem;
+                }
+            }
+        }
+    }
+}

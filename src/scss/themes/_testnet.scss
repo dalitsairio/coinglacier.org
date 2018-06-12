@@ -1,0 +1,31 @@
+.testnet {
+    $theme-colors: (
+        "primary": $testnet-primary-color
+    );
+
+    // Navigation: Submenu items' background when active
+    .dropdown-item{
+        &.active, &:active{
+            background: $testnet-primary-color;
+        }
+    }
+
+    #options {
+        background: lighten($testnet-primary-color, 30);
+    }
+
+    #page-loader {
+        #spinner-wrapper {
+                .loader {
+                    // should be 14px for big loader and 8px for small one. But who cares, I'm too lazy for this.
+                    border-top: 12px solid $testnet-primary-color;
+            }
+
+        }
+
+    }
+    
+    .small-loader {
+        border-top: 5px solid $testnet-primary-color;
+    }
+}

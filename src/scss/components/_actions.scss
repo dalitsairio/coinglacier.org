@@ -1,0 +1,17 @@
+#actions {
+    background: $actions-bg;
+    border-bottom: 0.0625rem solid #A9A9A9;
+    box-shadow: 0 0.0625rem 1.25rem -0.25rem rgba(145, 145, 145, 0.35);
+    padding: 0.5rem 1.2rem;
+    position: relative;
+    
+    #print-button {
+        float: right;
+    }
+}
+
+@media print {
+    #actions {
+        display: none;
+    }
+}

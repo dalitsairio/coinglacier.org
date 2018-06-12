@@ -1,0 +1,91 @@
+#mainmenu {
+	padding-left: 17.8125rem;
+    position: relative;
+
+    #service-name {
+        margin-right: 0.625rem;
+    }
+
+    .navbar-brand{
+        left: 1.625rem;
+        position: absolute;
+        top: -0.875rem;
+        
+        img {
+            width: 4.6875rem;
+        }
+    }
+
+    .navbar-toggler {
+        background: darken($mainnet-primary-color, 15%);
+
+        &:hover {
+            background: darken($mainnet-primary-color, 22%);
+        }
+    }
+}
+
+.testnet{
+    #mainmenu {
+        .navbar-toggler {
+            background-color: darken($testnet-primary-color, 17%);
+
+            &:hover {
+                background-color: darken($testnet-primary-color, 22%);
+            }
+        }
+    }
+}
+
+@media screen and (min-width: $bootstrap-sm) and (max-width: $bootstrap-md) {
+	#mainmenu {
+        padding-left: 5.9375rem;
+
+        a.navbar-brand {
+            left: 0.625rem;
+        }
+    }
+
+    .privkey-wrapper {
+        margin-top: -8rem;
+    }
+}
+
+@media screen and (max-width: $bootstrap-sm) {
+    #mainmenu {
+        padding: 0;
+
+        .navbar-toggler {
+            position: absolute;
+            right: 0.75rem;
+            top: 0.5rem;
+        }
+
+        #navbarNav {
+            margin-bottom: 0;
+            margin-left: 1.125rem;
+            margin-right: 1.125rem;
+            margin-top: 0;
+        }
+
+        .navbar-brand {
+            left: 1rem;
+            position: relative;
+            top: 0;
+
+            img {
+                width: 3.125rem;
+            }
+        }
+    }
+}
+
+@media screen and (max-width: $screen-xs) {
+    #mainmenu {
+        min-height: 3.5rem;
+
+        img {
+            display: none;
+        }
+    }
+}

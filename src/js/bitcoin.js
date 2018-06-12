@@ -1,12 +1,13 @@
-const bitcoinjs = require('./bitcoinjs-lib_patched').bitcoinjs;
+const bitcoinjs = require('./patchedLibs/bitcoinjs-lib_patched').bitcoinjs;
 const bip39 = require('bip39');
 const mEntropy = require('more-entropy');
-var randomBytes = require('randombytes');
+const randomBytes = require('randombytes');
+const createHash = require('create-hash');
 
 const bip39_bitSize = 128; // = 12 words  // https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki#generating-the-mnemonic
 const bip39_byteSize = bip39_bitSize / 8;
 
-var moreEntropyGen = new mEntropy.Generator({
+let moreEntropyGen = new mEntropy.Generator({
     'loop_delay':        2, // how many milliseconds to pause between each operation loop. A lower value will generate entropy faster, but will also be harder on the CPU
     'work_min':           1 ,// milliseconds per loop; a higher value blocks the CPU more, so 1 is recommended
     'auto_stop_bits':  8192, // the generator prepares entropy for you before you request it; if it reaches this much unclaimed entropy it will stop working
@@ -17,6 +18,12 @@ var moreEntropyGen = new mEntropy.Generator({
 // https://github.com/keybase/more-entropy/blob/v0.0.4/lib/generator.js#L173
 if (typeof window !== "undefined" && window !== null) {
     window.Generator = null;
+}
+
+function hash256 (buffer) {
+    return createHash('sha256').update(
+        createHash('sha256').update(buffer).digest()
+    ).digest()
 }
 
 function getEntropy(useImprovedEntropy, cb){
@@ -39,18 +46,18 @@ async function improveEntropy(amountInBytes){
         moreEntropyGen.generate(amountInBytes * 8, function (vals) {
 
             // stuff entropy into a Uint8Array
-            var valsUint8 = new Uint8Array(vals);
+            let valsUint8 = new Uint8Array(vals);
 
             // get randomBytes (uses crypto.getRandomValues)
-            var randBytes = randomBytes(amountInBytes);
+            let randBytes = randomBytes(amountInBytes);
 
             // merge
-            var mergeArray = new Uint8Array(amountInBytes);
-            for (var i = 0; i < amountInBytes; i++) {
+            let mergeArray = new Uint8Array(amountInBytes);
+            for (let i = 0; i < amountInBytes; i++) {
                 mergeArray[i] = randBytes[i] ^ valsUint8[i];
             }
 
-            var mergedEntropy = Buffer.from(mergeArray);
+            let mergedEntropy = Buffer.from(mergeArray);
 
             resolve(mergedEntropy);
         });
@@ -60,33 +67,30 @@ async function improveEntropy(amountInBytes){
 
 function initiateHDWallet(loadMnemonic, password, useImprovedEntropy, cb) {
 
-    function afterGettingMnemonic(mnemonic, password) {
-        var seed = bip39.mnemonicToSeed(mnemonic, password);
-        var bip32RootKey = bitcoinjs.HDNode.fromSeedBuffer(seed);
-
-        cb(mnemonic, bip32RootKey);
-    }
-
     if (!loadMnemonic) {
-
         getEntropy(useImprovedEntropy, function (entropy) {
 
             // create a new mnemonic and return it
-            var mnemonic = bip39.entropyToMnemonic(entropy);
+            let mnemonic = bip39.entropyToMnemonic(entropy);
 
-            afterGettingMnemonic(mnemonic, password);
+            getRootKeyFromMnemonic(mnemonic, password, cb);
         });
-
-
     } else {
         // import a given mnemonic
         if (bip39.validateMnemonic(loadMnemonic)) {
 
-            afterGettingMnemonic(loadMnemonic, password);
+            getRootKeyFromMnemonic(loadMnemonic, password, cb);
         } else {
             throw ('given mnemonic [' + loadMnemonic + '] is not a valid 12 word mnemonic');
         }
     }
+}
+
+function getRootKeyFromMnemonic(mnemonic, password, cb){
+    let seed = bip39.mnemonicToSeed(mnemonic, password);
+    let bip32RootKey = bitcoinjs.HDNode.fromSeedBuffer(seed);
+
+    cb(mnemonic, bip32RootKey);
 }
 
 function createAccount(bip32RootKey, networkID, index) {
@@ -94,25 +98,25 @@ function createAccount(bip32RootKey, networkID, index) {
     index = index || 0;
 
     // check path validity
-    var accountPath = getAccountPath(networkID, index);
-    var pathError = findDerivationPathErrors(accountPath, false, true);
+    let accountPath = getAccountPath(networkID, index);
+    let pathError = findDerivationPathErrors(accountPath, false, true);
     if (pathError) throw 'Derivation Path Error: ' + pathError;
 
-    var account = bip32RootKey.derivePath(accountPath);
+    let account = bip32RootKey.derivePath(accountPath);
     account.keyPair.network = getNetworkByID(networkID);
 
-    var result = {};
-    result.account = account;
-
-    result.xpub = account.neutered().toBase58();
-    result.credentials = [];
+    let result = {
+        account: account,
+        xpub: account.neutered().toBase58(),
+        credentials: []
+    };
 
     // calculate one level more downwards the tree, so time can be saved when creating multiple addresses later on
     // Masternode / BIP44 | BIP49 | BIP84 / Bitcoin | Testnet / Account / External / First Address
     //                                                                   ^^^^^^^^^
-    var externalPath = '0';
-    var pathError = findDerivationPathErrors(externalPath, false, false);
-    if (pathError) throw 'Derivation Path Error: ' + pathError;
+    let externalPath = '0';
+    let pathError2 = findDerivationPathErrors(externalPath, false, false);
+    if (pathError2) throw 'Derivation Path Error: ' + pathError;
     result.external = account.derivePath(externalPath);
 
     return result;
@@ -122,51 +126,100 @@ function createAccount(bip32RootKey, networkID, index) {
 // creates addresses and privKeys on the level of a BIP32 account
 function createCredentials(bip44external, addressIndex) {
 
-    var credentials;
-
     // Masternode / BIP44 | BIP49 | BIP84 / Bitcoin | Testnet / Account / External / First Address
     //                                                                              ^^^^^^^^^^^^^^^
-    var addressPath = addressIndex + '';
-    var pathError = findDerivationPathErrors(addressPath, true, false);
+    let addressPath = addressIndex + '';
+    let pathError = findDerivationPathErrors(addressPath, true, false);
     if (pathError) throw 'Derivation Path Error: ' + pathError;
-    var bip32 = bip44external.derivePath(addressPath);
+    let bip32 = bip44external.derivePath(addressPath);
 
-    var privateKey = bip32.keyPair.toWIF();
+    let privateKey = bip32.keyPair.toWIF();
 
-    switch (bip32.keyPair.network) {
-        case bitcoinjs.networks.bitcoin:
-        case bitcoinjs.networks.testnet:
+    return getCredentialsFromPrivKey(privateKey, bip32, bip32.keyPair.network);
+}
 
-            credentials = {privateKey: privateKey, address: bip32.getAddress()};
+function getCredentialsFromPrivKey(privateKey, ecPair, network){
+
+    let pubKey, redeemScript, scriptPubKey;
+
+    switch (network.id) {
+        case bitcoinjs.networks.bitcoin.id:
+        case bitcoinjs.networks.testnet.id:
+
+            return { privateKey: privateKey, address: ecPair.getAddress() };
             break;
-        case bitcoinjs.networks.bitcoin.p2wpkhInP2sh:
-        case bitcoinjs.networks.testnet.p2wpkhInP2sh:
+        case bitcoinjs.networks.bitcoin.p2wpkhInP2sh.id:
+        case bitcoinjs.networks.testnet.p2wpkhInP2sh.id:
 
-            var pubKey = bip32.getPublicKeyBuffer();
-            var redeemScript = bitcoinjs.script.witnessPubKeyHash.output.encode(bitcoinjs.crypto.hash160(pubKey));
-            var scriptPubKey = bitcoinjs.script.scriptHash.output.encode(bitcoinjs.crypto.hash160(redeemScript));
+            pubKey = ecPair.getPublicKeyBuffer();
+            redeemScript = bitcoinjs.script.witnessPubKeyHash.output.encode(bitcoinjs.crypto.hash160(pubKey));
+            scriptPubKey = bitcoinjs.script.scriptHash.output.encode(bitcoinjs.crypto.hash160(redeemScript));
 
-            credentials = {
+            return {
                 privateKey: privateKey,
-                address: bitcoinjs.address.fromOutputScript(scriptPubKey, bip32.keyPair.network)
+                address: bitcoinjs.address.fromOutputScript(scriptPubKey, network)
             };
             break;
-        case bitcoinjs.networks.bitcoin.p2wpkh:
-        case bitcoinjs.networks.testnet.p2wpkh:
+        case bitcoinjs.networks.bitcoin.p2wpkh.id:
+        case bitcoinjs.networks.testnet.p2wpkh.id:
 
-            var pubKey = bip32.getPublicKeyBuffer();
-            var scriptPubKey = bitcoinjs.script.witnessPubKeyHash.output.encode(bitcoinjs.crypto.hash160(pubKey));
+            pubKey = ecPair.getPublicKeyBuffer();
+            scriptPubKey = bitcoinjs.script.witnessPubKeyHash.output.encode(bitcoinjs.crypto.hash160(pubKey));
 
-            credentials = {
+            return {
                 privateKey: privateKey,
-                address: bitcoinjs.address.fromOutputScript(scriptPubKey, bip32.keyPair.network)
+                address: bitcoinjs.address.fromOutputScript(scriptPubKey, network)
             };
             break;
         default:
             throw ("given network is not a valid network");
     }
+}
 
-    return credentials;
+// todo   this should actually be part of the BIP38 library
+// todo   but testnet/segwit/bech32 support is not implemented yet (May '18)
+// is solely used for BIP38 decryption, to find out what addresstype the encrypted privKey originally was created for.
+// guesses on what address type should be returned
+function getCredentialsFromPrivKeyAndSalt(privateKey, salt, testnet){
+
+    let possibleNetworks = getNetworkArray(testnet);
+
+    try {
+        for (let x = 0; x < possibleNetworks.length; x++) {
+
+            let ecPair = bitcoinjs.ECPair.fromWIF(privateKey, possibleNetworks[x]);
+            let credentials = getCredentialsFromPrivKey(privateKey, ecPair, possibleNetworks[x]);
+            let checksum = hash256(credentials.address).slice(0, 4);
+
+            let checksumCorrect = Buffer.compare(Buffer.from(salt), Buffer.from(checksum)) === 0;
+
+            if (checksumCorrect) {
+                return credentials;
+            }
+        }
+    }catch (e) {
+        console.error('Error in BIP38 Password Decryption');
+        console.error(e.message);
+    }
+
+    return false;
+}
+
+function getNetworkArray(testnet){
+
+    let mainnetNetworks = [
+        bitcoinjs.networks.bitcoin.p2wpkhInP2sh,
+        bitcoinjs.networks.bitcoin.p2wpkh,
+        bitcoinjs.networks.bitcoin,
+    ];
+
+    let testnetNetworks = [
+        bitcoinjs.networks.testnet.p2wpkhInP2sh,
+        bitcoinjs.networks.testnet.p2wpkh,
+        bitcoinjs.networks.testnet
+    ];
+
+    return testnet ? testnetNetworks : mainnetNetworks;
 }
 
 function getNetworkByID(networkID) {
@@ -200,7 +253,7 @@ function getBip44testnetOrMainnet(networkID) {
 function getAccountPath(networkID, accountIndex) {
 
     // https://github.com/satoshilabs/slips/blob/master/slip-0044.md
-    var mainnetORtestnet = getBip44testnetOrMainnet(networkID);
+    let mainnetORtestnet = getBip44testnetOrMainnet(networkID);
 
     // get extended public key of each account
     switch (networkID) {
@@ -243,11 +296,11 @@ function findDerivationPathErrors(path, createXPUB, fromMasternode) {
     // https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki#test-vectors
     // and
     // https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki#extended-keys
-    var maxDepth = 255; // TODO verify this!!
-    var maxIndexValue = Math.pow(2, 31); // TODO verify this!!
+    let maxDepth = 255; // TODO verify this!!
+    let maxIndexValue = Math.pow(2, 31); // TODO verify this!!
 
     // check first character
-    var invalidFirstChar = path[0].replace(/^[0-9m]/, "");
+    let invalidFirstChar = path[0].replace(/^[0-9m]/, "");
     if (invalidFirstChar > 0) {
         return "first charactar must be 'm' or a number, but is " + invalidFirstChar;
     }
@@ -262,17 +315,17 @@ function findDerivationPathErrors(path, createXPUB, fromMasternode) {
         if (path[1] != '/') {
             return "Separator must be '/'";
         }
-        var indexes = path.split('/');
+        let indexes = path.split('/');
         if (indexes.length > maxDepth) {
             return 'Derivation depth is ' + indexes.length + ', must be less than ' + maxDepth;
         }
-        for (var depth = 1; depth < indexes.length; depth++) {
-            var index = indexes[depth];
-            var invalidChars = index.replace(/^[0-9]+'?$/g, "")
+        for (let depth = 1; depth < indexes.length; depth++) {
+            let index = indexes[depth];
+            let invalidChars = index.replace(/^[0-9]+'?$/g, "")
             if (invalidChars.length > 0) {
                 return "Invalid characters " + invalidChars + " found at depth " + depth;
             }
-            var indexValue = parseInt(index.replace("'", ""));
+            let indexValue = parseInt(index.replace("'", ""));
             if (isNaN(depth)) {
                 return "Invalid number at depth " + depth;
             }
@@ -283,7 +336,7 @@ function findDerivationPathErrors(path, createXPUB, fromMasternode) {
     }
 
     // Check no hardened derivation path when using xpub keys
-    var isHardenedPath = path.indexOf("'") > -1;
+    let isHardenedPath = path.indexOf("'") > -1;
     if (isHardenedPath && createXPUB) {
         return "Hardened derivation path is invalid with xpub key";
     }
@@ -295,5 +348,7 @@ module.exports = {
     initiateHDWallet,
     createAccount,
     createCredentials,
+    getCredentialsFromPrivKeyAndSalt,
+    validateMnemonic: bip39.validateMnemonic,
     networks: bitcoinjs.networks
 };
