@@ -15,6 +15,26 @@
             width: 4.6875rem;
         }
     }
+
+    .navbar-toggler {
+        background: darken($mainnet-primary-color, 15%);
+
+        &:hover {
+            background: darken($mainnet-primary-color, 22%);
+        }
+    }
+}
+
+.testnet{
+    #mainmenu {
+        .navbar-toggler {
+            background-color: darken($testnet-primary-color, 17%);
+
+            &:hover {
+                background-color: darken($testnet-primary-color, 22%);
+            }
+        }
+    }
 }
 
 @media screen and (min-width: $bootstrap-sm) and (max-width: $bootstrap-md) {
