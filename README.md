@@ -46,7 +46,7 @@ gpg --list-keys dalit.sairio@protonmail.com
 
 Download the HTML file and the corresponding PGP signature from coinglacier.org
 ```sh
-wget https://coinglacier.org/git/coinglacier.org_v1.0.0_SHA256-e8d0799f83089066d760e295899839f5d67eea4bb768b6d564140253e8eff9a8.html https://coinglacier.org/git/coinglacier.org_v1.0.0_SHA256-e8d0799f83089066d760e295899839f5d67eea4bb768b6d564140253e8eff9a8.html.asc
+wget https://coinglacier.org/coinglacier.org_v1.0.0_SHA256-e8d0799f83089066d760e295899839f5d67eea4bb768b6d564140253e8eff9a8.html https://coinglacier.org/coinglacier.org_v1.0.0_SHA256-e8d0799f83089066d760e295899839f5d67eea4bb768b6d564140253e8eff9a8.html.asc
 ```
 
 Proof the authenticity of the HTML file by verifying its signature.
