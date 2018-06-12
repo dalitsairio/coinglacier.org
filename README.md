@@ -46,12 +46,12 @@ gpg --list-keys dalit.sairio@protonmail.com
 
 Download the HTML file and the corresponding PGP signature from coinglacier.org
 ```sh
-wget https://coinglacier.org/git/coinglacier.org_v0.0.1_SHA256-b4c1f6db3c3a70beff0db88b65bc8595bd2373f787a4def1743c1fa0084bd691.html https://coinglacier.org/git/coinglacier.org_v0.0.1_SHA256-b4c1f6db3c3a70beff0db88b65bc8595bd2373f787a4def1743c1fa0084bd691.html.asc
+wget https://coinglacier.org/git/coinglacier.org_v1.0.0_SHA256-e8d0799f83089066d760e295899839f5d67eea4bb768b6d564140253e8eff9a8.html https://coinglacier.org/git/coinglacier.org_v1.0.0_SHA256-e8d0799f83089066d760e295899839f5d67eea4bb768b6d564140253e8eff9a8.html.asc
 ```
 
 Proof the authenticity of the HTML file by verifying its signature.
 ```sh
-gpg --verify coinglacier.org_v0.0.1_SHA256-b4c1f6db3c3a70beff0db88b65bc8595bd2373f787a4def1743c1fa0084bd691.html.asc
+gpg --verify coinglacier.org_v1.0.0_SHA256-e8d0799f83089066d760e295899839f5d67eea4bb768b6d564140253e8eff9a8.html.asc
 ```
 *If the verification fails, immediately stop the process. Somebody is trying to trick you.*
 
@@ -60,7 +60,7 @@ You can now disconnect your machine from the internet and use the application of
 
 ### Using the coinglacier.org application
 After having installed coinglacier.org on a trustworthy machine, disconnect your machine from the internet.
-Open coinglacier.org_v0.0.1_SHA256-b4c1f6db3c3a70beff0db88b65bc8595bd2373f787a4def1743c1fa0084bd691.html in the incognito mode of your trustworthy browser.<br />
+Open coinglacier.org_v1.0.0_SHA256-e8d0799f83089066d760e295899839f5d67eea4bb768b6d564140253e8eff9a8.html in the incognito mode of your trustworthy browser.<br />
 To create safe wallets, print your created wallets but *do not* store any file anywhere digitally. The idea is that your confidential data is *only* stored offline, not digitally, for example on paper.<br />
 If you print the keys, make sure the printer you are using does not store any data you send to it or transmit it to any other device/service.
 This also applies to any other device your machine may be connected to.<br />

@@ -1,7 +1,7 @@
 {
   "name": "coinglacier.org",
-  "version": "0.0.1",
-  "sha256sum": "b4c1f6db3c3a70beff0db88b65bc8595bd2373f787a4def1743c1fa0084bd691",
+  "version": "1.0.0",
+  "sha256sum": "e8d0799f83089066d760e295899839f5d67eea4bb768b6d564140253e8eff9a8",
   "description": "Open Source JavaScript Client-Side Bitcoin Wallet Generator",
   "main": "index.js",
   "scripts": {
