@@ -875,7 +875,7 @@ function Footer() {
     this.windows = new FooterWindows();
 
     this.redirectToSignature = () => {
-        let signatureFileName = window.location.pathname + '.sig';
+        let signatureFileName = window.location.pathname + '.asc';
         window.open(signatureFileName, '_blank');
     }
 }
