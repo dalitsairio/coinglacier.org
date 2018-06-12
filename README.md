@@ -159,6 +159,7 @@ Each commit message should begin with one of the following tags:
 * **[TEST]**: Handling unit tests
 * **[CHORE]**: Changes to the build process or auxiliary tools
 * **[STYLING]**: UI design changes that do not affect functionality
+* **[RELEASE]**: For new releases
 * **[MISC]**: Everything that doesn't fit the above types
 
 # Supported Bitcoin Standards
