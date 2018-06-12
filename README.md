@@ -46,12 +46,12 @@ gpg --list-keys dalit.sairio@protonmail.com
 
 Download the HTML file and the corresponding PGP signature from coinglacier.org
 ```sh
-wget https://coinglacier.org/coinglacier.org_v1.0.0_SHA256-e8d0799f83089066d760e295899839f5d67eea4bb768b6d564140253e8eff9a8.html https://coinglacier.org/coinglacier.org_v1.0.0_SHA256-e8d0799f83089066d760e295899839f5d67eea4bb768b6d564140253e8eff9a8.html.asc
+wget https://coinglacier.org/coinglacier.org_v1.0.0_SHA256-53b04fc126ce2f4b814d0994359e6992a2982218c2048d58c5249fc5df586fb5.html https://coinglacier.org/coinglacier.org_v1.0.0_SHA256-53b04fc126ce2f4b814d0994359e6992a2982218c2048d58c5249fc5df586fb5.html.asc
 ```
 
 Proof the authenticity of the HTML file by verifying its signature.
 ```sh
-gpg --verify coinglacier.org_v1.0.0_SHA256-e8d0799f83089066d760e295899839f5d67eea4bb768b6d564140253e8eff9a8.html.asc
+gpg --verify coinglacier.org_v1.0.0_SHA256-53b04fc126ce2f4b814d0994359e6992a2982218c2048d58c5249fc5df586fb5.html.asc
 ```
 *If the verification fails, immediately stop the process. Somebody is trying to trick you.*
 
@@ -60,7 +60,7 @@ You can now disconnect your machine from the internet and use the application of
 
 ### Using the coinglacier.org application
 After having installed coinglacier.org on a trustworthy machine, disconnect your machine from the internet.
-Open coinglacier.org_v1.0.0_SHA256-e8d0799f83089066d760e295899839f5d67eea4bb768b6d564140253e8eff9a8.html in the incognito mode of your trustworthy browser.<br />
+Open coinglacier.org_v1.0.0_SHA256-53b04fc126ce2f4b814d0994359e6992a2982218c2048d58c5249fc5df586fb5.html in the incognito mode of your trustworthy browser.<br />
 To create safe wallets, print your created wallets but *do not* store any file anywhere digitally. The idea is that your confidential data is *only* stored offline, not digitally, for example on paper.<br />
 If you print the keys, make sure the printer you are using does not store any data you send to it or transmit it to any other device/service.
 This also applies to any other device your machine may be connected to.<br />
