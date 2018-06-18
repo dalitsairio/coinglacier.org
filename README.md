@@ -35,13 +35,12 @@ to avoid becoming a victim of attackers trying to tamper with the coinglacier.or
 ### Recommended installation method (+ authenticity check)
 If you do this procedure for the first time on this machine, add our PGP key to your Public Key ring
 ```sh
-wget https://coinglacier.org/coinglacier-gpg-key.txt
-gpg --import coinglacier-gpg-key.txt
+wget -qO- https://coinglacier.org/coinglacier-pgp-key.txt | gpg --import
 ```
 
-List the imported PGP key and make sure its fingerprint is 12A2411A8C5CC0356DDB767C24B0274E5B6CA8B1
+List the imported PGP key and make sure its fingerprint is 12A2 411A 8C5C C035 6DDB  767C 24B0 274E 5B6C A8B1
 ```sh
-gpg --list-keys dalit.sairio@protonmail.com
+gpg --list-keys --with-fingerprint dalit.sairio@protonmail.com
 ```
 
 Download the HTML file and the corresponding PGP signature from coinglacier.org
