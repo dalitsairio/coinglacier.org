@@ -42,6 +42,7 @@ List the imported PGP key and make sure its fingerprint is 12A2 411A 8C5C C035 6
 ```sh
 gpg --list-keys --with-fingerprint dalit.sairio@protonmail.com
 ```
+For extra credit you can validate the key's authenticity on [keybase.io](https://keybase.io/dalitsairio).
 
 Download the HTML file and the corresponding PGP signature from coinglacier.org
 ```sh
