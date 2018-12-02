@@ -170,11 +170,21 @@ DOM.footer.donations.bech32QR = $('#canvas-donations-bech32').get(0);
 DOM.footer.pgpSignature = $('#pgp-signature');
 
 DOM.footer.windows = {};
+DOM.footer.windows.all = $('footer .footer-window');
 DOM.footer.windows.online = $('footer #online-check-wrapper');
 DOM.footer.windows.crypto = $('footer #crypto-check-wrapper');
 DOM.footer.windows.mocha = $('footer #mocha-wrapper');
 DOM.footer.windows.segwitQR = $('footer #donation-segwit-qr-wrapper');
 DOM.footer.windows.bech32QR = $('footer #donation-bech32-qr-wrapper');
+
+
+// //////////////////////////////////////////////////
+// Page view at startup
+// //////////////////////////////////////////////////
+
+let initView = {};
+initView.visibleElements = [DOM.pageLoader, DOM.body];
+initView.hiddenElements = [DOM.root, DOM.footer.windows.all];
 
 
 // //////////////////////////////////////////////////
@@ -336,6 +346,7 @@ function Init() {
 
     this.app = () => {
 
+        this.startupView();
         network();
         page();
         popovers();
@@ -350,6 +361,10 @@ function Init() {
         footer.securityChecks.runAll();
     }
 
+    this.startupView = () => {
+        initView.hiddenElements.map(dom => { dom.hide(); });
+        initView.visibleElements.map(dom => { dom.show(); });
+    }
 
     this.wallet = () => {
 
@@ -736,7 +751,7 @@ function MnemonicDecryption() {
         initDecryption();
     }
 
-    this.passwordChanged = () => {      
+    this.passwordChanged = () => {
         formCheck.validateInput(verifyPassword(), DOM.decMnemonic.pass);
         initDecryption();
     }
@@ -758,7 +773,7 @@ function MnemonicDecryption() {
     const verifyPassword = () => DOM.decMnemonic.pass.val() !== '';
 
     const initDecryption = () => {
-        
+
         if (checkInputsFulfilled()) {
             let encryptedMnemonic = DOM.decMnemonic.mnemonic.val();
             password = DOM.decMnemonic.pass.val();
@@ -832,7 +847,7 @@ function PrivkeyDecryption() {
     const decryptPrivKey = (encryptedPrivKey, password) => {
 
         let isTestnet = networkId >= 10;
-        
+
         bitcoinLoader.getCredentialsFromEncryptedPrivKey(encryptedPrivKey, password, isTestnet, function (credentials) {
             wallet.fillCredentialsHTML(0, 0, credentials.address, credentials.privateKey);
         }, function () {
@@ -1407,7 +1422,7 @@ function FormCheck() {
     }
 
     this.validateInput = (condition, domElement) => {
-        this.removeValidityClasses(domElement);       
+        this.removeValidityClasses(domElement);
         this.setValidityClass(condition, domElement);
     }
 
