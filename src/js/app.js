@@ -111,9 +111,9 @@ DOM.options.qrcodeLink = $('input#qrcode-links-check');
 DOM.actions = {};
 DOM.actions.newAddress = $('#actions #new-address');
 DOM.actions.newMnemonic = $('#actions #new-mnemonic');
-DOM.actions.printEnabled = $('#actions #print-button-enabled');
-DOM.actions.printLoading = $('#actions #print-button-loading');
-DOM.actions.printDisabled = $('#actions #print-button-disabled');
+DOM.actions.print.enabled = $('#actions #print-button-enabled');
+DOM.actions.print.loading = $('#actions #print-button-loading');
+DOM.actions.print.disabled = $('#actions #print-button-disabled');
 
 DOM.popovers = {};
 DOM.popovers.testnetWarning = $('#testnet-warning');
@@ -317,7 +317,7 @@ DOM.options.qrcodeLink.change(options.toggleQRcodeLink);
 // Actions
 DOM.actions.newAddress.click(init.wallet);
 DOM.actions.newMnemonic.click(init.wallet);
-DOM.actions.printEnabled.click(print);
+DOM.actions.print.enabled.click(print);
 
 // Decrypt mnemonic page
 DOM.decMnemonic.mnemonic.change(mnemonicDecryption.mnemonicChanged);
@@ -916,23 +916,23 @@ function PrintButton() {
 
     this.disable = () => {
         disableAllButtons();
-        DOM.actions.printDisabled.show();
+        DOM.actions.print.disabled.show();
     }
 
     this.setLoading = () => {
         disableAllButtons();
-        DOM.actions.printLoading.show();
+        DOM.actions.print.loading.show();
     }
 
     this.enable = () => {
         disableAllButtons();
-        DOM.actions.printEnabled.show();
+        DOM.actions.print.enabled.show();
     }
 
     const disableAllButtons = () => {
-        DOM.actions.printEnabled.hide();
-        DOM.actions.printLoading.hide();
-        DOM.actions.printDisabled.hide();
+        DOM.actions.print.enabled.hide();
+        DOM.actions.print.loading.hide();
+        DOM.actions.print.disabled.hide();
     }
 }
 
