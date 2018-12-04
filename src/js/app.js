@@ -112,6 +112,7 @@ DOM.actions = {};
 DOM.actions.newAddress = $('#actions #new-address');
 DOM.actions.newMnemonic = $('#actions #new-mnemonic');
 DOM.actions.print = $('#actions #print-button');
+DOM.actions.printLoading = $('#actions #print-button-loading');
 
 DOM.popovers = {};
 DOM.popovers.testnetWarning = $('#testnet-warning');
@@ -271,6 +272,7 @@ currentPage = pages.singleWallet;
 const mnemonicDecryption = new MnemonicDecryption();
 const privkeyDecryption = new PrivkeyDecryption();
 const footer = new Footer();
+const printButton = new PrintButton();
 const init = new Init();
 const pageManagement = new PageManagement();
 const switchNetwork = new SwitchNetwork();
@@ -881,6 +883,24 @@ function PrivkeyDecryption() {
 
 
 // //////////////////////////////////////////////////
+// Print Button
+// //////////////////////////////////////////////////
+
+function PrintButton() {
+
+    this.setLoading = () => {
+        DOM.actions.print.hide();
+        DOM.actions.printLoading.show();
+    }
+
+    this.setLoadingDone = () => {
+        DOM.actions.print.show();
+        DOM.actions.printLoading.hide();
+    }
+}
+
+
+// //////////////////////////////////////////////////
 // Footer
 // //////////////////////////////////////////////////
 
@@ -1020,6 +1040,8 @@ function Wallet() {
     }
 
     this.load = () => {
+
+        printButton.setLoading();
 
         if (options.isAccountsFormEmpty()) {
             init.accounts();
@@ -1172,6 +1194,8 @@ function Wallet() {
 
     const fillWalletHTML = () => {
 
+        let credentialsCreated = getAmountOfAddresses();
+
         let perAccount = function (accountIndex) {
             bitcoinLoader.createAccount(networkId, accountIndex, function (account) {
                 fillAccountHTML(accountIndex, account.xpub);
@@ -1187,21 +1211,29 @@ function Wallet() {
 
             bitcoinLoader.asyncCreateCredentials(networkId, accountIndex, addressIndex, encryption, function (credentials) {
                 self.fillCredentialsHTML(accountIndex, addressIndex, credentials.address, credentials.privateKey);
+
+                if(--credentialsCreated === 0) {
+                    printButton.setLoadingDone();
+                }
             });
         };
 
         foreachCredential(perAccount, perAddress);
     }
 
+    const getAmountOfAddresses = () => {
+        return accounts.reduce((a, b) => a + b, 0);
+    }
+
     const foreachCredential = (callbackPerAccount, callbackPerAddress) => {
         // loop through accounts
-        for (let accountIndex = 0; accountIndex < accounts.length; accountIndex++) {
+        accounts.forEach((account, accountIndex) => {
             callbackPerAccount(accountIndex);
             // loop through addresses
             for (let addressIndex = 0; addressIndex < accounts[accountIndex]; addressIndex++) {
                 callbackPerAddress(accountIndex, addressIndex);
             }
-        }
+        });
     }
 
     const fillAccountHTML = (accountIndex, xpub) => {

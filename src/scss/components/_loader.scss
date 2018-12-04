@@ -47,6 +47,16 @@
     width: 1.5625rem;
 }
 
+.micro-loader {
+    -webkit-animation: spin 2s linear infinite; /* Safari */
+    animation: spin 1s linear infinite;
+    border: 0.2rem solid #f3f3f3;
+    border-radius: 50%;
+    border-top: 0.2rem solid $mainnet-primary-color;
+    height: 1rem;
+    width: 1rem;
+}
+
 @media screen and (max-width: $bootstrap-sm) {
 	#page-loader {
 		#spinner-wrapper {
