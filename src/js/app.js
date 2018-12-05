@@ -111,6 +111,7 @@ DOM.options.qrcodeLink = $('input#qrcode-links-check');
 DOM.actions = {};
 DOM.actions.newAddress = $('#actions #new-address');
 DOM.actions.newMnemonic = $('#actions #new-mnemonic');
+DOM.actions.print = {};
 DOM.actions.print.enabled = $('#actions #print-button-enabled');
 DOM.actions.print.loading = $('#actions #print-button-loading');
 DOM.actions.print.disabled = $('#actions #print-button-disabled');
@@ -830,6 +831,7 @@ function PrivkeyDecryption() {
         alignWallet();
 
         if (pages.decryptPrivKey.showWallet) {
+            blockInputFields();
             initDecryption();
         }
     }
@@ -854,6 +856,16 @@ function PrivkeyDecryption() {
     const verifyPassword = () => DOM.decPriv.pass.val() !== '';
     const checkInputsFulfilled = () => verifyPrivKey() && verifyPassword();
 
+    const blockInputFields = () => {
+        DOM.decPriv.privKey.prop('disabled', true);;
+        DOM.decPriv.pass.prop('disabled', true);
+    }
+
+    const unblockInputFields = () => {
+        DOM.decPriv.privKey.prop('disabled', false);;
+        DOM.decPriv.pass.prop('disabled', false);
+    }
+
     const initDecryption = () => {
         let encryptedPrivKey = DOM.decPriv.privKey.val();
         let password = DOM.decPriv.pass.val();
@@ -870,15 +882,18 @@ function PrivkeyDecryption() {
         bitcoinLoader.getCredentialsFromEncryptedPrivKey(encryptedPrivKey, password, isTestnet, function (credentials) {
             wallet.fillCredentialsHTML(0, 0, credentials.address, credentials.privateKey);
             printButton.enable();
+            unblockInputFields();
         }, function () {
             DOM.decPriv.wrongNetwork.show();
             DOM.decPriv.pass.addClass(CSS_CLASS_INVALID);
             $('.wallet-account').hide();
             printButton.disable();
+            unblockInputFields();
         }, function () {
             DOM.decPriv.pass.addClass(CSS_CLASS_INVALID);
             $('.wallet-account').hide();
             printButton.disable();
+            unblockInputFields();
         });
     }
 
