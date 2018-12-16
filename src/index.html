@@ -534,6 +534,8 @@ Git Repo: https://github.com/dalitsairio/coinglacier.org.git
 
 <body>
 
+<script src="js/cleanStartup.js" inline></script>
+
 <div id="page-loader">
     <span class="title text-center">loading wallet generator</span>
     <div id="spinner-wrapper"><div class="loader"></div></div>
@@ -1325,7 +1327,9 @@ Git Repo: https://github.com/dalitsairio/coinglacier.org.git
         <div id="actions">
             <button id="new-address" type="button" class="btn btn-dark btn-sm page-element single-wallet">New Address</button>
             <button id="new-mnemonic" type="button" class="btn btn-dark btn-sm page-element paper-wallet">New Mnemonic</button>
-            <button id="print-button" type="button" class="btn btn-dark btn-sm">Print</button>
+            <button id="print-button-loading" type="button" class="btn btn-dark btn-sm loading-button" disabled="disabled"><span class="micro-loader"></span>Print</button>
+            <button id="print-button-disabled" type="button" class="btn btn-dark btn-sm loading-button" disabled="disabled">Print</button>
+            <button id="print-button-enabled" type="button" class="btn btn-dark btn-sm loading-button" style="display: none">Print</button>
             <div style="clear: both;"></div>
         </div>
 

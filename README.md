@@ -107,7 +107,42 @@ or some attacker manages to sneak into your browser.
     they might record the private key you generated.
 
 ## Developers (install guide)
+### Dockerized setup
 
+Download coinglacier.org
+```sh
+git clone https://github.com/dalitsairio/coinglacier.org.git
+cd coinglacier.org
+git checkout develop
+```
+
+Create image
+```sh
+docker build -t coinglacier-org .
+```
+
+#### Development
+During development, run gulp watchers
+```sh
+docker run -t --rm -p 3000:3000 -v "$PWD":/usr/src/app coinglacier-org
+```
+Open http://localhost:3000 in your browser
+
+#### Build finished releases
+Bugfix releases
+```sh
+docker run -t --rm -v "$PWD":/usr/src/app coinglacier-org gulp build
+```
+Backwards compatible releases
+```sh
+docker run -t --rm -v "$PWD":/usr/src/app coinglacier-org gulp build-minor
+```
+Backwards incompatible releases
+```sh
+docker run -t --rm -v "$PWD":/usr/src/app coinglacier-org gulp build-major
+```
+
+### Without Docker
 Install git, NodeJS and NPM
 ```sh
 apt install git nodejs npm
@@ -115,7 +150,7 @@ apt install git nodejs npm
 
 Install Gulp 4 globally
 ```sh
-npm install -g gulpjs/gulp.git#4.0
+npm install -g gulp@next
 ```
 
 Download coinglacier.org
@@ -129,12 +164,12 @@ Install dependencies
 ```sh
 npm install --only=dev
 ```
-### Development
+#### Development
 During development, run gulp watchers
 ```sh
 gulp
 ```
-### Build finished releases
+#### Build finished releases
 Bugfix releases
 ```sh
 gulp build

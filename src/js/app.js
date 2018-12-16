@@ -111,7 +111,10 @@ DOM.options.qrcodeLink = $('input#qrcode-links-check');
 DOM.actions = {};
 DOM.actions.newAddress = $('#actions #new-address');
 DOM.actions.newMnemonic = $('#actions #new-mnemonic');
-DOM.actions.print = $('#actions #print-button');
+DOM.actions.print = {};
+DOM.actions.print.enabled = $('#actions #print-button-enabled');
+DOM.actions.print.loading = $('#actions #print-button-loading');
+DOM.actions.print.disabled = $('#actions #print-button-disabled');
 
 DOM.popovers = {};
 DOM.popovers.testnetWarning = $('#testnet-warning');
@@ -170,11 +173,21 @@ DOM.footer.donations.bech32QR = $('#canvas-donations-bech32').get(0);
 DOM.footer.pgpSignature = $('#pgp-signature');
 
 DOM.footer.windows = {};
+DOM.footer.windows.all = $('footer .footer-window');
 DOM.footer.windows.online = $('footer #online-check-wrapper');
 DOM.footer.windows.crypto = $('footer #crypto-check-wrapper');
 DOM.footer.windows.mocha = $('footer #mocha-wrapper');
 DOM.footer.windows.segwitQR = $('footer #donation-segwit-qr-wrapper');
 DOM.footer.windows.bech32QR = $('footer #donation-bech32-qr-wrapper');
+
+
+// //////////////////////////////////////////////////
+// Page view at startup
+// //////////////////////////////////////////////////
+
+let initView = {};
+initView.visibleElements = [DOM.pageLoader, DOM.body];
+initView.hiddenElements = [DOM.root, DOM.footer.windows.all];
 
 
 // //////////////////////////////////////////////////
@@ -261,6 +274,7 @@ currentPage = pages.singleWallet;
 const mnemonicDecryption = new MnemonicDecryption();
 const privkeyDecryption = new PrivkeyDecryption();
 const footer = new Footer();
+const printButton = new PrintButton();
 const init = new Init();
 const pageManagement = new PageManagement();
 const switchNetwork = new SwitchNetwork();
@@ -304,7 +318,7 @@ DOM.options.qrcodeLink.change(options.toggleQRcodeLink);
 // Actions
 DOM.actions.newAddress.click(init.wallet);
 DOM.actions.newMnemonic.click(init.wallet);
-DOM.actions.print.click(print);
+DOM.actions.print.enabled.click(print);
 
 // Decrypt mnemonic page
 DOM.decMnemonic.mnemonic.change(mnemonicDecryption.mnemonicChanged);
@@ -336,6 +350,7 @@ function Init() {
 
     this.app = () => {
 
+        this.startupView();
         network();
         page();
         popovers();
@@ -350,6 +365,10 @@ function Init() {
         footer.securityChecks.runAll();
     }
 
+    this.startupView = () => {
+        initView.hiddenElements.map(dom => { dom.hide(); });
+        initView.visibleElements.map(dom => { dom.show(); });
+    }
 
     this.wallet = () => {
 
@@ -609,7 +628,7 @@ function Options() {
     this.toggleQRcodeLink = () => {
         useBitcoinLink = DOM.options.qrcodeLink.prop('checked');
         if (currentPage === pages.decryptPrivKey) {
-            privkeyDecryption.initDecryption();
+            privkeyDecryption.formChanged();
         } else {
             wallet.load();
         }
@@ -725,6 +744,7 @@ function togglePasswordVisibility(domTextfield, domButton) {
     }
 };
 
+
 // //////////////////////////////////////////////////
 // Mnemonic Decryption
 // //////////////////////////////////////////////////
@@ -733,12 +753,12 @@ function MnemonicDecryption() {
 
     this.mnemonicChanged = () => {
         formCheck.validateInput(verifyMnemonic(), DOM.decMnemonic.mnemonic);
-        initDecryption();
+        formChanged();
     }
 
-    this.passwordChanged = () => {      
+    this.passwordChanged = () => {
         formCheck.validateInput(verifyPassword(), DOM.decMnemonic.pass);
-        initDecryption();
+        formChanged();
     }
 
     this.resetPage = (leaveMnemonic) => {
@@ -756,28 +776,34 @@ function MnemonicDecryption() {
 
     const verifyMnemonic = () => bitcoin.validateMnemonic(DOM.decMnemonic.mnemonic.val());
     const verifyPassword = () => DOM.decMnemonic.pass.val() !== '';
+    const checkInputsFulfilled = () => verifyMnemonic() && verifyPassword();
+
+    const formChanged = () => {
+        pages.decryptMnemonic.showWallet = checkInputsFulfilled();
+        alignPrintButton();
+        initDecryption();
+    }
 
     const initDecryption = () => {
-        
-        if (checkInputsFulfilled()) {
+        if (pages.decryptMnemonic.showWallet) {
             let encryptedMnemonic = DOM.decMnemonic.mnemonic.val();
             password = DOM.decMnemonic.pass.val();
             wallet.init(encryptedMnemonic);
             $('.wallet-account').show();
-        }
-    }
-
-    const checkInputsFulfilled = () => {
-        if (verifyMnemonic() && verifyPassword()) {
-            pages.decryptMnemonic.showWallet = true;
-        } else {
-            pages.decryptMnemonic.showWallet = false;
+        }else{
             $('.wallet-account').hide();
         }
+    }
 
-        return pages.decryptMnemonic.showWallet;
+    const alignPrintButton = () => {
+        if (pages.decryptMnemonic.showWallet) {
+            printButton.setLoading();
+        }else{
+            printButton.disable();
+        }
     }
 }
+
 
 // //////////////////////////////////////////////////
 // BIP38 Private Key Decryption
@@ -788,14 +814,26 @@ function PrivkeyDecryption() {
     this.encrypedPrivkeyChanged = () => {
         formCheck.validateInput(verifyPrivKey(), DOM.decPriv.privKey);
         // When privKey changes, password could theoretically be correct now, even if it was wrong before.
-        // Hence, the password validation needs to be resetted for the next decryption.
+        // Hence, the password validation needs to be reset for the next decryption.
         formCheck.removeValidityClasses(DOM.decPriv.pass);
-        this.initDecryption();
+        this.formChanged();
     }
 
     this.passwordChanged = () => {
         formCheck.validateInput(verifyPassword(), DOM.decPriv.pass);
-        this.initDecryption();
+        this.formChanged();
+    }
+
+    this.formChanged = () => {
+        pages.decryptPrivKey.showWallet = checkInputsFulfilled();
+
+        alignPrintButton();
+        alignWallet();
+
+        if (pages.decryptPrivKey.showWallet) {
+            blockInputFields();
+            initDecryption();
+        }
     }
 
     this.resetPage = (leavePrivKey) => {
@@ -814,34 +852,48 @@ function PrivkeyDecryption() {
     this.checkMainnet = () => checkOtherNetwork(init.mainnet);
     this.checkTestnet = () => checkOtherNetwork(init.testnet);
 
-    this.initDecryption = () => {
-        if (checkInputsFulfilled()) {
-            let encryptedPrivKey = DOM.decPriv.privKey.val();
-            let password = DOM.decPriv.pass.val();
-
-            DOM.decPriv.wrongNetwork.hide();
-            wallet.createHTML();
-            $('.wallet-account').show();
-            decryptPrivKey(encryptedPrivKey, password);
-        }
-    }
-
     const verifyPrivKey = () => bip38.verify(DOM.decPriv.privKey.val());
     const verifyPassword = () => DOM.decPriv.pass.val() !== '';
+    const checkInputsFulfilled = () => verifyPrivKey() && verifyPassword();
+
+    const blockInputFields = () => {
+        DOM.decPriv.privKey.prop('disabled', true);;
+        DOM.decPriv.pass.prop('disabled', true);
+    }
+
+    const unblockInputFields = () => {
+        DOM.decPriv.privKey.prop('disabled', false);;
+        DOM.decPriv.pass.prop('disabled', false);
+    }
+
+    const initDecryption = () => {
+        let encryptedPrivKey = DOM.decPriv.privKey.val();
+        let password = DOM.decPriv.pass.val();
+
+        DOM.decPriv.wrongNetwork.hide();
+        wallet.createHTML();
+        decryptPrivKey(encryptedPrivKey, password);
+    }
 
     const decryptPrivKey = (encryptedPrivKey, password) => {
 
         let isTestnet = networkId >= 10;
-        
+
         bitcoinLoader.getCredentialsFromEncryptedPrivKey(encryptedPrivKey, password, isTestnet, function (credentials) {
             wallet.fillCredentialsHTML(0, 0, credentials.address, credentials.privateKey);
+            printButton.enable();
+            unblockInputFields();
         }, function () {
             DOM.decPriv.wrongNetwork.show();
             DOM.decPriv.pass.addClass(CSS_CLASS_INVALID);
             $('.wallet-account').hide();
+            printButton.disable();
+            unblockInputFields();
         }, function () {
             DOM.decPriv.pass.addClass(CSS_CLASS_INVALID);
             $('.wallet-account').hide();
+            printButton.disable();
+            unblockInputFields();
         });
     }
 
@@ -853,14 +905,49 @@ function PrivkeyDecryption() {
         this.passwordChanged();
     }
 
-    const checkInputsFulfilled = () => {
-        if (verifyPrivKey() && verifyPassword()) {
-            pages.decryptPrivKey.showWallet = true;
-        } else {
-            pages.decryptPrivKey.showWallet = false;
+    const alignWallet = () => {
+        if (pages.decryptPrivKey.showWallet) {
+            $('.wallet-account').show();
+        }else{
             $('.wallet-account').hide();
         }
-        return pages.decryptPrivKey.showWallet;
+    }
+
+    const alignPrintButton = () => {
+        if (pages.decryptPrivKey.showWallet) {
+            printButton.setLoading();
+        }else{
+            printButton.disable();
+        }
+    }
+}
+
+
+// //////////////////////////////////////////////////
+// Print Button
+// //////////////////////////////////////////////////
+
+function PrintButton() {
+
+    this.disable = () => {
+        disableAllButtons();
+        DOM.actions.print.disabled.show();
+    }
+
+    this.setLoading = () => {
+        disableAllButtons();
+        DOM.actions.print.loading.show();
+    }
+
+    this.enable = () => {
+        disableAllButtons();
+        DOM.actions.print.enabled.show();
+    }
+
+    const disableAllButtons = () => {
+        DOM.actions.print.enabled.hide();
+        DOM.actions.print.loading.hide();
+        DOM.actions.print.disabled.hide();
     }
 }
 
@@ -1017,7 +1104,10 @@ function Wallet() {
         showDOMif(currentPage.showWallet, $('.wallet-account'));
 
         if (currentPage.showWallet) {
+            printButton.setLoading();
             fillWalletHTML();
+        } else {
+            printButton.disable();
         }
     }
 
@@ -1157,6 +1247,8 @@ function Wallet() {
 
     const fillWalletHTML = () => {
 
+        let credentialsCreated = getAmountOfAddresses();
+
         let perAccount = function (accountIndex) {
             bitcoinLoader.createAccount(networkId, accountIndex, function (account) {
                 fillAccountHTML(accountIndex, account.xpub);
@@ -1172,21 +1264,29 @@ function Wallet() {
 
             bitcoinLoader.asyncCreateCredentials(networkId, accountIndex, addressIndex, encryption, function (credentials) {
                 self.fillCredentialsHTML(accountIndex, addressIndex, credentials.address, credentials.privateKey);
+
+                if(--credentialsCreated === 0) {
+                    printButton.enable();
+                }
             });
         };
 
         foreachCredential(perAccount, perAddress);
     }
 
+    const getAmountOfAddresses = () => {
+        return accounts.reduce((a, b) => a + b, 0);
+    }
+
     const foreachCredential = (callbackPerAccount, callbackPerAddress) => {
         // loop through accounts
-        for (let accountIndex = 0; accountIndex < accounts.length; accountIndex++) {
+        accounts.forEach((account, accountIndex) => {
             callbackPerAccount(accountIndex);
             // loop through addresses
             for (let addressIndex = 0; addressIndex < accounts[accountIndex]; addressIndex++) {
                 callbackPerAddress(accountIndex, addressIndex);
             }
-        }
+        });
     }
 
     const fillAccountHTML = (accountIndex, xpub) => {
@@ -1407,7 +1507,7 @@ function FormCheck() {
     }
 
     this.validateInput = (condition, domElement) => {
-        this.removeValidityClasses(domElement);       
+        this.removeValidityClasses(domElement);
         this.setValidityClass(condition, domElement);
     }
 
