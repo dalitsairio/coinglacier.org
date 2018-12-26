@@ -88,7 +88,7 @@ function initiateHDWallet(loadMnemonic, password, useImprovedEntropy, cb) {
 
 function getRootKeyFromMnemonic(mnemonic, password, cb){
     let seed = bip39.mnemonicToSeed(mnemonic, password);
-    let bip32RootKey = bitcoinjs.HDNode.fromSeedBuffer(seed);
+    let bip32RootKey = bitcoinjs.bip32.fromSeed(seed);
 
     cb(mnemonic, bip32RootKey);
 }
