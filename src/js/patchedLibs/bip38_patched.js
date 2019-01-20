@@ -2,7 +2,7 @@
 
 VERY DIRTY PATCH
 
-The BIP32 standard needs to know the address beloning to the encrypted private key, since it uses it as a salt:
+The BIP32 standard needs to know the address belonging to the encrypted private key, since it uses it as a salt:
 "4 bytes: SHA256(SHA256(expected_bitcoin_address))[0...3], used both for typo checking and as salt"
 (https://github.com/bitcoin/bips/blob/master/bip-0038.mediawiki#Proposed_specification)
 
