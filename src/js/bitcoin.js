@@ -305,14 +305,14 @@ function findDerivationPathErrors(path, createXPUB, fromMasternode) {
         return "first charactar must be 'm' or a number, but is " + invalidFirstChar;
     }
 
-    if (fromMasternode && path[0] != 'm') {
+    if (fromMasternode && path[0] !== 'm') {
         return "First character must be 'm'";
-    } else if (!fromMasternode && path[0] == 'm') {
+    } else if (!fromMasternode && path[0] === 'm') {
         return 'The path starts at masternode, but the third param is set to false';
     }
 
     if (fromMasternode && path.length > 1) {
-        if (path[1] != '/') {
+        if (path[1] !== '/') {
             return "Separator must be '/'";
         }
         let indexes = path.split('/');

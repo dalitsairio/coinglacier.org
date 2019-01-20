@@ -977,7 +977,7 @@ function SecurityChecks() {
         this.crypto();
 
         // run unit tests
-        let runAllTests = getURLparameter(GET.allUnitTests.keyword) == GET.allUnitTests.yes;
+        let runAllTests = getURLparameter(GET.allUnitTests.keyword) === GET.allUnitTests.yes;
         if(runAllTests){
             removeParamFromURL(GET.allUnitTests.keyword);
         }
@@ -1213,11 +1213,11 @@ function Wallet() {
     }
 
     const addOrderingAccountClasses = (domElement, accountIndex) => {
-        if (accountIndex == 0) {
+        if (accountIndex === 0) {
             domElement.addClass('first-account');
         }
 
-        if(accountIndex == accounts.length - 1){
+        if(accountIndex === accounts.length - 1){
             domElement.addClass('last-account');
         }
     }
