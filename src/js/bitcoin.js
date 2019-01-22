@@ -103,7 +103,7 @@ function createAccount(bip32RootKey, networkID, index) {
     if (pathError) throw 'Derivation Path Error: ' + pathError;
 
     let account = bip32RootKey.derivePath(accountPath);
-    account.keyPair.network = getNetworkByID(networkID);
+    account.network = getNetworkByID(networkID);
 
     let result = {
         account: account,
@@ -133,44 +133,37 @@ function createCredentials(bip44external, addressIndex) {
     if (pathError) throw 'Derivation Path Error: ' + pathError;
     let bip32 = bip44external.derivePath(addressPath);
 
-    let privateKey = bip32.keyPair.toWIF();
+    let privateKey = bip32.toWIF();
 
-    return getCredentialsFromPrivKey(privateKey, bip32, bip32.keyPair.network);
+    return getCredentialsFromPrivKey(privateKey, bip32, bip32.network);
 }
 
 function getCredentialsFromPrivKey(privateKey, ecPair, network){
-
-    let pubKey, redeemScript, scriptPubKey;
 
     switch (network.id) {
         case bitcoinjs.networks.bitcoin.id:
         case bitcoinjs.networks.testnet.id:
 
-            return { privateKey: privateKey, address: ecPair.getAddress() };
-            break;
+            return {
+                privateKey: privateKey,
+                address: bitcoinjs.payments.p2pkh({ pubkey: ecPair.publicKey, network }).address
+            };
         case bitcoinjs.networks.bitcoin.p2wpkhInP2sh.id:
         case bitcoinjs.networks.testnet.p2wpkhInP2sh.id:
 
-            pubKey = ecPair.getPublicKeyBuffer();
-            redeemScript = bitcoinjs.script.witnessPubKeyHash.output.encode(bitcoinjs.crypto.hash160(pubKey));
-            scriptPubKey = bitcoinjs.script.scriptHash.output.encode(bitcoinjs.crypto.hash160(redeemScript));
+            let redeemScript = bitcoinjs.payments.p2wpkh({pubkey: ecPair.publicKey, network});
 
             return {
                 privateKey: privateKey,
-                address: bitcoinjs.address.fromOutputScript(scriptPubKey, network)
+                address: bitcoinjs.payments.p2sh({redeem: redeemScript, network}).address
             };
-            break;
         case bitcoinjs.networks.bitcoin.p2wpkh.id:
         case bitcoinjs.networks.testnet.p2wpkh.id:
 
-            pubKey = ecPair.getPublicKeyBuffer();
-            scriptPubKey = bitcoinjs.script.witnessPubKeyHash.output.encode(bitcoinjs.crypto.hash160(pubKey));
-
             return {
                 privateKey: privateKey,
-                address: bitcoinjs.address.fromOutputScript(scriptPubKey, network)
+                address: bitcoinjs.payments.p2wpkh({pubkey: ecPair.publicKey, network}).address
             };
-            break;
         default:
             throw ("given network is not a valid network");
     }
@@ -321,7 +314,7 @@ function findDerivationPathErrors(path, createXPUB, fromMasternode) {
         }
         for (let depth = 1; depth < indexes.length; depth++) {
             let index = indexes[depth];
-            let invalidChars = index.replace(/^[0-9]+'?$/g, "")
+            let invalidChars = index.replace(/^[0-9]+'?$/g, "");
             if (invalidChars.length > 0) {
                 return "Invalid characters " + invalidChars + " found at depth " + depth;
             }
