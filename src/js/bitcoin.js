@@ -28,7 +28,6 @@ function hash256 (buffer) {
 
 function getEntropy(useImprovedEntropy, cb){
     if(useImprovedEntropy){
-        // if(useImprovedEntropy){
         improveEntropy(bip39_byteSize)
             .then(function (improvedEntropy) {
                 cb(improvedEntropy);
