@@ -158,6 +158,9 @@ gulp.task('move-dependencies', function () {
     gulp.src('node_modules/bootstrap/scss/mixins/*.scss')
         .pipe(gulp.dest('src/scss/vendors/bootstrap/mixins'));
 
+    gulp.src('node_modules/bootstrap/scss/vendor/*.scss')
+        .pipe(gulp.dest('src/scss/vendors/bootstrap/vendor'));
+
     return gulp.src('node_modules/bootstrap/scss/utilities/*.scss')
         .pipe(gulp.dest('src/scss/vendors/bootstrap/utilities'));
 
