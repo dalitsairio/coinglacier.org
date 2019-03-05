@@ -117,7 +117,7 @@ DOM.actions.print.loading = $('#actions #print-button-loading');
 DOM.actions.print.disabled = $('#actions #print-button-disabled');
 
 DOM.popovers = {};
-DOM.popovers.testnetWarning = $('#testnet-warning');
+DOM.popovers.testnetWarning = DOM.network.testnetWarning; // $('#testnet-warning');
 DOM.popovers.showXPUB = $('#showXPUBlabel');
 DOM.popovers.encryption = $('#password-input-group');
 DOM.popovers.numberAddresses = $('#address-numbering-label');
