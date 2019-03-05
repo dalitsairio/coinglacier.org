@@ -280,7 +280,7 @@ gulp.task('build:update-package-json', function () {
 
     fs.writeFile('./' + packageFile, JSON.stringify(packageJson, null, 2), function(err) {
         if(err) {
-            console.log(err);
+            console.error(err);
         }
         else {
             console.log('JSON saved to ' + packageFile);
@@ -332,7 +332,7 @@ gulp.task('build:update-changelog', function () {
 
     fs.writeFile('./' + changelogFile, newEntry + currentFile, function(err) {
         if(err) {
-            console.log(err);
+            console.error(err);
         }
         else {
             console.log('JSON saved to ' + packageFile);
