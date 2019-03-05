@@ -40,7 +40,7 @@ function getEntropy(useImprovedEntropy, cb){
 }
 
 // takes randomBytes() and more-entropy and returns an XOR of both entropies
-async function improveEntropy(amountInBytes){
+function improveEntropy(amountInBytes){
 
     return new Promise(function (resolve, reject) {
         // get an array of integers with at least the given amount of bits of combined entropy:
