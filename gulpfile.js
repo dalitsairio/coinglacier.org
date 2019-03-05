@@ -5,7 +5,7 @@
 
 const fs = require('fs');
 const gulp = require('gulp');
-const plumber = require('gulp-plumber')
+const plumber = require('gulp-plumber');
 const browserify = require('browserify');
 const source = require('vinyl-source-stream');
 const buffer = require('vinyl-buffer');
