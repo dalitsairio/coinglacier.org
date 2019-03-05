@@ -31,7 +31,9 @@ function getEntropy(useImprovedEntropy, cb){
         improveEntropy(bip39_byteSize)
             .then(function (improvedEntropy) {
                 cb(improvedEntropy);
-            });
+            }).catch(function (err) {
+                console.error(err);
+        });
     }else{
         cb(randomBytes(bip39_byteSize));
     }
