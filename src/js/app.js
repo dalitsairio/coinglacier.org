@@ -359,10 +359,10 @@ function Init() {
         donations.init();
 
         this.accounts();
-        this.wallet();
-
-        // Run the security checks shown in the footer of the page
-        footer.securityChecks.runAll();
+        this.wallet(function () {
+            // Run the security checks shown in the footer of the page
+            footer.securityChecks.runAll();
+        });
     }
 
     this.startupView = () => {
@@ -370,13 +370,13 @@ function Init() {
         initView.visibleElements.map(dom => { dom.show(); });
     }
 
-    this.wallet = () => {
+    this.wallet = (cb) => {
 
         if (password) {
             bitcoinLoader.interrupt();
         }
 
-        wallet.init(false);
+        wallet.init(false, cb);
     }
 
     this.mainnet = () => {
@@ -1082,12 +1082,14 @@ function Wallet() {
 
     let self = this;
 
-    this.init = (mnemonic) => {
+    this.init = (mnemonic, cb) => {
         bitcoinLoader.initiateHDWallet(mnemonic, password, useImprovedEntropy, function (result) {
             DOM.pageLoader.hide();
             DOM.root.show();
 
             self.load(mnemonic);
+
+            cb();
         });
     }
 
