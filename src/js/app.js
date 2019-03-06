@@ -166,9 +166,7 @@ DOM.footer.securityChecks.mocha.encTestButton = $('footer #run-enc-tests-button'
 DOM.footer.donations = {};
 DOM.footer.donations.segwit = $('#donation-address-segwit');
 DOM.footer.donations.bech32 = $('#donation-address-bech32');
-DOM.footer.donations.segwitQrIcon = $('#donations-segwit-qr-icon');
 DOM.footer.donations.bech32QrIcon = $('#donations-bech32-qr-icon');
-DOM.footer.donations.segwitQR = $('#canvas-donations-segwit').get(0);
 DOM.footer.donations.bech32QR = $('#canvas-donations-bech32').get(0);
 DOM.footer.pgpSignature = $('#pgp-signature');
 
@@ -177,7 +175,6 @@ DOM.footer.windows.all = $('footer .footer-window');
 DOM.footer.windows.online = $('footer #online-check-wrapper');
 DOM.footer.windows.crypto = $('footer #crypto-check-wrapper');
 DOM.footer.windows.mocha = $('footer #mocha-wrapper');
-DOM.footer.windows.segwitQR = $('footer #donation-segwit-qr-wrapper');
 DOM.footer.windows.bech32QR = $('footer #donation-bech32-qr-wrapper');
 
 
@@ -337,7 +334,6 @@ DOM.footer.securityChecks.online.click(footer.windows.toggleOnline);
 DOM.footer.securityChecks.crypto.click(footer.windows.toggleCrypto);
 DOM.footer.securityChecks.unittests.click(footer.windows.toggleUnitTests);
 DOM.footer.securityChecks.mocha.encTestButton.click(footer.securityChecks.reloadAndRunAllTests);
-DOM.footer.donations.segwitQrIcon.click(footer.windows.toggleSegwitQr);
 DOM.footer.donations.bech32QrIcon.click(footer.windows.toggleBech32Qr);
 DOM.footer.pgpSignature.click(footer.redirectToSignature);
 
@@ -1043,15 +1039,13 @@ function FooterWindows() {
     const ONLINE = {id: 0, window: DOM.footer.windows.online};
     const CRYPTO = {id: 1, window: DOM.footer.windows.crypto};
     const UNITTESTS = {id: 2, window: DOM.footer.windows.mocha};
-    const SEGWIT_QR = {id: 3, window: DOM.footer.windows.segwitQR};
-    const BECH32_QR = {id: 4, window: DOM.footer.windows.bech32QR};
+    const BECH32_QR = {id: 3, window: DOM.footer.windows.bech32QR};
 
     let shownWindow = null;
 
     this.toggleOnline = () => toggleWindow(ONLINE);
     this.toggleCrypto = () => toggleWindow(CRYPTO);
     this.toggleUnitTests = () => toggleWindow(UNITTESTS);
-    this.toggleSegwitQr = () => toggleWindow(SEGWIT_QR);
     this.toggleBech32Qr = () => toggleWindow(BECH32_QR);
 
     const hideAllWindows = function () {
@@ -1364,39 +1358,6 @@ function Wallet() {
 
 function Donations() {
 
-    const segwitAddresses = [
-        '3DPSFabdQfUTTQz3aBmcq5ZcxQ7dpXS6Vj',
-        '3JhPVnRgSZB3mHA4SYQT5fRjnb7npTnkfe',
-        '3QFzu1cC8sR6SrBGkavdssX3XZ9r86vQE4',
-        '34UuKWyqPEjpnfhVy3Zrk1t8Dz6imA59SR',
-        '3AV6iytTv7brMQ2r6t4JC1iWYVN9XELgZi',
-        '36JHcPfyhjV7cp2udRDUAEfV9re3MyGSWn',
-        '36aSDRUydVSWgincAwhis9TcbJKMC5i9LT',
-        '3QpszzvnH4HqKvgtjQCD4vKidCbgA8gVGi',
-        '3HXeBvwGytNuiXBnmsdfaTyh5P9RqR8CNK',
-        '368cx33jWrmi4vKeHsFkHbUh8tQBZNZW4d',
-        '3DbP8unTKE7MLDnnkosnnvKCLUsumyqZ7R',
-        '33LZB4qMyDxUetAeTq3xdkVeYv9XELixSp',
-        '3CCuRXbSpC9c9UwZh1ksRcmBigDEmSUfSx',
-        '32Wq18nPpcgKXj875kTUXJDG7gXfB4CHy7',
-        '39KzLeFCEVq24KNFBsg3p85ZXbjV1zAASY',
-        '3JgqS7TVWgfxeGzJtqa5MAdjVKWT9W3wFQ',
-        '3GT1rXmUnRrZahwpDURmB8gnaiKoJLuEKw',
-        '34dT35usTZcf3WwTYNuntyC53PVH9c2q8h',
-        '36SiMcXRxDH2Foi8unmToJLBkzFUAExwNv',
-        '38bUPjMMth3ti5MS8FCmRAyLVGtjGqzeaF',
-        '3G9FtZ7ndDD2gPrXMGAz84dG9aCERy4UsT',
-        '3M3TFZgUxUDpiT8u861ZUe8YvbADootCBF',
-        '3MUWj9JrrSyEWgh14vLFNbFrjou9H9it7B',
-        '34pUQDd9eDnsDRMJuWNhS64mPbn7D5oYXw',
-        '337YiDjgaUAW2BNAboUJUCgeLkRbUL73YU',
-        '37wzbUXYPNGMxHM13EH8DHeAcC97QAGaBK',
-        '34pY2oHEGWyxLqdPwSvSDByPa4NQQ5DJg7',
-        '3FNFzMXpjnjcgf3ebymKDWc8Le1PmeaT4a',
-        '3JpMmYzH4fZieZvQSqxCMVE9KJSaUsK3o6',
-        '3L9uKmjL5RuZJKVUPePGqJRVbJLFskKTif'
-    ];
-
     const bech32Addresses = [
         'bc1q5r2nkl767t600jsz79s8xqwcz308f8vrl9nxv0',
         'bc1q8t33ezncwanux8q3zlq3vhhryw8sz6wzqmmuy6',
@@ -1431,7 +1392,6 @@ function Donations() {
     ];
 
     this.init = () => {
-        initAddress(MAINNET_SEGWIT, DOM.footer.donations.segwit, DOM.footer.donations.segwitQR);
         initAddress(MAINNET_BECH32, DOM.footer.donations.bech32, DOM.footer.donations.bech32QR);
     };
 
@@ -1465,11 +1425,6 @@ function Donations() {
         let index;
 
         switch(addressType){
-
-            case MAINNET_SEGWIT:
-                index = getRandPerDay(0, segwitAddresses.length -1);
-                return segwitAddresses[index];
-                break;
 
             case MAINNET_BECH32:
                 index = getRandPerDay(0, bech32Addresses.length -1);

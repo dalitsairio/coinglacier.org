@@ -19,6 +19,9 @@ Please send DONATIONS for this project to one of the following Bitcoin Addresses
 * bc1qdmhnh62rn42uq6md7lp9zvwhsm6t8wl9nwh30a
 * 1EFTmGDaDELbShUAjuPgj5Ada6WsKFBNHA
 
+For ⚡️ Pioneers:
+[tippin.me](https://tippin.me/@DalitSairio)
+
 # Manual
 ## End Users
 
