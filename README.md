@@ -14,12 +14,12 @@ loaded.
 Here is a link to the BitcoinTalk.org forum topic discussing this project:<br />
 https://bitcointalk.org/index.php?topic=4461152
 
-Please send DONATIONS for this project to one of the following Bitcoin Addresses:<br />
+Please send DONATIONS for this project to one of the following Bitcoin addresses:<br />
 * 34yh3Wofm4g7yNRXrAAEPjgXtuoLE6nyxY
 * bc1qdmhnh62rn42uq6md7lp9zvwhsm6t8wl9nwh30a
 * 1EFTmGDaDELbShUAjuPgj5Ada6WsKFBNHA
 
-For ⚡️ Pioneers:
+For ⚡️ pioneers:
 [tippin.me](https://tippin.me/@DalitSairio)
 
 # Manual
@@ -242,8 +242,7 @@ NPM packages functions with their redistributable license is provided below.
 | [bip38](https://www.npmjs.com/package/bip38) | MIT |
 | [bip39](https://www.npmjs.com/package/bip39) | ISC |
 | [bitcoinjs-lib](https://www.npmjs.com/package/bitcoinjs-lib) | MIT |
-| [bootrsap](https://www.npmjs.com/package/bootstrap) | MIT |
-| [chai](https://www.npmjs.com/package/chai) | MIT |
+| [bootstrap](https://www.npmjs.com/package/bootstrap) | MIT |
 | [chai](https://www.npmjs.com/package/chai) | MIT |
 | [jquery](https://www.npmjs.com/package/jquery) | MIT |
 | [mocha](https://www.npmjs.com/package/mocha) | MIT |
@@ -254,7 +253,7 @@ The github [repository](https://github.com/pointbiz/bitaddress.org) from bitaddr
 was used as a template. Ideas, patterns and parts of documentation were adopted from it.
 The bitaddress.org project is published under the MIT license.
 
-The coinglacier.org software is available under The MIT License (MIT)
+The coinglacier.org software is available under the MIT License (MIT)
 Copyright (c) 2018 coinglacier.org
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
