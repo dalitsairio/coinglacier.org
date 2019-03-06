@@ -1,3 +1,15 @@
+# 1.1.0
+-------------------------------------
+date: 2019-03-06
+SHA256 checksum: 45288e949fb491f8833971edd4e42665cf1a619b6712114c2ecb14c5970ce218
+* UI improvements
+    * Always reset view on opening of HTML file
+    * Spinner in print button
+    * Decrypt PrivKey: Block input fields while decryption process is on-going
+* Dockerized build process
+* Updated dependencies
+* Enable donations over Lightning
+
 # 1.0.0
 -------------------------------------
 date: 2018-06-12  
