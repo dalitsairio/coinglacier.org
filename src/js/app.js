@@ -1567,17 +1567,18 @@ function removeParamFromURL(param) {
     }
 }
 
-function getURLparameter(name, url) {
+function getURLparameter(name) {
 
     if (!name) {
         return null;
     }
 
-    url = url || window.location.href;
+    let url = window.location.href;
     name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
     let regexS = "[\\?&]" + name + "=([^&#]*)";
     let regex = new RegExp(regexS);
     let results = regex.exec(url);
+
     return results == null ? null : results[1];
 }
 
