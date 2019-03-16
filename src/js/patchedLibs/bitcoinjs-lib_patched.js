@@ -68,18 +68,6 @@ bitcoinjs.networks.testnet.p2wpkhInP2sh = {
     wif: 0xef
 };
 
-bitcoinjs.networks.litecoin.p2wpkhInP2sh = {
-    baseNetwork: "litecoin",
-    messagePrefix: '\x19Litecoin Signed Message:\n',
-    bip32: {
-        public: 0x01b26ef6,
-        private: 0x01b26792
-    },
-    pubKeyHash: 0x30,
-    scriptHash: 0x32,
-    wif: 0xb0
-};
-
 })();
 
 module.exports = {

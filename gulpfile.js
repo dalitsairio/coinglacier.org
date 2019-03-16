@@ -5,7 +5,7 @@
 
 const fs = require('fs');
 const gulp = require('gulp');
-const plumber = require('gulp-plumber')
+const plumber = require('gulp-plumber');
 const browserify = require('browserify');
 const source = require('vinyl-source-stream');
 const buffer = require('vinyl-buffer');
@@ -158,6 +158,9 @@ gulp.task('move-dependencies', function () {
     gulp.src('node_modules/bootstrap/scss/mixins/*.scss')
         .pipe(gulp.dest('src/scss/vendors/bootstrap/mixins'));
 
+    gulp.src('node_modules/bootstrap/scss/vendor/*.scss')
+        .pipe(gulp.dest('src/scss/vendors/bootstrap/vendor'));
+
     return gulp.src('node_modules/bootstrap/scss/utilities/*.scss')
         .pipe(gulp.dest('src/scss/vendors/bootstrap/utilities'));
 
@@ -280,7 +283,7 @@ gulp.task('build:update-package-json', function () {
 
     fs.writeFile('./' + packageFile, JSON.stringify(packageJson, null, 2), function(err) {
         if(err) {
-            console.log(err);
+            console.error(err);
         }
         else {
             console.log('JSON saved to ' + packageFile);
@@ -332,7 +335,7 @@ gulp.task('build:update-changelog', function () {
 
     fs.writeFile('./' + changelogFile, newEntry + currentFile, function(err) {
         if(err) {
-            console.log(err);
+            console.error(err);
         }
         else {
             console.log('JSON saved to ' + packageFile);

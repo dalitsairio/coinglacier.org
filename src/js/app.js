@@ -111,10 +111,13 @@ DOM.options.qrcodeLink = $('input#qrcode-links-check');
 DOM.actions = {};
 DOM.actions.newAddress = $('#actions #new-address');
 DOM.actions.newMnemonic = $('#actions #new-mnemonic');
-DOM.actions.print = $('#actions #print-button');
+DOM.actions.print = {};
+DOM.actions.print.enabled = $('#actions #print-button-enabled');
+DOM.actions.print.loading = $('#actions #print-button-loading');
+DOM.actions.print.disabled = $('#actions #print-button-disabled');
 
 DOM.popovers = {};
-DOM.popovers.testnetWarning = $('#testnet-warning');
+DOM.popovers.testnetWarning = DOM.network.testnetWarning; // $('#testnet-warning');
 DOM.popovers.showXPUB = $('#showXPUBlabel');
 DOM.popovers.encryption = $('#password-input-group');
 DOM.popovers.numberAddresses = $('#address-numbering-label');
@@ -163,18 +166,25 @@ DOM.footer.securityChecks.mocha.encTestButton = $('footer #run-enc-tests-button'
 DOM.footer.donations = {};
 DOM.footer.donations.segwit = $('#donation-address-segwit');
 DOM.footer.donations.bech32 = $('#donation-address-bech32');
-DOM.footer.donations.segwitQrIcon = $('#donations-segwit-qr-icon');
 DOM.footer.donations.bech32QrIcon = $('#donations-bech32-qr-icon');
-DOM.footer.donations.segwitQR = $('#canvas-donations-segwit').get(0);
 DOM.footer.donations.bech32QR = $('#canvas-donations-bech32').get(0);
 DOM.footer.pgpSignature = $('#pgp-signature');
 
 DOM.footer.windows = {};
+DOM.footer.windows.all = $('footer .footer-window');
 DOM.footer.windows.online = $('footer #online-check-wrapper');
 DOM.footer.windows.crypto = $('footer #crypto-check-wrapper');
 DOM.footer.windows.mocha = $('footer #mocha-wrapper');
-DOM.footer.windows.segwitQR = $('footer #donation-segwit-qr-wrapper');
 DOM.footer.windows.bech32QR = $('footer #donation-bech32-qr-wrapper');
+
+
+// //////////////////////////////////////////////////
+// Page view at startup
+// //////////////////////////////////////////////////
+
+let initView = {};
+initView.visibleElements = [DOM.pageLoader, DOM.body];
+initView.hiddenElements = [DOM.root, DOM.footer.windows.all];
 
 
 // //////////////////////////////////////////////////
@@ -261,6 +271,7 @@ currentPage = pages.singleWallet;
 const mnemonicDecryption = new MnemonicDecryption();
 const privkeyDecryption = new PrivkeyDecryption();
 const footer = new Footer();
+const printButton = new PrintButton();
 const init = new Init();
 const pageManagement = new PageManagement();
 const switchNetwork = new SwitchNetwork();
@@ -304,7 +315,7 @@ DOM.options.qrcodeLink.change(options.toggleQRcodeLink);
 // Actions
 DOM.actions.newAddress.click(init.wallet);
 DOM.actions.newMnemonic.click(init.wallet);
-DOM.actions.print.click(print);
+DOM.actions.print.enabled.click(print);
 
 // Decrypt mnemonic page
 DOM.decMnemonic.mnemonic.change(mnemonicDecryption.mnemonicChanged);
@@ -323,7 +334,6 @@ DOM.footer.securityChecks.online.click(footer.windows.toggleOnline);
 DOM.footer.securityChecks.crypto.click(footer.windows.toggleCrypto);
 DOM.footer.securityChecks.unittests.click(footer.windows.toggleUnitTests);
 DOM.footer.securityChecks.mocha.encTestButton.click(footer.securityChecks.reloadAndRunAllTests);
-DOM.footer.donations.segwitQrIcon.click(footer.windows.toggleSegwitQr);
 DOM.footer.donations.bech32QrIcon.click(footer.windows.toggleBech32Qr);
 DOM.footer.pgpSignature.click(footer.redirectToSignature);
 
@@ -336,6 +346,7 @@ function Init() {
 
     this.app = () => {
 
+        this.startupView();
         network();
         page();
         popovers();
@@ -344,21 +355,25 @@ function Init() {
         donations.init();
 
         this.accounts();
-        this.wallet();
+        this.wallet(function () {
+            // Run the security checks shown in the footer of the page
+            footer.securityChecks.runAll();
+        });
+    };
 
-        // Run the security checks shown in the footer of the page
-        footer.securityChecks.runAll();
-    }
+    this.startupView = () => {
+        initView.hiddenElements.map(dom => { dom.hide(); });
+        initView.visibleElements.map(dom => { dom.show(); });
+    };
 
-
-    this.wallet = () => {
+    this.wallet = (cb) => {
 
         if (password) {
             bitcoinLoader.interrupt();
         }
 
-        wallet.init(false);
-    }
+        wallet.init(false, cb);
+    };
 
     this.mainnet = () => {
 
@@ -376,7 +391,7 @@ function Init() {
 
         // set correct Bitcoin network and reload the wallet
         wallet.setNetwork();
-    }
+    };
 
     this.testnet = () => {
 
@@ -400,18 +415,18 @@ function Init() {
 
         // set correct Bitcoin network and reload the wallet
         wallet.setNetwork();
-    }
+    };
 
     this.accounts = () => {
         accounts = [];
         accounts.push(currentPage.addressesPerAccount);
-    }
+    };
 
     const setDefaults = () => {
         password = currentPage.defaultPassword;
         options.showXPUB = currentPage.showXPUB;
         useBitcoinLink = currentPage.useBitcoinLink;
-    }
+    };
 
     // set mainnet or testnet
     const network = () => {
@@ -423,7 +438,7 @@ function Init() {
                 this.mainnet();
                 break;
         }
-    }
+    };
 
     const page = () => {
         // set correct page
@@ -444,7 +459,7 @@ function Init() {
                 pageManagement.initPage(currentPage);
                 break;
         }
-    }
+    };
 
     const popovers = () => {
         if($(window).width() > 1000) { // DO NOT show popovers on mobile phones
@@ -472,7 +487,7 @@ function PageManagement() {
 
         // reload the page
         options.showAccountsOptions(true);
-    }
+    };
 
     this.changePage = (newPage) => {
         bitcoinLoader.interrupt();
@@ -480,13 +495,13 @@ function PageManagement() {
         privkeyDecryption.resetPage();
         this.initPage(newPage);
         wallet.load();
-    }
+    };
 
     const changePageElements = () => {
         // only show elements that are getting activated with this call
         DOM.pageElements.all.hide();
         currentPage.pageElementsDOM.show();
-    }
+    };
 
     // set new menu link to active
     const setMenuLinkActive = () => {
@@ -544,7 +559,7 @@ function AddressTypes() {
                     break;
             }
         }
-    }
+    };
 
     this.changeToNonSegwit = () => changeAddressType(GET.addressTypes.nonSegwit);
     this.changeToSegwit = () => changeAddressType(GET.addressTypes.segwit);
@@ -578,14 +593,14 @@ function Options() {
 
         password = currentPage.defaultPassword;
         DOM.options.encryption.pass.val(currentPage.defaultPassword);
-    }
+    };
 
     // checkbox show extended public key changed
     this.showXPUBchanged = () => {
         readXPUBform();
         handleAccounts();
         wallet.load();
-    }
+    };
 
     this.showAccountsOptions = (reset) => {
         if (this.isAccountsFormEmpty() || reset) {
@@ -599,7 +614,7 @@ function Options() {
         for (let index = accounts.length - 1; index >= 0; index--) {
             showAccountOptions(index);
         }
-    }
+    };
 
     this.toggleAddressNumbering = () => {
         currentPage.numberAddresses = DOM.options.numberAddresses.prop('checked');
@@ -609,7 +624,7 @@ function Options() {
     this.toggleQRcodeLink = () => {
         useBitcoinLink = DOM.options.qrcodeLink.prop('checked');
         if (currentPage === pages.decryptPrivKey) {
-            privkeyDecryption.initDecryption();
+            privkeyDecryption.formChanged();
         } else {
             wallet.load();
         }
@@ -661,7 +676,7 @@ function Options() {
 
 
         DOM.options.accounts.accountTemplate.after(accountDiv);
-    }
+    };
 
     const readXPUBform = () => this.showXPUB = DOM.options.showXPUB.prop('checked');
     const handleAccounts = () => this.showXPUB ? enableAccounts() : disableAccounts();
@@ -674,7 +689,7 @@ function Options() {
 
         $('.account-row.not-template span.title').show();
         $('.account-row.not-template button.account-insertion').show();
-    }
+    };
 
     const disableAccounts = () => {
 
@@ -691,14 +706,14 @@ function Options() {
         this.showAccountsOptions();
         $('.account-row.not-template span.title').hide();
         $('.account-row.not-template button.account-insertion').hide();
-    }
+    };
 
     const addAccount = (prev) => {
         accounts.splice(prev + 1, 0, currentPage.addressesPerAccount);
 
         // reload the view
         this.showAccountsOptions();
-    }
+    };
 
     const removeAccount = (position) => {
         // remove the element from array
@@ -706,7 +721,7 @@ function Options() {
 
         // reload the view
         this.showAccountsOptions();
-    }
+    };
 
     const setAddressesPerAccount = (index, amount) => {
         if (amount > 0) {
@@ -723,7 +738,8 @@ function togglePasswordVisibility(domTextfield, domButton) {
         domTextfield.prop('type', 'text');
         domButton.html('Hide');
     }
-};
+}
+
 
 // //////////////////////////////////////////////////
 // Mnemonic Decryption
@@ -733,13 +749,13 @@ function MnemonicDecryption() {
 
     this.mnemonicChanged = () => {
         formCheck.validateInput(verifyMnemonic(), DOM.decMnemonic.mnemonic);
-        initDecryption();
-    }
+        formChanged();
+    };
 
-    this.passwordChanged = () => {      
+    this.passwordChanged = () => {
         formCheck.validateInput(verifyPassword(), DOM.decMnemonic.pass);
-        initDecryption();
-    }
+        formChanged();
+    };
 
     this.resetPage = (leaveMnemonic) => {
         DOM.decMnemonic.pass.val('');
@@ -750,34 +766,40 @@ function MnemonicDecryption() {
             DOM.decMnemonic.mnemonic.val('');
             formCheck.removeValidityClasses(DOM.decMnemonic.mnemonic);
         }
-    }
+    };
 
     this.togglePwVisibility = () => togglePasswordVisibility(DOM.decMnemonic.pass, DOM.decMnemonic.hidePass);
 
     const verifyMnemonic = () => bitcoin.validateMnemonic(DOM.decMnemonic.mnemonic.val());
     const verifyPassword = () => DOM.decMnemonic.pass.val() !== '';
+    const checkInputsFulfilled = () => verifyMnemonic() && verifyPassword();
+
+    const formChanged = () => {
+        pages.decryptMnemonic.showWallet = checkInputsFulfilled();
+        alignPrintButton();
+        initDecryption();
+    };
 
     const initDecryption = () => {
-        
-        if (checkInputsFulfilled()) {
+        if (pages.decryptMnemonic.showWallet) {
             let encryptedMnemonic = DOM.decMnemonic.mnemonic.val();
             password = DOM.decMnemonic.pass.val();
             wallet.init(encryptedMnemonic);
             $('.wallet-account').show();
-        }
-    }
-
-    const checkInputsFulfilled = () => {
-        if (verifyMnemonic() && verifyPassword()) {
-            pages.decryptMnemonic.showWallet = true;
-        } else {
-            pages.decryptMnemonic.showWallet = false;
+        }else{
             $('.wallet-account').hide();
         }
+    };
 
-        return pages.decryptMnemonic.showWallet;
+    const alignPrintButton = () => {
+        if (pages.decryptMnemonic.showWallet) {
+            printButton.setLoading();
+        }else{
+            printButton.disable();
+        }
     }
 }
+
 
 // //////////////////////////////////////////////////
 // BIP38 Private Key Decryption
@@ -788,15 +810,27 @@ function PrivkeyDecryption() {
     this.encrypedPrivkeyChanged = () => {
         formCheck.validateInput(verifyPrivKey(), DOM.decPriv.privKey);
         // When privKey changes, password could theoretically be correct now, even if it was wrong before.
-        // Hence, the password validation needs to be resetted for the next decryption.
+        // Hence, the password validation needs to be reset for the next decryption.
         formCheck.removeValidityClasses(DOM.decPriv.pass);
-        this.initDecryption();
-    }
+        this.formChanged();
+    };
 
     this.passwordChanged = () => {
         formCheck.validateInput(verifyPassword(), DOM.decPriv.pass);
-        this.initDecryption();
-    }
+        this.formChanged();
+    };
+
+    this.formChanged = () => {
+        pages.decryptPrivKey.showWallet = checkInputsFulfilled();
+
+        alignPrintButton();
+        alignWallet();
+
+        if (pages.decryptPrivKey.showWallet) {
+            blockInputFields();
+            initDecryption();
+        }
+    };
 
     this.resetPage = (leavePrivKey) => {
         DOM.decPriv.pass.val('');
@@ -808,42 +842,56 @@ function PrivkeyDecryption() {
             DOM.decPriv.privKey.val('');
             formCheck.removeValidityClasses(DOM.decPriv.privKey);
         }
-    }
+    };
 
     this.togglePwVisibility = () => togglePasswordVisibility(DOM.decPriv.pass, DOM.decPriv.hidePass);
     this.checkMainnet = () => checkOtherNetwork(init.mainnet);
     this.checkTestnet = () => checkOtherNetwork(init.testnet);
 
-    this.initDecryption = () => {
-        if (checkInputsFulfilled()) {
-            let encryptedPrivKey = DOM.decPriv.privKey.val();
-            let password = DOM.decPriv.pass.val();
-
-            DOM.decPriv.wrongNetwork.hide();
-            wallet.createHTML();
-            $('.wallet-account').show();
-            decryptPrivKey(encryptedPrivKey, password);
-        }
-    }
-
     const verifyPrivKey = () => bip38.verify(DOM.decPriv.privKey.val());
     const verifyPassword = () => DOM.decPriv.pass.val() !== '';
+    const checkInputsFulfilled = () => verifyPrivKey() && verifyPassword();
+
+    const blockInputFields = () => {
+        DOM.decPriv.privKey.prop('disabled', true);
+        DOM.decPriv.pass.prop('disabled', true);
+    };
+
+    const unblockInputFields = () => {
+        DOM.decPriv.privKey.prop('disabled', false);
+        DOM.decPriv.pass.prop('disabled', false);
+    };
+
+    const initDecryption = () => {
+        let encryptedPrivKey = DOM.decPriv.privKey.val();
+        let password = DOM.decPriv.pass.val();
+
+        DOM.decPriv.wrongNetwork.hide();
+        wallet.createHTML();
+        decryptPrivKey(encryptedPrivKey, password);
+    };
 
     const decryptPrivKey = (encryptedPrivKey, password) => {
 
         let isTestnet = networkId >= 10;
-        
+
         bitcoinLoader.getCredentialsFromEncryptedPrivKey(encryptedPrivKey, password, isTestnet, function (credentials) {
             wallet.fillCredentialsHTML(0, 0, credentials.address, credentials.privateKey);
+            printButton.enable();
+            unblockInputFields();
         }, function () {
             DOM.decPriv.wrongNetwork.show();
             DOM.decPriv.pass.addClass(CSS_CLASS_INVALID);
             $('.wallet-account').hide();
+            printButton.disable();
+            unblockInputFields();
         }, function () {
             DOM.decPriv.pass.addClass(CSS_CLASS_INVALID);
             $('.wallet-account').hide();
+            printButton.disable();
+            unblockInputFields();
         });
-    }
+    };
 
     const checkOtherNetwork = (initNetwork) => {
         let password = DOM.decPriv.pass.val();
@@ -851,16 +899,51 @@ function PrivkeyDecryption() {
         initNetwork(); // resets the password field
         DOM.decPriv.pass.val(password);
         this.passwordChanged();
-    }
+    };
 
-    const checkInputsFulfilled = () => {
-        if (verifyPrivKey() && verifyPassword()) {
-            pages.decryptPrivKey.showWallet = true;
-        } else {
-            pages.decryptPrivKey.showWallet = false;
+    const alignWallet = () => {
+        if (pages.decryptPrivKey.showWallet) {
+            $('.wallet-account').show();
+        }else{
             $('.wallet-account').hide();
         }
-        return pages.decryptPrivKey.showWallet;
+    };
+
+    const alignPrintButton = () => {
+        if (pages.decryptPrivKey.showWallet) {
+            printButton.setLoading();
+        }else{
+            printButton.disable();
+        }
+    }
+}
+
+
+// //////////////////////////////////////////////////
+// Print Button
+// //////////////////////////////////////////////////
+
+function PrintButton() {
+
+    this.disable = () => {
+        disableAllButtons();
+        DOM.actions.print.disabled.show();
+    };
+
+    this.setLoading = () => {
+        disableAllButtons();
+        DOM.actions.print.loading.show();
+    };
+
+    this.enable = () => {
+        disableAllButtons();
+        DOM.actions.print.enabled.show();
+    };
+
+    const disableAllButtons = () => {
+        DOM.actions.print.enabled.hide();
+        DOM.actions.print.loading.hide();
+        DOM.actions.print.disabled.hide();
     }
 }
 
@@ -890,58 +973,58 @@ function SecurityChecks() {
         this.crypto();
 
         // run unit tests
-        let runAllTests = getURLparameter(GET.allUnitTests.keyword) == GET.allUnitTests.yes;
+        let runAllTests = getURLparameter(GET.allUnitTests.keyword) === GET.allUnitTests.yes;
         if(runAllTests){
             removeParamFromURL(GET.allUnitTests.keyword);
         }
         this.unittests(runAllTests);
-    }
+    };
 
     this.online = () => {
         if (navigator.onLine) {
             onFailed(DOM.footer.securityChecks.online);
             DOM.footer.securityChecks.browserOnline.show();
         } else {
-            onSuccess(DOM.footer.securityChecks.online)
+            onSuccess(DOM.footer.securityChecks.online);
             DOM.footer.securityChecks.browserOffline.show();
         }
-    }
+    };
 
     this.crypto = () => {
         if (window.crypto && window.crypto.getRandomValues) {
-            onSuccess(DOM.footer.securityChecks.crypto)
+            onSuccess(DOM.footer.securityChecks.crypto);
             DOM.footer.securityChecks.cryptoSupported.show();
         } else {
             onFailed(DOM.footer.securityChecks.crypto);
             DOM.footer.securityChecks.cryptoNotSupported.show();
         }
-    }
+    };
 
     this.unittests = (allTests) => {
         if(allTests){
             DOM.footer.securityChecks.mocha.encryptionDialog.hide();
         }
         bitcoinLoader.runUnitTests(allTests, onUnittestsSuccesful, onUnittestsFailed);
-    }
+    };
 
     this.reloadAndRunAllTests = () => {
         addParamToURL({key: GET.allUnitTests.keyword, value: GET.allUnitTests.yes});
 
         // looks ridiculous but this is actually a page reload
         window.location.href = window.location.href;
-    }
+    };
 
     const onSuccess = (domElement) => domElement.html('&#10004;'); // &#10004; = ✔
     const onFailed = (domElement) => {
         domElement.html('&#9888;'); // &#9888; = ⚠
         domElement.addClass('warning');
-    }
+    };
 
     const onUnittestsSuccesful = () => {
         DOM.footer.securityChecks.mocha.title.html('Unit tests successful');
         DOM.footer.securityChecks.mocha.title.addClass('success');
         onSuccess(DOM.footer.securityChecks.unittests);
-    }
+    };
 
     const onUnittestsFailed = () => {
         DOM.footer.securityChecks.mocha.title.html('Unit tests failed!');
@@ -956,15 +1039,13 @@ function FooterWindows() {
     const ONLINE = {id: 0, window: DOM.footer.windows.online};
     const CRYPTO = {id: 1, window: DOM.footer.windows.crypto};
     const UNITTESTS = {id: 2, window: DOM.footer.windows.mocha};
-    const SEGWIT_QR = {id: 3, window: DOM.footer.windows.segwitQR};
-    const BECH32_QR = {id: 4, window: DOM.footer.windows.bech32QR};
+    const BECH32_QR = {id: 3, window: DOM.footer.windows.bech32QR};
 
     let shownWindow = null;
 
     this.toggleOnline = () => toggleWindow(ONLINE);
     this.toggleCrypto = () => toggleWindow(CRYPTO);
     this.toggleUnitTests = () => toggleWindow(UNITTESTS);
-    this.toggleSegwitQr = () => toggleWindow(SEGWIT_QR);
     this.toggleBech32Qr = () => toggleWindow(BECH32_QR);
 
     const hideAllWindows = function () {
@@ -984,7 +1065,7 @@ function FooterWindows() {
             shownWindow = null;
         }
     };
-};
+}
 
 
 // //////////////////////////////////////////////////
@@ -995,14 +1076,16 @@ function Wallet() {
 
     let self = this;
 
-    this.init = (mnemonic) => {
+    this.init = (mnemonic, cb) => {
         bitcoinLoader.initiateHDWallet(mnemonic, password, useImprovedEntropy, function (result) {
             DOM.pageLoader.hide();
             DOM.root.show();
 
             self.load(mnemonic);
+
+            cb();
         });
-    }
+    };
 
     this.load = () => {
 
@@ -1017,9 +1100,12 @@ function Wallet() {
         showDOMif(currentPage.showWallet, $('.wallet-account'));
 
         if (currentPage.showWallet) {
+            printButton.setLoading();
             fillWalletHTML();
+        } else {
+            printButton.disable();
         }
-    }
+    };
 
     this.setNetwork = () => {
 
@@ -1038,12 +1124,12 @@ function Wallet() {
         }
 
         privkeyDecryption.resetPage(true);
-    }
+    };
 
     this.recalculate = () => {
         this.setNetwork();
         this.load();
-    }
+    };
 
 
     this.createHTML = () => {
@@ -1063,9 +1149,9 @@ function Wallet() {
         createMnemonicHTML();
 
         foreachCredential(createAccountHTML, createCredentialsHTML);
-    }
+    };
 
-    const showDOMif = (condition, domElement) => { condition ? domElement.show() : domElement.hide(); }
+    const showDOMif = (condition, domElement) => { condition ? domElement.show() : domElement.hide(); };
 
     const setNetworkMainnet = (addressType) => {
         DOM.networkElements.mainnet.show();
@@ -1081,7 +1167,7 @@ function Wallet() {
                 networkId = MAINNET_BECH32;
                 break;
         }
-    }
+    };
 
     const setNetworkTestnet = (addressType) => {
         DOM.networkElements.testnet.show();
@@ -1097,14 +1183,14 @@ function Wallet() {
                 networkId = TESTNET_BECH32;
                 break;
         }
-    }
+    };
 
     const createMnemonicHTML = () => {
         DOM.wallet.container.find('.mnemonic').html(bitcoinLoader.getMnemonic());
 
         let mnemonicCanvas = DOM.wallet.container.find('.canvas-mnemonic').get(0);
         createQRCode(mnemonicCanvas, bitcoinLoader.getMnemonic());
-    }
+    };
 
     const createAccountHTML = (accountIndex) => {
 
@@ -1120,17 +1206,17 @@ function Wallet() {
         addOrderingAccountClasses(accountCopy, accountIndex);
 
         DOM.wallet.container.append(accountCopy);
-    }
+    };
 
     const addOrderingAccountClasses = (domElement, accountIndex) => {
-        if (accountIndex == 0) {
+        if (accountIndex === 0) {
             domElement.addClass('first-account');
         }
 
-        if(accountIndex == accounts.length - 1){
+        if(accountIndex === accounts.length - 1){
             domElement.addClass('last-account');
         }
-    }
+    };
 
     const createCredentialsHTML = (accountIndex, addressIndex) => {
 
@@ -1153,9 +1239,11 @@ function Wallet() {
 
         let walletAccount = $('div#account-' + accountIndex);
         walletAccount.append(credentialsCopy);
-    }
+    };
 
     const fillWalletHTML = () => {
+
+        let credentialsCreated = getAmountOfAddresses();
 
         let perAccount = function (accountIndex) {
             bitcoinLoader.createAccount(networkId, accountIndex, function (account) {
@@ -1172,29 +1260,37 @@ function Wallet() {
 
             bitcoinLoader.asyncCreateCredentials(networkId, accountIndex, addressIndex, encryption, function (credentials) {
                 self.fillCredentialsHTML(accountIndex, addressIndex, credentials.address, credentials.privateKey);
+
+                if(--credentialsCreated === 0) {
+                    printButton.enable();
+                }
             });
         };
 
         foreachCredential(perAccount, perAddress);
-    }
+    };
+
+    const getAmountOfAddresses = () => {
+        return accounts.reduce((a, b) => a + b, 0);
+    };
 
     const foreachCredential = (callbackPerAccount, callbackPerAddress) => {
         // loop through accounts
-        for (let accountIndex = 0; accountIndex < accounts.length; accountIndex++) {
+        accounts.forEach((account, accountIndex) => {
             callbackPerAccount(accountIndex);
             // loop through addresses
             for (let addressIndex = 0; addressIndex < accounts[accountIndex]; addressIndex++) {
                 callbackPerAddress(accountIndex, addressIndex);
             }
-        }
-    }
+        });
+    };
 
     const fillAccountHTML = (accountIndex, xpub) => {
         $('#xpub-' + accountIndex).html(xpub);
 
         let xpubCanvas = $('#canvas-xpub-' + accountIndex).get(0);
         createQRCode(xpubCanvas, xpub);
-    }
+    };
 
     this.fillCredentialsHTML = (accIndex, addIndex, address, privKey) => {
 
@@ -1208,7 +1304,7 @@ function Wallet() {
 
         fillCredentialsElement(addressIdentifier, address, addressLink);
         fillCredentialsElement(privKeyIdentifier, privKey);
-    }
+    };
 
     const fillCredentialsElement = (id, plaintext, link) => {
 
@@ -1223,7 +1319,7 @@ function Wallet() {
         }
 
         createQRCode($('#canvas-' + id).get(0), qrCodeData);
-    }
+    };
 
     const setupBitcoinLink = (address, accIndex, addIndex) => {
 
@@ -1242,7 +1338,7 @@ function Wallet() {
         }
 
         return createBitcoinLink(address, label);
-    }
+    };
 
     const removeCredentialsLoadingGui = (accountIndex, addressIndex) => {
         let credentialsDiv = $('div#credentials-' + accountIndex + '-' + addressIndex);
@@ -1261,39 +1357,6 @@ function Wallet() {
 // //////////////////////////////////////////////////
 
 function Donations() {
-
-    const segwitAddresses = [
-        '3DPSFabdQfUTTQz3aBmcq5ZcxQ7dpXS6Vj',
-        '3JhPVnRgSZB3mHA4SYQT5fRjnb7npTnkfe',
-        '3QFzu1cC8sR6SrBGkavdssX3XZ9r86vQE4',
-        '34UuKWyqPEjpnfhVy3Zrk1t8Dz6imA59SR',
-        '3AV6iytTv7brMQ2r6t4JC1iWYVN9XELgZi',
-        '36JHcPfyhjV7cp2udRDUAEfV9re3MyGSWn',
-        '36aSDRUydVSWgincAwhis9TcbJKMC5i9LT',
-        '3QpszzvnH4HqKvgtjQCD4vKidCbgA8gVGi',
-        '3HXeBvwGytNuiXBnmsdfaTyh5P9RqR8CNK',
-        '368cx33jWrmi4vKeHsFkHbUh8tQBZNZW4d',
-        '3DbP8unTKE7MLDnnkosnnvKCLUsumyqZ7R',
-        '33LZB4qMyDxUetAeTq3xdkVeYv9XELixSp',
-        '3CCuRXbSpC9c9UwZh1ksRcmBigDEmSUfSx',
-        '32Wq18nPpcgKXj875kTUXJDG7gXfB4CHy7',
-        '39KzLeFCEVq24KNFBsg3p85ZXbjV1zAASY',
-        '3JgqS7TVWgfxeGzJtqa5MAdjVKWT9W3wFQ',
-        '3GT1rXmUnRrZahwpDURmB8gnaiKoJLuEKw',
-        '34dT35usTZcf3WwTYNuntyC53PVH9c2q8h',
-        '36SiMcXRxDH2Foi8unmToJLBkzFUAExwNv',
-        '38bUPjMMth3ti5MS8FCmRAyLVGtjGqzeaF',
-        '3G9FtZ7ndDD2gPrXMGAz84dG9aCERy4UsT',
-        '3M3TFZgUxUDpiT8u861ZUe8YvbADootCBF',
-        '3MUWj9JrrSyEWgh14vLFNbFrjou9H9it7B',
-        '34pUQDd9eDnsDRMJuWNhS64mPbn7D5oYXw',
-        '337YiDjgaUAW2BNAboUJUCgeLkRbUL73YU',
-        '37wzbUXYPNGMxHM13EH8DHeAcC97QAGaBK',
-        '34pY2oHEGWyxLqdPwSvSDByPa4NQQ5DJg7',
-        '3FNFzMXpjnjcgf3ebymKDWc8Le1PmeaT4a',
-        '3JpMmYzH4fZieZvQSqxCMVE9KJSaUsK3o6',
-        '3L9uKmjL5RuZJKVUPePGqJRVbJLFskKTif'
-    ];
 
     const bech32Addresses = [
         'bc1q5r2nkl767t600jsz79s8xqwcz308f8vrl9nxv0',
@@ -1329,9 +1392,8 @@ function Donations() {
     ];
 
     this.init = () => {
-        initAddress(MAINNET_SEGWIT, DOM.footer.donations.segwit, DOM.footer.donations.segwitQR);
         initAddress(MAINNET_BECH32, DOM.footer.donations.bech32, DOM.footer.donations.bech32QR);
-    }
+    };
 
     const initAddress = (addressType, linkDOM, qrDOM) => {
 
@@ -1341,7 +1403,7 @@ function Donations() {
         linkDOM.html(htmlLink);
 
         createQRCode(qrDOM, link);
-    }
+    };
 
     const getLink = (addressType) => {
         let label = 'Donation to coinglacier.org';
@@ -1349,25 +1411,20 @@ function Donations() {
         let address = this.getAddress(addressType);
 
         return createBitcoinLink(address, label, amount);
-    }
+    };
 
     const getHtmlLink = (addressType) => {
         let address = this.getAddress(addressType);
         let link = getLink(addressType);
 
         return wrapLinkAroundText(address, link);
-    }
+    };
 
     this.getAddress = (addressType) => {
 
         let index;
 
         switch(addressType){
-
-            case MAINNET_SEGWIT:
-                index = getRandPerDay(0, segwitAddresses.length -1);
-                return segwitAddresses[index];
-                break;
 
             case MAINNET_BECH32:
                 index = getRandPerDay(0, bech32Addresses.length -1);
@@ -1376,7 +1433,7 @@ function Donations() {
         }
 
         return false;
-    }
+    };
 
     const getRandPerDay = (from, to) => {
         let d = new Date();
@@ -1399,15 +1456,15 @@ function FormCheck() {
         } else {
             domElement.addClass(CSS_CLASS_INVALID);
         }
-    }
+    };
 
     this.removeValidityClasses = (domElement) => {
         domElement.removeClass(CSS_CLASS_VALID);
         domElement.removeClass(CSS_CLASS_INVALID);
-    }
+    };
 
     this.validateInput = (condition, domElement) => {
-        this.removeValidityClasses(domElement);       
+        this.removeValidityClasses(domElement);
         this.setValidityClass(condition, domElement);
     }
 
@@ -1420,7 +1477,7 @@ function FormCheck() {
 
 // param requires object {key: key, value: value}
 function switchURLparam(param) {
-    removeParamFromURL(param.key)
+    removeParamFromURL(param.key);
     addParamToURL(param);
 }
 
@@ -1465,17 +1522,18 @@ function removeParamFromURL(param) {
     }
 }
 
-function getURLparameter(name, url) {
+function getURLparameter(name) {
 
     if (!name) {
         return null;
     }
 
-    url = url || window.location.href;
+    let url = window.location.href;
     name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
     let regexS = "[\\?&]" + name + "=([^&#]*)";
     let regex = new RegExp(regexS);
     let results = regex.exec(url);
+
     return results == null ? null : results[1];
 }
 

@@ -14,10 +14,13 @@ loaded.
 Here is a link to the BitcoinTalk.org forum topic discussing this project:<br />
 https://bitcointalk.org/index.php?topic=4461152
 
-Please send DONATIONS for this project to one of the following Bitcoin Addresses:<br />
+Please send DONATIONS for this project to one of the following Bitcoin addresses:<br />
 * 34yh3Wofm4g7yNRXrAAEPjgXtuoLE6nyxY
 * bc1qdmhnh62rn42uq6md7lp9zvwhsm6t8wl9nwh30a
 * 1EFTmGDaDELbShUAjuPgj5Ada6WsKFBNHA
+
+For ⚡️ pioneers:
+[tippin.me](https://tippin.me/@DalitSairio)
 
 # Manual
 ## End Users
@@ -35,23 +38,23 @@ to avoid becoming a victim of attackers trying to tamper with the coinglacier.or
 ### Recommended installation method (+ authenticity check)
 If you do this procedure for the first time on this machine, add our PGP key to your Public Key ring
 ```sh
-wget https://coinglacier.org/coinglacier-gpg-key.txt
-gpg --import coinglacier-gpg-key.txt
+wget -qO- https://coinglacier.org/coinglacier-pgp-key.txt | gpg --import
 ```
 
-List the imported PGP key and make sure its fingerprint is 12A2411A8C5CC0356DDB767C24B0274E5B6CA8B1
+List the imported PGP key and make sure its fingerprint is 12A2 411A 8C5C C035 6DDB  767C 24B0 274E 5B6C A8B1
 ```sh
-gpg --list-keys dalit.sairio@protonmail.com
+gpg --list-keys --with-fingerprint dalit.sairio@protonmail.com
 ```
+For extra credit you can validate the key's authenticity on [keybase.io](https://keybase.io/dalitsairio).
 
 Download the HTML file and the corresponding PGP signature from coinglacier.org
 ```sh
-wget https://coinglacier.org/coinglacier.org_v1.0.0_SHA256-53b04fc126ce2f4b814d0994359e6992a2982218c2048d58c5249fc5df586fb5.html https://coinglacier.org/coinglacier.org_v1.0.0_SHA256-53b04fc126ce2f4b814d0994359e6992a2982218c2048d58c5249fc5df586fb5.html.asc
+wget https://coinglacier.org/coinglacier.org_v1.1.0_SHA256-45288e949fb491f8833971edd4e42665cf1a619b6712114c2ecb14c5970ce218.html https://coinglacier.org/coinglacier.org_v1.1.0_SHA256-45288e949fb491f8833971edd4e42665cf1a619b6712114c2ecb14c5970ce218.html.asc
 ```
 
 Proof the authenticity of the HTML file by verifying its signature.
 ```sh
-gpg --verify coinglacier.org_v1.0.0_SHA256-53b04fc126ce2f4b814d0994359e6992a2982218c2048d58c5249fc5df586fb5.html.asc
+gpg --verify coinglacier.org_v1.1.0_SHA256-45288e949fb491f8833971edd4e42665cf1a619b6712114c2ecb14c5970ce218.html.asc
 ```
 *If the verification fails, immediately stop the process. Somebody is trying to trick you.*
 
@@ -60,7 +63,7 @@ You can now disconnect your machine from the internet and use the application of
 
 ### Using the coinglacier.org application
 After having installed coinglacier.org on a trustworthy machine, disconnect your machine from the internet.
-Open coinglacier.org_v1.0.0_SHA256-53b04fc126ce2f4b814d0994359e6992a2982218c2048d58c5249fc5df586fb5.html in the incognito mode of your trustworthy browser.<br />
+Open coinglacier.org_v1.1.0_SHA256-45288e949fb491f8833971edd4e42665cf1a619b6712114c2ecb14c5970ce218.html in the incognito mode of your trustworthy browser.<br />
 To create safe wallets, print your created wallets but *do not* store any file anywhere digitally. The idea is that your confidential data is *only* stored offline, not digitally, for example on paper.<br />
 If you print the keys, make sure the printer you are using does not store any data you send to it or transmit it to any other device/service.
 This also applies to any other device your machine may be connected to.<br />
@@ -107,7 +110,42 @@ or some attacker manages to sneak into your browser.
     they might record the private key you generated.
 
 ## Developers (install guide)
+### Dockerized setup
 
+Download coinglacier.org
+```sh
+git clone https://github.com/dalitsairio/coinglacier.org.git
+cd coinglacier.org
+git checkout develop
+```
+
+Create image
+```sh
+docker build -t coinglacier-org .
+```
+
+#### Development
+During development, run gulp watchers
+```sh
+docker run -t --rm -p 3000:3000 -v "$PWD":/usr/src/app coinglacier-org
+```
+Open http://localhost:3000 in your browser
+
+#### Build finished releases
+Bugfix releases
+```sh
+docker run -t --rm -v "$PWD":/usr/src/app coinglacier-org gulp build
+```
+Backwards compatible releases
+```sh
+docker run -t --rm -v "$PWD":/usr/src/app coinglacier-org gulp build-minor
+```
+Backwards incompatible releases
+```sh
+docker run -t --rm -v "$PWD":/usr/src/app coinglacier-org gulp build-major
+```
+
+### Without Docker
 Install git, NodeJS and NPM
 ```sh
 apt install git nodejs npm
@@ -115,7 +153,7 @@ apt install git nodejs npm
 
 Install Gulp 4 globally
 ```sh
-npm install -g gulpjs/gulp.git#4.0
+npm install -g gulp@next
 ```
 
 Download coinglacier.org
@@ -129,12 +167,12 @@ Install dependencies
 ```sh
 npm install --only=dev
 ```
-### Development
+#### Development
 During development, run gulp watchers
 ```sh
 gulp
 ```
-### Build finished releases
+#### Build finished releases
 Bugfix releases
 ```sh
 gulp build
@@ -204,8 +242,7 @@ NPM packages functions with their redistributable license is provided below.
 | [bip38](https://www.npmjs.com/package/bip38) | MIT |
 | [bip39](https://www.npmjs.com/package/bip39) | ISC |
 | [bitcoinjs-lib](https://www.npmjs.com/package/bitcoinjs-lib) | MIT |
-| [bootrsap](https://www.npmjs.com/package/bootstrap) | MIT |
-| [chai](https://www.npmjs.com/package/chai) | MIT |
+| [bootstrap](https://www.npmjs.com/package/bootstrap) | MIT |
 | [chai](https://www.npmjs.com/package/chai) | MIT |
 | [jquery](https://www.npmjs.com/package/jquery) | MIT |
 | [mocha](https://www.npmjs.com/package/mocha) | MIT |
@@ -216,7 +253,7 @@ The github [repository](https://github.com/pointbiz/bitaddress.org) from bitaddr
 was used as a template. Ideas, patterns and parts of documentation were adopted from it.
 The bitaddress.org project is published under the MIT license.
 
-The coinglacier.org software is available under The MIT License (MIT)
+The coinglacier.org software is available under the MIT License (MIT)
 Copyright (c) 2018 coinglacier.org
 
 Permission is hereby granted, free of charge, to any person obtaining a copy

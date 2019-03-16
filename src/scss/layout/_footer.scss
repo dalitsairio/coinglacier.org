@@ -3,7 +3,7 @@ footer{
 
     .statusicon {
         float: left;
-        margin: 0 0.5rem 0 0;
+        margin: 0.15rem 0.5rem 0 0;
 
         .small-loader {
             margin: 0.4rem 0.4rem 0 0.4rem;
@@ -71,12 +71,12 @@ footer{
 
     #donations-wrapper {
         float:right;
-        margin: 0.3rem 0 0.2rem 0;
+        margin: 0.15rem 0 0.2rem 0;
 
         #donations-title {
             float: left;
             margin-right: 1rem;
-            margin-top: 0.25rem;
+            margin-top: 0.4rem;
         }
     }
 
@@ -101,6 +101,11 @@ footer{
         padding-left: 1.25rem;
         padding-right: 0.3125rem;
         padding-top: 0.3125rem;
+    }
+
+    #donations-tippin {
+        line-height: 1.5rem;
+        margin-left: 0.5rem;
     }
 }
 

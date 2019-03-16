@@ -28,18 +28,19 @@ function hash256 (buffer) {
 
 function getEntropy(useImprovedEntropy, cb){
     if(useImprovedEntropy){
-        // if(useImprovedEntropy){
         improveEntropy(bip39_byteSize)
             .then(function (improvedEntropy) {
                 cb(improvedEntropy);
-            });
+            }).catch(function (err) {
+                console.error(err);
+        });
     }else{
         cb(randomBytes(bip39_byteSize));
     }
 }
 
 // takes randomBytes() and more-entropy and returns an XOR of both entropies
-async function improveEntropy(amountInBytes){
+function improveEntropy(amountInBytes){
 
     return new Promise(function (resolve, reject) {
         // get an array of integers with at least the given amount of bits of combined entropy:
@@ -88,7 +89,7 @@ function initiateHDWallet(loadMnemonic, password, useImprovedEntropy, cb) {
 
 function getRootKeyFromMnemonic(mnemonic, password, cb){
     let seed = bip39.mnemonicToSeed(mnemonic, password);
-    let bip32RootKey = bitcoinjs.HDNode.fromSeedBuffer(seed);
+    let bip32RootKey = bitcoinjs.bip32.fromSeed(seed);
 
     cb(mnemonic, bip32RootKey);
 }
@@ -103,7 +104,7 @@ function createAccount(bip32RootKey, networkID, index) {
     if (pathError) throw 'Derivation Path Error: ' + pathError;
 
     let account = bip32RootKey.derivePath(accountPath);
-    account.keyPair.network = getNetworkByID(networkID);
+    account.network = getNetworkByID(networkID);
 
     let result = {
         account: account,
@@ -133,44 +134,37 @@ function createCredentials(bip44external, addressIndex) {
     if (pathError) throw 'Derivation Path Error: ' + pathError;
     let bip32 = bip44external.derivePath(addressPath);
 
-    let privateKey = bip32.keyPair.toWIF();
+    let privateKey = bip32.toWIF();
 
-    return getCredentialsFromPrivKey(privateKey, bip32, bip32.keyPair.network);
+    return getCredentialsFromPrivKey(privateKey, bip32, bip32.network);
 }
 
 function getCredentialsFromPrivKey(privateKey, ecPair, network){
-
-    let pubKey, redeemScript, scriptPubKey;
 
     switch (network.id) {
         case bitcoinjs.networks.bitcoin.id:
         case bitcoinjs.networks.testnet.id:
 
-            return { privateKey: privateKey, address: ecPair.getAddress() };
-            break;
+            return {
+                privateKey: privateKey,
+                address: bitcoinjs.payments.p2pkh({ pubkey: ecPair.publicKey, network }).address
+            };
         case bitcoinjs.networks.bitcoin.p2wpkhInP2sh.id:
         case bitcoinjs.networks.testnet.p2wpkhInP2sh.id:
 
-            pubKey = ecPair.getPublicKeyBuffer();
-            redeemScript = bitcoinjs.script.witnessPubKeyHash.output.encode(bitcoinjs.crypto.hash160(pubKey));
-            scriptPubKey = bitcoinjs.script.scriptHash.output.encode(bitcoinjs.crypto.hash160(redeemScript));
+            let redeemScript = bitcoinjs.payments.p2wpkh({pubkey: ecPair.publicKey, network});
 
             return {
                 privateKey: privateKey,
-                address: bitcoinjs.address.fromOutputScript(scriptPubKey, network)
+                address: bitcoinjs.payments.p2sh({redeem: redeemScript, network}).address
             };
-            break;
         case bitcoinjs.networks.bitcoin.p2wpkh.id:
         case bitcoinjs.networks.testnet.p2wpkh.id:
 
-            pubKey = ecPair.getPublicKeyBuffer();
-            scriptPubKey = bitcoinjs.script.witnessPubKeyHash.output.encode(bitcoinjs.crypto.hash160(pubKey));
-
             return {
                 privateKey: privateKey,
-                address: bitcoinjs.address.fromOutputScript(scriptPubKey, network)
+                address: bitcoinjs.payments.p2wpkh({pubkey: ecPair.publicKey, network}).address
             };
-            break;
         default:
             throw ("given network is not a valid network");
     }
@@ -305,14 +299,14 @@ function findDerivationPathErrors(path, createXPUB, fromMasternode) {
         return "first charactar must be 'm' or a number, but is " + invalidFirstChar;
     }
 
-    if (fromMasternode && path[0] != 'm') {
+    if (fromMasternode && path[0] !== 'm') {
         return "First character must be 'm'";
-    } else if (!fromMasternode && path[0] == 'm') {
+    } else if (!fromMasternode && path[0] === 'm') {
         return 'The path starts at masternode, but the third param is set to false';
     }
 
     if (fromMasternode && path.length > 1) {
-        if (path[1] != '/') {
+        if (path[1] !== '/') {
             return "Separator must be '/'";
         }
         let indexes = path.split('/');
@@ -321,7 +315,7 @@ function findDerivationPathErrors(path, createXPUB, fromMasternode) {
         }
         for (let depth = 1; depth < indexes.length; depth++) {
             let index = indexes[depth];
-            let invalidChars = index.replace(/^[0-9]+'?$/g, "")
+            let invalidChars = index.replace(/^[0-9]+'?$/g, "");
             if (invalidChars.length > 0) {
                 return "Invalid characters " + invalidChars + " found at depth " + depth;
             }

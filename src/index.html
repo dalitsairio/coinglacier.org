@@ -534,6 +534,8 @@ Git Repo: https://github.com/dalitsairio/coinglacier.org.git
 
 <body>
 
+<script src="js/cleanStartup.js" inline></script>
+
 <div id="page-loader">
     <span class="title text-center">loading wallet generator</span>
     <div id="spinner-wrapper"><div class="loader"></div></div>
@@ -568,7 +570,7 @@ Git Repo: https://github.com/dalitsairio/coinglacier.org.git
             <h2 class="page-title">Decrypt Mnemonic</h2>
             <h2 class="page-title">Decrypt Private Key</h2>
             <nav id="mainmenu" class="navbar navbar-expand-md bg-dark">
-                <a class="navbar-brand" href="javascript:void(0);">
+                <div class="navbar-brand">
                     <span id="service-name" class="d-inline d-md-none d-lg-inline">COINGLACIER.ORG</span>
                     <img id="coinglacier-logo" alt="Logo" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+CjxzdmcKICAg
                     eG1sbnM6ZGM9Imh0dHA6Ly9wdXJsLm9yZy9kYy9lbGVtZW50cy8xLjEvIgogICB4bWxuczpjYz0iaHR0cDovL2NyZWF0aXZlY29tbW9ucy5vcmcvbnMjIgogICB4bWxuczpyZGY9Imh0dHA6Ly93d3cud
@@ -1168,7 +1170,7 @@ Git Repo: https://github.com/dalitsairio/coinglacier.org.git
                     wtMC4yNSAwLjI1LDAuODUgMCwwLjc2NyAwLjE0OSwyLjMzMyAwLjQ1LDQuNyAwLjE2NiwyLjA2NiAwLjAxNywzLjMgLTAuNDUsMy42OTkgLTAuNzY3LDAuNjY3IC0yLjYzNCwxLjg2NyAtNS42MDEsMy4
                     2MDEgMS43MzMsLTEuNjM0IDMuMTE3LC0zLjEzNCA0LjE1LC00LjUgMC42NjcsLTAuODM0IDEsLTEuODUxIDEsLTMuMDUgQyAzNC42NSwyMC44NSAzNC42MTYsMTkuOSAzNC42NSwxOS4zIFoiCiAgICAg
                     aW5rc2NhcGU6Y29ubmVjdG9yLWN1cnZhdHVyZT0iMCIgLz48L2c+PC9zdmc+Cg=="/>
-                </a>
+                </div>
                 <button class="navbar-toggler navbar-toggler-right navbar-light" type="button"
                         data-toggle="collapse" data-target="#navbarNav"
                         aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -1325,7 +1327,9 @@ Git Repo: https://github.com/dalitsairio/coinglacier.org.git
         <div id="actions">
             <button id="new-address" type="button" class="btn btn-dark btn-sm page-element single-wallet">New Address</button>
             <button id="new-mnemonic" type="button" class="btn btn-dark btn-sm page-element paper-wallet">New Mnemonic</button>
-            <button id="print-button" type="button" class="btn btn-dark btn-sm">Print</button>
+            <button id="print-button-loading" type="button" class="btn btn-dark btn-sm loading-button" disabled="disabled"><span class="micro-loader"></span>Print</button>
+            <button id="print-button-disabled" type="button" class="btn btn-dark btn-sm loading-button" disabled="disabled">Print</button>
+            <button id="print-button-enabled" type="button" class="btn btn-dark btn-sm loading-button" style="display: none">Print</button>
             <div style="clear: both;"></div>
         </div>
 
@@ -1477,11 +1481,15 @@ Git Repo: https://github.com/dalitsairio/coinglacier.org.git
             <div id="donations-wrapper">
                 <span id="donations-title">Donations</span>
                 <span id="donations-addresses-wrapper">
-                    <a id="donations-segwit-qr-icon" href="javascript:void(0);"><span class="qr-code-icon"></span></a>
-                    <span id="donation-address-segwit">33LZB4qMyDxUetAeTq3xdkVeYv9XELixSp</span>
-                    <br />
                     <a id="donations-bech32-qr-icon" href="javascript:void(0);"><span class="qr-code-icon"></span></a>
                     <span id="donation-address-bech32">bc1qays4mkrv653l3hg0nydkxz5r2u4jajvuqwmjrq</span>
+                    <br />
+                    <span id="donations-tippin">
+                        ⚡ Lightning:
+                        <a href="https://tippin.me/@DalitSairio" target="_blank">
+                            https://tippin.me/@DalitSairio
+                        </a>
+                    </span>
                 </span>
             </div>
             <div style="clear: both;"></div>
@@ -1543,9 +1551,6 @@ Git Repo: https://github.com/dalitsairio/coinglacier.org.git
                 </div>
                 <div id="mocha"></div>
             </div>
-            <div id="donation-segwit-qr-wrapper" class="footer-window" style="display:none;">
-                <canvas id="canvas-donations-segwit"></canvas>
-            </div>
             <div id="donation-bech32-qr-wrapper" class="footer-window" style="display:none;">
                 <canvas id="canvas-donations-bech32"></canvas>
             </div>
@@ -1564,7 +1569,7 @@ Git Repo: https://github.com/dalitsairio/coinglacier.org.git
                data-content="<div class='normal-popover'>
                Fingerprint:<br />
                12A2 411A 8C5C C035 6DDB 767C 24B0 274E 5B6C A8B1</div>"
-               href="https://coinglacier.org/coinglacier-gpg-key.txt" target="_blank">PGP</a>
+               href="https://coinglacier.org/coinglacier-pgp-key.txt" target="_blank">PGP</a>
             (<a id="pgp-signature" href="javascript:void(0);" target="_blank">Signature</a>)
         </div>
     </div>

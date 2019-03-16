@@ -116,7 +116,7 @@ header {
     }
 
     #privkey-dec-key {
-        font-size: 0.8rem;
+        font-size: 0.7rem;
         font-family: monospace;
     }
 }
@@ -206,7 +206,6 @@ header {
             }
 
             .keep-secret {
-                font-size: 1rem;
                 font-size: 0.95rem;
             }
         }
@@ -232,6 +231,7 @@ footer, .testnet footer {
 		color: #fff;
 		font-size: 1.6rem;
         text-decoration: none;
+        font-family: sans-serif;
 
         &.warning {
             color: #ff7820;
