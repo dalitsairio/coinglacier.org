@@ -1083,7 +1083,9 @@ function Wallet() {
 
             self.load(mnemonic);
 
-            cb();
+            if (cb && typeof cb === 'function') {
+                cb();
+            }
         });
     };
 
