@@ -1,6 +1,6 @@
 # 1.1.0
 -------------------------------------
-date: 2019-03-06
+date: 2019-03-06  
 SHA256 checksum: 45288e949fb491f8833971edd4e42665cf1a619b6712114c2ecb14c5970ce218
 * UI improvements
     * Always reset view on opening of HTML file
