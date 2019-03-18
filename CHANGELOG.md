@@ -1,3 +1,10 @@
+# 1.1.1
+-------------------------------------
+date: 2019-03-19  
+SHA256 checksum: 9d0836a2b43a1661190146762786b3a21956c8192e57f6b18fa666a1266b47da
+* Bugfix: Remove error messages in JS console on creation of new wallets
+* Bugfix: Fixed critical error when switching pages: Keypairs may be derived from mnemonic with password, even though the UI suggests there was no password used.
+
 # 1.1.0
 -------------------------------------
 date: 2019-03-06  
