@@ -494,7 +494,7 @@ function PageManagement() {
         mnemonicDecryption.resetPage();
         privkeyDecryption.resetPage();
         this.initPage(newPage);
-        wallet.load();
+        wallet.init();
     };
 
     const changePageElements = () => {
@@ -1081,7 +1081,7 @@ function Wallet() {
             DOM.pageLoader.hide();
             DOM.root.show();
 
-            self.load(mnemonic);
+            self.load();
 
             if (cb && typeof cb === 'function') {
                 cb();
