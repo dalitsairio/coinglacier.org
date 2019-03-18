@@ -49,12 +49,12 @@ For extra credit you can validate the key's authenticity on [keybase.io](https:/
 
 Download the HTML file and the corresponding PGP signature from coinglacier.org
 ```sh
-wget https://coinglacier.org/coinglacier.org_v1.1.0_SHA256-45288e949fb491f8833971edd4e42665cf1a619b6712114c2ecb14c5970ce218.html https://coinglacier.org/coinglacier.org_v1.1.0_SHA256-45288e949fb491f8833971edd4e42665cf1a619b6712114c2ecb14c5970ce218.html.asc
+wget https://coinglacier.org/coinglacier.org_v1.1.1_SHA256-9d0836a2b43a1661190146762786b3a21956c8192e57f6b18fa666a1266b47da.html https://coinglacier.org/coinglacier.org_v1.1.1_SHA256-9d0836a2b43a1661190146762786b3a21956c8192e57f6b18fa666a1266b47da.html.asc
 ```
 
 Proof the authenticity of the HTML file by verifying its signature.
 ```sh
-gpg --verify coinglacier.org_v1.1.0_SHA256-45288e949fb491f8833971edd4e42665cf1a619b6712114c2ecb14c5970ce218.html.asc
+gpg --verify coinglacier.org_v1.1.1_SHA256-9d0836a2b43a1661190146762786b3a21956c8192e57f6b18fa666a1266b47da.html.asc
 ```
 *If the verification fails, immediately stop the process. Somebody is trying to trick you.*
 
@@ -63,7 +63,7 @@ You can now disconnect your machine from the internet and use the application of
 
 ### Using the coinglacier.org application
 After having installed coinglacier.org on a trustworthy machine, disconnect your machine from the internet.
-Open coinglacier.org_v1.1.0_SHA256-45288e949fb491f8833971edd4e42665cf1a619b6712114c2ecb14c5970ce218.html in the incognito mode of your trustworthy browser.<br />
+Open coinglacier.org_v1.1.1_SHA256-9d0836a2b43a1661190146762786b3a21956c8192e57f6b18fa666a1266b47da.html in the incognito mode of your trustworthy browser.<br />
 To create safe wallets, print your created wallets but *do not* store any file anywhere digitally. The idea is that your confidential data is *only* stored offline, not digitally, for example on paper.<br />
 If you print the keys, make sure the printer you are using does not store any data you send to it or transmit it to any other device/service.
 This also applies to any other device your machine may be connected to.<br />
