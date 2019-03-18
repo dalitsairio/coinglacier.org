@@ -1,12 +1,10 @@
 # 1.1.1
--------------------------------------
 date: 2019-03-19  
 SHA256 checksum: 9d0836a2b43a1661190146762786b3a21956c8192e57f6b18fa666a1266b47da
 * Bugfix: Remove error messages in JS console on creation of new wallets
 * Bugfix: Fixed critical error when switching pages: Keypairs may be derived from mnemonic with password, even though the UI suggests there was no password used.
 
 # 1.1.0
--------------------------------------
 date: 2019-03-06  
 SHA256 checksum: 45288e949fb491f8833971edd4e42665cf1a619b6712114c2ecb14c5970ce218
 * UI improvements
@@ -18,7 +16,6 @@ SHA256 checksum: 45288e949fb491f8833971edd4e42665cf1a619b6712114c2ecb14c5970ce21
 * Enable donations over Lightning
 
 # 1.0.0
--------------------------------------
 date: 2018-06-12  
 SHA256 checksum: 53b04fc126ce2f4b814d0994359e6992a2982218c2048d58c5249fc5df586fb5
 * Initial release

@@ -325,7 +325,6 @@ gulp.task('build:update-changelog', function () {
     ];
 
     let newEntry = '# ' + getVersion() +
-        '\n-------------------------------------' +
         '\ndate: ' + date.join('-') + '  ' +
         '\nSHA256 checksum: ' + getSha256sum() +
         '\n* ADD' +
