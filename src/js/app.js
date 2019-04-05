@@ -323,7 +323,7 @@ DOM.decMnemonic.pass.change(mnemonicDecryption.passwordChanged);
 DOM.decMnemonic.hidePass.click(mnemonicDecryption.togglePwVisibility);
 
 // Decrypt private key page
-DOM.decPriv.privKey.change(privkeyDecryption.encrypedPrivkeyChanged);
+DOM.decPriv.privKey.change(privkeyDecryption.encryptedPrivkeyChanged);
 DOM.decPriv.pass.change(privkeyDecryption.passwordChanged);
 DOM.decPriv.hidePass.click(privkeyDecryption.togglePwVisibility);
 DOM.decPriv.checkTestnet.click(privkeyDecryption.checkTestnet);
@@ -516,7 +516,7 @@ function PageManagement() {
 
 
 // //////////////////////////////////////////////////
-// Switch beetween mainnet and testnet
+// Switch between mainnet and testnet
 // //////////////////////////////////////////////////
 
 function SwitchNetwork() {
@@ -807,7 +807,7 @@ function MnemonicDecryption() {
 
 function PrivkeyDecryption() {
 
-    this.encrypedPrivkeyChanged = () => {
+    this.encryptedPrivkeyChanged = () => {
         formCheck.validateInput(verifyPrivKey(), DOM.decPriv.privKey);
         // When privKey changes, password could theoretically be correct now, even if it was wrong before.
         // Hence, the password validation needs to be reset for the next decryption.
@@ -1004,7 +1004,7 @@ function SecurityChecks() {
         if(allTests){
             DOM.footer.securityChecks.mocha.encryptionDialog.hide();
         }
-        bitcoinLoader.runUnitTests(allTests, onUnittestsSuccesful, onUnittestsFailed);
+        bitcoinLoader.runUnitTests(allTests, onUnittestsSuccessful, onUnittestsFailed);
     };
 
     this.reloadAndRunAllTests = () => {
@@ -1020,7 +1020,7 @@ function SecurityChecks() {
         domElement.addClass('warning');
     };
 
-    const onUnittestsSuccesful = () => {
+    const onUnittestsSuccessful = () => {
         DOM.footer.securityChecks.mocha.title.html('Unit tests successful');
         DOM.footer.securityChecks.mocha.title.addClass('success');
         onSuccess(DOM.footer.securityChecks.unittests);
