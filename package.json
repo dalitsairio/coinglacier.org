@@ -47,7 +47,7 @@
     "gulp-replace": "^1.0.0",
     "gulp-sass": "^4.0.2",
     "gulp-sourcemaps": "^2.6.5",
-    "gulp-uglify": "^3.0.2",
+    "gulp-uglify-es": "^1.0.4",
     "jquery": "^3.3.1",
     "mocha": "^6.0.2",
     "more-entropy": "0.0.7",

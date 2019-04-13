@@ -45,23 +45,23 @@ function WorkerPool (){
         for (let index = 0; index < pool.length; index++) {
             resetWorker(pool[index]);
         }
-    }
+    };
 
     this.addToQueue = (callData, callback) => {
         queue.push({callData: callData, callback: callback});
-    }
+    };
 
 
     const getElementFromQueue = () => queue.shift();
-    const clearQueue = () => { queue = []; }
+    const clearQueue = () => { queue = []; };
 
     const createWorker = () => {
 
         let workerCode = 'WORKER_CODE_PLACEHOLDER'; // is replaced with actual JS code by gulp task
         let blob = new Blob([workerCode], {type: 'application/javascript'});
 
-        return new Worker(URL.createObjectURL(blob));;
-    }
+        return new Worker(URL.createObjectURL(blob));
+    };
 
     const getFreeWorkerIndex = () => {
         for (let index = 0; index < amountOfWorkers; index++) {
@@ -70,7 +70,7 @@ function WorkerPool (){
             }
         }
         return false;
-    }
+    };
 
     const serveQueue = () => {
 
@@ -92,7 +92,7 @@ function WorkerPool (){
                 runWorker(workerIndex, getElementFromQueue());
             }
         }, 100);
-    }
+    };
 
     const runWorker = (workerIndex, task) => {
         pool[workerIndex].worker.onmessage = function (e) {
@@ -102,7 +102,7 @@ function WorkerPool (){
 
         pool[workerIndex].state = workerState.busy;
         pool[workerIndex].worker.postMessage(JSON.stringify(task.callData));
-    }
+    };
 
     const resetWorker = (workerObj) => {
         if (workerObj.state === workerState.busy) {
@@ -140,7 +140,7 @@ function BitcoinLoader() {
             bip32RootKey = resultRootKey;
             cb(mnemonic, bip32RootKey);
         });
-    }
+    };
 
     this.getMnemonic = () => mnemonic;
 
@@ -157,7 +157,7 @@ function BitcoinLoader() {
             cache[networkID][index] = bitcoin.createAccount(bip32RootKey, networkID, index)
         }
         callback(cache[networkID][index]);
-    }
+    };
 
     this.asyncCreateCredentials = (networkID, accountIndex, addressIndex, encryption, callback) => {
 
@@ -191,7 +191,7 @@ function BitcoinLoader() {
                 let processResult = (credentials) => {
                     cache[networkID][accountIndex].credentials[encryption.password][addressIndex] = credentials;
                     callback(credentials);
-                }
+                };
 
                 if (encryption.password && encryption.bip38encrypt) {
                     runPrivateKeyEncryption(function (credentialsEncrypted){
@@ -203,7 +203,7 @@ function BitcoinLoader() {
             }, 0);
         });
 
-    }
+    };
 
     this.interrupt = () => workerPool.interruptWorkers();
 
@@ -220,10 +220,10 @@ function BitcoinLoader() {
         let onResponse = (response) => {
             credentials.privateKey = response;
             cb(credentials);
-        }
+        };
 
         workerPool.addToQueue(callData, onResponse);
-    }
+    };
 
     const runPrivateKeyDecryption = (encryptedPrivKey, password, success, failure) => {
 
@@ -244,10 +244,10 @@ function BitcoinLoader() {
             } else {
                 success(JSON.parse(response));
             }
-        }
+        };
 
         workerPool.addToQueue(callData, onResponse);
-    }
+    };
 
     this.getCredentialsFromEncryptedPrivKey = (encryptedPrivKey, password, testnet, success, otherNetwork, failure) => {
 
@@ -262,11 +262,11 @@ function BitcoinLoader() {
                 let credentials = processPrivKeyDecryptionResult(result, testnet, success, otherNetwork, failure);
                 // cache the result
                 bip38cache[encryptedPrivKey][password][testnet] = credentials;
-            }
+            };
 
             runPrivateKeyDecryption(encryptedPrivKey, password, cb, failure);
         }
-    }
+    };
 
     const processPrivKeyDecryptionResult = (result, testnet, success, otherNetwork, failure) => {
 
@@ -283,7 +283,7 @@ function BitcoinLoader() {
                 failure();
             }
         }
-    }
+    };
 
     const getCredentialsFromBIP38Result = (result, testnet) => {
         let decrypted = testnet ? result.testnet : result.mainnet;
@@ -291,7 +291,7 @@ function BitcoinLoader() {
         let salt = Uint8Array.from(decrypted.salt.data);
 
         return bitcoin.getCredentialsFromPrivKeyAndSalt(privKey, salt, testnet);
-    }
+    };
 
     // //////////////////////////////////////////////////
     // Unit Tests

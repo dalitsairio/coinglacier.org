@@ -1,4 +1,4 @@
-var bip38 = require('./bip38encryption');
+const bip38 = require('./bip38encryption');
 
 function encrypt(input) {
     return bip38.encryptPrivKey(input.privateKey, input.password, input.address);
@@ -15,7 +15,7 @@ function decrypt(input) {
 
 onmessage = function(e) {
 
-    var input = JSON.parse(e.data);
+    let input = JSON.parse(e.data);
 
     switch(input.mode) {
         case 'encrypt':

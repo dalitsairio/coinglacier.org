@@ -153,7 +153,7 @@ apt install git nodejs npm
 
 Install Gulp 4 globally
 ```sh
-npm install -g gulp@next
+npm install -g gulp
 ```
 
 Download coinglacier.org

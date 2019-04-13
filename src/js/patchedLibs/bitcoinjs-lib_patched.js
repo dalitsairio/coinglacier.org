@@ -1,4 +1,4 @@
-var bitcoinjs = require('bitcoinjs-lib');
+const bitcoinjs = require('bitcoinjs-lib');
 
 // extensions copied from https://github.com/iancoleman/bip39/blob/master/src/js/segwit-parameters.js
 (function() {
@@ -72,4 +72,4 @@ bitcoinjs.networks.testnet.p2wpkhInP2sh = {
 
 module.exports = {
     bitcoinjs
-}
+};
